@@ -786,7 +786,6 @@
             "Abu Majed": { pass: "m54d23f74", role: "D-2", loggedIn: false, loginTime: null, lastLogout: "---" },
             "Ahmed_D3": { pass: "mdf", role: "D-3", loggedIn: false, loginTime: null, lastLogout: "---" },
             "Nerf": { pass: "m14d27f99", role: "L-1", loggedIn: false, loginTime: null, lastLogout: "---" },
-            // حساب القائد المخصص (يفتح صفحة المهام / الدورات حصراً)
             "leader": { pass: "L483D@r200", role: "Leader", loggedIn: false, loginTime: null, lastLogout: "---", isLeaderPortalOnly: true }
         };
 
@@ -924,10 +923,29 @@
         }
 
         function parseCSV(text) {
-            const rows = text.split("\n").map(r => r.split(","));
+            const lines = text.split("\n");
             csvData = [];
-            for(let i = 1; i < rows.length; i++) {
-                let r = rows[i];
+            for(let i = 1; i < lines.length; i++) {
+                let line = lines[i].trim();
+                if(!line) continue;
+                
+                let r = [];
+                let inQuotes = false;
+                let currentVal = "";
+                
+                for(let c = 0; c < line.length; c++) {
+                    let char = line[c];
+                    if(char === '"') {
+                        inQuotes = !inQuotes;
+                    } else if(char === ',' && !inQuotes) {
+                        r.push(currentVal);
+                        currentVal = "";
+                    } else {
+                        currentVal += char;
+                    }
+                }
+                r.push(currentVal);
+
                 if(r.length >= 3) {
                     let nameVal = r[4] ? r[4].trim() : "";
                     let idVal = r[5] ? r[5].trim() : "";
@@ -1031,7 +1049,6 @@
         }
 
         function switchPage(pageId, element) {
-            // إذا كان المستخدم الحالي هو حساب الـ leader، نمنعه تماماً من فتح أي صفحة غير صفحة المهام (courses)
             if(accounts[currentUser].isLeaderPortalOnly && pageId !== 'courses') {
                 return;
             }
@@ -1056,18 +1073,15 @@
                 document.getElementById('currentRoleDisplay').innerText = accounts[user].role;
 
                 if(accounts[user].isLeaderPortalOnly) {
-                    // إخفاء بقية الأقسام من القائمة الجانبية تماماً لحساب الليدر
                     document.getElementById('menuHome').style.display = 'none';
                     document.getElementById('menuLoginTracker').style.display = 'none';
                     document.getElementById('menuMembers').style.display = 'none';
                     document.getElementById('menuInventory').style.display = 'none';
                     document.getElementById('menuSoldierWeek').style.display = 'none';
                     
-                    // توجيهه حصراً لصفحة المهام (courses)
                     document.getElementById('menuCourses').style.display = 'flex';
                     switchPage('courses', document.getElementById('menuCourses'));
                 } else {
-                    // إظهار كافة الأقسام للحسابات الإدارية الأخرى
                     document.getElementById('menuHome').style.display = 'flex';
                     document.getElementById('menuLoginTracker').style.display = 'flex';
                     document.getElementById('menuMembers').style.display = 'flex';
