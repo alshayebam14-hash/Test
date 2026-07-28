@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة تحكم وزارة الدفاع - Grave RP</title>
+    <!-- مكتبة الأيقونات FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- الخط العربي -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0f1117;
+            --bg-card: #161b22;
+            --bg-sidebar: #11151c;
+            --border-color: #30363d;
+            --accent-gold: #d4af37;
+            --accent-gold-hover: #b3922f;
+            --text-main: #f0f6fc;
+            --text-muted: #8b949e;
+            --danger: #f85149;
+            --success: #2ea043;
+            --sidebar-width: 260px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* شاشة تسجيل الدخول */
+        #loginOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(15, 17, 23, 0.95);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .login-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            padding: 40px;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+            text-align: center;
+        }
+
+        .login-card h2 {
+            color: var(--accent-gold);
+            margin-bottom: 25px;
+            font-size: 1.5rem;
+        }
+
+        .login-input {
+            width: 100%;
+            padding: 12px 15px;
+            margin-bottom: 15px;
+            background: var(--bg-dark);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-main);
+            font-size: 1rem;
+        }
+
+        .login-input:focus {
+            border-color: var(--accent-gold);
+            outline: none;
+        }
+
+        /* القائمة الجانبية */
+        aside {
+            width: var(--sidebar-width);
+            background-color: var(--bg-sidebar);
+            border-left: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            z-index: 10;
+        }
+
+        .sidebar-brand {
+            padding: 20px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--accent-gold);
+            border-bottom: 1px solid var(--border-color);
+            text-align: center;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 15px 10px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .sidebar-menu .menu-item {
+            padding: 12px 15px;
+            margin-bottom: 5px;
+            border-radius: 6px;
+            cursor: pointer;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+        }
+
+        .sidebar-menu .menu-item:hover, 
+        .sidebar-menu .menu-item.active {
+            background-color: rgba(212, 175, 55, 0.1);
+            color: var(--accent-gold);
+        }
+
+        .sidebar-menu .menu-item i {
+            width: 20px;
+            text-align: center;
+        }
+
+        /* المحتوى الرئيسي */
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        header {
+            height: 70px;
+            background-color: var(--bg-card);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 30px;
+        }
+
+        .header-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .header-user {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .content-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 25px;
+            background-color: var(--bg-dark);
+        }
+
+        .page-section {
+            display: none;
+        }
+
+        .page-section.active {
+            display: block;
+        }
+
+        /* البطاقات والإحصائيات */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-card h3 {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .stat-card .number {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent-gold);
+        }
+
+        /* الجداول */
+        .table-responsive {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow-x: auto;
+            margin-bottom: 25px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: right;
+            white-space: nowrap;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.9rem;
+        }
+
+        th {
+            background-color: rgba(22, 27, 34, 0.8);
+            color: var(--accent-gold);
+            font-weight: 600;
+        }
+
+        tr:hover td {
+            background-color: rgba(255, 255, 255, 0.02);
+        }
+
+        /* الأزرار ونماذج الإدخال */
+        .btn {
+            background-color: var(--accent-gold);
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .btn:hover {
+            background-color: var(--accent-gold-hover);
+        }
+
+        .btn-danger {
+            background-color: var(--danger);
+            color: #fff;
+        }
+
+        .btn-danger:hover {
+            background-color: #da3633;
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        /* قسم عسكري الأسبوع - الكارت الخاص */
+        .paint-soldier-card {
+            background: linear-gradient(135deg, #11151c 0%, #1a212d 100%);
+            border: 2px solid var(--accent-gold);
+            border-radius: 16px;
+            padding: 30px;
+            max-width: 450px;
+            margin: 30px auto;
+            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .paint-card-top-right {
+            text-align: right;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+            border-bottom: 1px dashed var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        .paint-card-avatar-section {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .paint-card-circle-avatar {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background: var(--bg-dark);
+            border: 3px solid var(--accent-gold);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2.2rem;
+            color: var(--accent-gold);
+            z-index: 2;
+        }
+
+        .paint-card-curved-line {
+            position: absolute;
+            width: 80%;
+            height: 2px;
+            background: var(--accent-gold);
+            top: 50%;
+            z-index: 1;
+            opacity: 0.3;
+        }
+
+        .paint-card-bottom-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 10px;
+            padding: 12px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
+
+        .paint-metric-title {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .paint-metric-val {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .center-total {
+            border-right: 1px solid var(--border-color);
+            border-left: 1px solid var(--border-color);
+        }
+
+        /* تنسيق أقسام الجرد والدورات */
+        .inv-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .inv-tab-btn {
+            background: var(--bg-card);
+            color: var(--text-muted);
+            border: 1px solid var(--border-color);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .inv-tab-btn.active {
+            background: var(--accent-gold);
+            color: #000;
+            border-color: var(--accent-gold);
+        }
+
+        .inv-section { display: none; }
+        .inv-section.active { display: block; }
+    </style>
+</head>
+<body>
+
+    <!-- نافذة تسجيل الدخول -->
+    <div id="loginOverlay">
+        <div class="login-card">
+            <h2>تسجيل الدخول - Grave RP</h2>
+            <input type="text" id="usernameInput" class="login-input" placeholder="اسم المستخدم أو الآيدي">
+            <input type="password" id="passwordInput" class="login-input" placeholder="كلمة المرور">
+            <button class="btn" style="width:100%;" onclick="handleLogin()">دخول للوحة</button>
+            <p id="loginError" style="color:var(--danger); margin-top:10px; font-size:0.85rem; display:none;">الرجاء التأكد من البيانات المدخلة.</p>
+        </div>
+    </div>
+
+    <!-- القائمة الجانبية -->
+    <aside>
+        <div class="sidebar-brand">Grave RP | وزارة الدفاع</div>
+        <ul class="sidebar-menu">
+            <li class="menu-item active" onclick="switchPage('members', this)"><i class="fa-solid fa-users"></i> إدارة المنسوبين</li>
+            <li class="menu-item" onclick="switchPage('inventory', this)"><i class="fa-solid fa-boxes-stacked"></i> نظام الجرد المجمع</li>
+            <li class="menu-item" onclick="switchPage('courses', this)"><i class="fa-solid fa-graduation-cap"></i> إدارة الدورات العسكرية</li>
+            <li class="menu-item" onclick="switchPage('soldier_week', this)"><i class="fa-solid fa-award"></i> عسكري الأسبوع</li>
+            <li class="menu-item" onclick="switchPage('login_tracker', this)"><i class="fa-solid fa-shield-halved"></i> تتبع الجلسات والصلاحيات</li>
+        </ul>
+    </aside>
+
+    <!-- المحتوى الرئيسي -->
+    <main>
+        <header>
+            <div class="header-title" id="headerTitle">لوحة التحكم المركزية</div>
+            <div class="header-user">
+                <span style="font-size:0.9rem; color: var(--text-muted);">المستخدم: <strong id="currentRoleDisplay" style="color: var(--accent-gold);">Owner</strong></span>
+                <button class="btn btn-danger" style="padding: 5px 12px; font-size: 0.8rem;" onclick="logout()">خروج</button>
+            </div>
+        </header>
+
+        <div class="content-area">
+
+            <!-- 1. صفحة إدارة المنسوبين -->
+            <div id="members" class="page-section active">
+                <div class="stats-grid">
+                    <div class="stat-card" onclick="filterMembers('ALL')" style="cursor: pointer;">
+                        <h3>إجمالي المنسوبين</h3>
+                        <div class="number" id="count-ALL">0</div>
+                    </div>
+                    <div class="stat-card" onclick="filterMembers('L')" style="cursor: pointer;">
+                        <h3>القيادة (L)</h3>
+                        <div class="number" id="count-L">0</div>
+                    </div>
+                    <div class="stat-card" onclick="filterMembers('M')" style="cursor: pointer;">
+                        <h3>الإدارة الوسطى (M)</h3>
+                        <div class="number" id="count-M">0</div>
+                    </div>
+                    <div class="stat-card" onclick="filterMembers('R')" style="cursor: pointer;">
+                        <h3>الأفراد (R)</h3>
+                        <div class="number" id="count-R">0</div>
+                    </div>
+                </div>
+
+                <div class="toolbar">
+                    <button class="btn" onclick="fetchSheetData(true)"><i class="fa-solid fa-rotate"></i> تحديث البيانات</button>
+                    <input type="text" id="memberSearchInput" class="login-input" placeholder="بحث بالآيدي أو الاسم..." style="margin:0; max-width:250px;" oninput="filterMembersTableBySearch()">
+                    <span id="refreshStatus" style="color: var(--text-muted); font-size: 0.85rem;"></span>
+                </div>
+
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>الرتبة</th>
+                                <th>ديسكورد</th>
+                                <th>الاسم</th>
+                                <th>ID</th>
+                                <th>الكود</th>
+                                <th>المسمى</th>
+                                <th>السجلات</th>
+                                <th>الإعلانات</th>
+                                <th>الملاحظات</th>
+                                <th>الإنذارات</th>
+                                <th>تاريخ الترقية</th>
+                                <th>ملاحظة يدوية</th>
+                                <th>الإجازة</th>
+                            </tr>
+                        </thead>
+                        <tbody id="membersTableBody">
+                            <tr><td colspan="13" style="text-align: center;">جاري تحميل البيانات...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 2. صفحة نظام الجرد الشامل -->
+            <div id="inventory" class="page-section">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
+                    <div class="inv-tabs">
+                        <button class="inv-tab-btn active" onclick="switchInvTab('logs_ads', this)">السجلات والإعلانات</button>
+                        <button class="inv-tab-btn" onclick="switchInvTab('ops', this)">العمليات</button>
+                        <button class="inv-tab-btn" onclick="switchInvTab('acceptance', this)">القبول</button>
+                    </div>
+                    <!-- إدارة الأسابيع -->
+                    <div style="display: flex; gap: 10px; align-items: center; background: var(--bg-card); padding: 8px 15px; border-radius: 6px; border: 1px solid var(--border-color);">
+                        <input type="text" id="newWeekInputInv" class="login-input" placeholder="اسم أسبوع جديد" style="margin:0; width:150px; padding: 6px;">
+                        <button class="btn" style="padding: 6px 12px;" onclick="addNewWeekFrom('Inv')">إضافة أسبوع</button>
+                        <select id="deleteWeekSelectInv" class="login-input" style="margin:0; width:130px; padding: 6px;"></select>
+                        <button class="btn btn-danger" style="padding: 6px 12px;" onclick="deleteSelectedWeekFrom('Inv')">حذف أسبوع</button>
+                    </div>
+                </div>
+
+                <!-- جرد السجلات والإعلانات -->
+                <div id="inv_logs_ads" class="inv-section active">
+                    <div style="background: var(--bg-card); padding: 20px; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 20px;">
+                        <h3 style="color: var(--accent-gold); margin-bottom: 10px; font-size:1rem;">إدخال مجمع (ID, السجلات, الإعلانات)</h3>
+                        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                            <select id="autoWeekLogsAds" class="login-input" style="margin:0; max-width:200px;" onchange="renderInventoryTables()"></select>
+                        </div>
+                        <textarea id="bulkLogsAdsText" class="login-input" style="height: 100px; resize: vertical;" placeholder="مثال:&#10;779, 15, 2&#10;812, 10, 1"></textarea>
+                        <button class="btn" onclick="processInventoryData('logs_ads')">معالجة وإضافة للجرد</button>
+                    </div>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr><th>الأسبوع</th><th>ID</th><th>الرتبة</th><th>الاسم</th><th>السجلات</th><th>الإعلانات</th><th>الإجراء</th></tr>
+                            </thead>
+                            <tbody id="tableLogsAds">
+                                <tr><td colspan="7" style="text-align: center;">لا توجد بيانات مسجلة</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- جرد العمليات -->
+                <div id="inv_ops" class="inv-section">
+                    <div style="background: var(--bg-card); padding: 20px; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 20px;">
+                        <h3 style="color: var(--accent-gold); margin-bottom: 10px; font-size:1rem;">إدخال مجمع عمليات (ID, عدد العمليات)</h3>
+                        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                            <select id="autoWeekOps" class="login-input" style="margin:0; max-width:200px;" onchange="renderInventoryTables()"></select>
+                        </div>
+                        <textarea id="bulkOpsText" class="login-input" style="height: 100px; resize: vertical;" placeholder="مثال:&#10;779, 5&#10;812, 3"></textarea>
+                        <button class="btn" onclick="processInventoryData('ops')">معالجة وإضافة للجرد</button>
+                    </div>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr><th>الأسبوع</th><th>ID</th><th>الرتبة</th><th>الاسم</th><th>العمليات</th><th>الإجراء</th></tr>
+                            </thead>
+                            <tbody id="tableOps">
+                                <tr><td colspan="6" style="text-align: center;">لا توجد بيانات مسجلة</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- جرد القبول -->
+                <div id="inv_acceptance" class="inv-section">
+                    <div style="background: var(--bg-card); padding: 20px; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 20px;">
+                        <h3 style="color: var(--accent-gold); margin-bottom: 10px; font-size:1rem;">إدخال مجمع قبول (ID, الحالة/النقاط)</h3>
+                        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                            <select id="autoWeekAcceptance" class="login-input" style="margin:0; max-width:200px;" onchange="renderInventoryTables()"></select>
+                        </div>
+                        <textarea id="bulkAcceptanceText" class="login-input" style="height: 100px; resize: vertical;" placeholder="مثال:&#10;779, مقبول&#10;812, ممتاز"></textarea>
+                        <button class="btn" onclick="processInventoryData('acceptance')">معالجة وإضافة للجرد</button>
+                    </div>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr><th>الأسبوع</th><th>ID</th><th>الرتبة</th><th>الاسم</th><th>حالة القبول</th><th>الإجراء</th></tr>
+                            </thead>
+                            <tbody id="tableAcceptance">
+                                <tr><td colspan="6" style="text-align: center;">لا توجد بيانات مسجلة</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. صفحة إدارة الدورات العسكرية -->
+            <div id="courses" class="page-section">
+                <div style="background: var(--bg-card); border: 1px solid var(--border-color); padding: 25px; border-radius: 8px; margin-bottom: 25px;">
+                    <h3 style="color: var(--accent-gold); margin-bottom: 15px; font-size: 1.1rem;">استعلام وتحديث دورات المنسوب</h3>
+                    <div style="display: flex; gap: 15px; flex-wrap: wrap; align-items: center; margin-bottom: 20px;">
+                        <select id="courseMemberSelect" class="login-input" style="margin:0; flex:1; min-width: 250px;" onchange="onCourseMemberSelected()">
+                            <option value="">اختر العسكري...</option>
+                        </select>
+                        <input type="text" id="courseSearchId" class="login-input" placeholder="بحث سريع بالآيدي" style="margin:0; width: 180px;" oninput="filterCourseDropdownById()">
+                    </div>
+                    <div id="courseMemberDetailBox" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; background: var(--bg-dark); padding: 15px; border-radius: 6px; border: 1px solid var(--border-color);">
+                        <div>الرتبة: <span id="courseViewRank" style="color: var(--accent-gold);">-</span></div>
+                        <div>الاسم: <span id="courseViewName" style="color: var(--accent-gold);">-</span></div>
+                        <div>الآيدي: <span id="courseViewId" style="color: var(--accent-gold);">-</span></div>
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div style="background: var(--bg-card); padding: 20px; border-radius: 8px; border: 1px solid var(--border-color);">
+                        <h4 style="color: var(--danger); margin-bottom: 12px;">الدورات الغير حاصل عليها</h4>
+                        <div id="missingCoursesList" style="display: flex; flex-direction: column; gap: 8px;">
+                            <span style="color: var(--text-muted); font-size: 0.85rem;">الرجاء اختيار عسكري أولاً</span>
+                        </div>
+                    </div>
+                    <div style="background: var(--bg-card); padding: 20px; border-radius: 8px; border: 1px solid var(--border-color);">
+                        <h4 style="color: var(--success); margin-bottom: 12px;">الدورات المجتازة</h4>
+                        <div id="earnedCoursesList" style="display: flex; flex-direction: column; gap: 8px;">
+                            <span style="color: var(--text-muted); font-size: 0.85rem;">الرجاء اختيار عسكري أولاً</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. صفحة عسكري الأسبوع وتتويجه -->
+            <div id="soldier_week" class="page-section">
+                <div style="background: var(--bg-card); border: 1px solid var(--border-color); padding: 25px; border-radius: 8px; margin-bottom: 25px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
+                        <div style="display: flex; gap: 15px; align-items: center;">
+                            <label style="font-weight: 600;">اختر الأسبوع:</label>
+                            <select id="selectWeekSoldier" class="login-input" style="margin:0; width: 180px;" onchange="renderSoldierOfWeek()"></select>
+                        </div>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <input type="text" id="newWeekInputSoldier" class="login-input" placeholder="أسبوع جديد" style="margin:0; width:130px; padding:6px;">
+                            <button class="btn" style="padding: 6px 12px;" onclick="addNewWeekFrom('Soldier')">إضافة</button>
+                            <select id="deleteWeekSelectSoldier" class="login-input" style="margin:0; width:120px; padding:6px;"></select>
+                            <button class="btn btn-danger" style="padding: 6px 12px;" onclick="deleteSelectedWeekFrom('Soldier')">حذف</button>
+                        </div>
+                    </div>
+
+                    <h3 style="color: var(--accent-gold); font-size: 1rem; margin-bottom: 10px;">اختر عسكري الأسبوع لهذا الأسبوع</h3>
+                    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                        <select id="selectWinnerSoldier" class="login-input" style="margin:0; flex:1; min-width: 250px;">
+                            <option value="">اختر العسكري الفائز...</option>
+                        </select>
+                        <button class="btn" onclick="saveSoldierOfWeekWinner()">اعتماد وتثبيت الفائز</button>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>الأسبوع</th>
+                                <th>ID</th>
+                                <th>الرتبة</th>
+                                <th>الاسم</th>
+                                <th>مجموع النقاط / الأداء</th>
+                                <th>الإجراء</th>
+                            </tr>
+                        </thead>
+                        <tbody id="soldierCandidatesTableBody">
+                            <tr><td colspan="6" style="text-align: center;">الرجاء اختيار الأسبوع لعرض المرشحين</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- عرض كارت عسكري الأسبوع المطابق للتصميم المطلوب -->
+                <div id="soldierWeekCardContainer"></div>
+            </div>
+
+            <!-- 5. صفحة تتبع الجلسات والصلاحيات -->
+            <div id="login_tracker" class="page-section">
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>اسم المستخدم</th>
+                                <th>الصلاحية</th>
+                                <th>الحالة</th>
+                                <th>مدة الجلسة الحالية</th>
+                                <th>آخر خروج</th>
+                                <th>الإجراء</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sessionsTableBody">
+                            <tr><td colspan="6" style="text-align: center;">جاري تحميل سجلات الجلسات...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        // بيانات الجلسات والمستخدمين المبدئية
+        let sessionsData = [
+            { username: "Owner", role: "Owner", status: "متصل", sessionTime: "02:15:40", lastLogout: "-" },
+            { username: "Leader_01", role: "L1", status: "غير متصل", sessionTime: "00:00:00", lastLogout: "منذ ساعتين" },
+            { username: "Leader_02", role: "L1", status: "متصل", sessionTime: "00:45:12", lastLogout: "-" }
+        ];
+
+        let weeksList = ["أسبوع الحسم", "الأسبوع الأول", "الأسبوع الثاني"];
+        let inventoryLogsAdsData = [];
+        let inventoryOpsData = [];
+        let inventoryAcceptanceData = [];
+        let soldierWinnersMap = {}; 
+        let membersData = [];
+
+        // دالة تسجيل الدخول
+        function handleLogin() {
+            const user = document.getElementById("usernameInput").value.trim();
+            const pass = document.getElementById("passwordInput").value.trim();
+            if(user !== "" && pass !== "") {
+                document.getElementById("loginOverlay").style.display = "none";
+                document.getElementById("currentRoleDisplay").innerText = user;
+                initDashboard();
+            } else {
+                document.getElementById("loginError").style.display = "block";
+            }
+        }
+
+        function logout() {
+            document.getElementById("loginOverlay").style.display = "flex";
+            document.getElementById("usernameInput").value = "";
+            document.getElementById("passwordInput").value = "";
+        }
+
+        // التنقل بين الأقسام
+        function switchPage(pageId, element) {
+            document.querySelectorAll('.page-section').forEach(sec => sec.classList.remove('active'));
+            document.querySelectorAll('.sidebar-menu .menu-item').forEach(item => item.classList.remove('active'));
+            
+            document.getElementById(pageId).classList.add('active');
+            if(element) element.classList.add('active');
+
+            if(pageId === 'inventory') {
+                updateAllWeekSelects();
+                renderInventoryTables();
+            } else if(pageId === 'soldier_week') {
+                updateAllWeekSelects();
+                renderSoldierOfWeek();
+            } else if(pageId === 'courses') {
+                populateCourseMembersDropdown();
+            } else if(pageId === 'login_tracker') {
+                renderSessionsTable();
+            }
+        }
+
+        function initDashboard() {
+            fetchSheetData(false);
+        }
+
+        // جلب البيانات ومحاكاة الربط
+        function fetchSheetData(isManual) {
+            const statusEl = document.getElementById("refreshStatus");
+            if(isManual) statusEl.innerText = "جاري تحديث البيانات...";
+            
+            setTimeout(() => {
+                membersData = [
+                    { rank: "L-1", discord: "owner#0001", name: "فهد العتيبي", id: "779", code: "A-1", title: "قائد القطاع", logs: "38", ads: "3", notes: "ملتزم", warnings: "0", promoDate: "2026-06-01", manualNote: "-", leave: "مستمر", category: "L" },
+                    { rank: "L-3", discord: "sultan#0002", name: "سلطان الشمري", id: "812", code: "A-2", title: "مساعد القائد", logs: "25", ads: "2", notes: "-", warnings: "0", promoDate: "2026-06-10", manualNote: "-", leave: "مستمر", category: "L" },
+                    { rank: "M-1", discord: "nayef#0003", name: "نايف الحربي", id: "904", code: "B-1", title: "ضابط ميداني", logs: "15", ads: "1", notes: "نشيط", warnings: "1", promoDate: "2026-06-15", manualNote: "-", leave: "إجازة", category: "M" },
+                    { rank: "R-2", discord: "turki#0004", name: "تركي العمري", id: "105", code: "C-4", title: "فرد أمن", logs: "10", ads: "0", notes: "-", warnings: "0", promoDate: "2026-07-01", manualNote: "-", leave: "مستمر", category: "R" }
+                ];
+
+                updateMemberStats();
+                renderMembersTable(membersData);
+                updateAllWeekSelects();
+                if(isManual) statusEl.innerText = "تم تحديث البيانات بنجاح!";
+            }, 500);
+        }
+
+        function updateMemberStats() {
+            document.getElementById("count-ALL").innerText = membersData.length;
+            document.getElementById("count-L").innerText = membersData.filter(m => m.category === 'L').length;
+            document.getElementById("count-M").innerText = membersData.filter(m => m.category === 'M').length;
+            document.getElementById("count-R").innerText = membersData.filter(m => m.category === 'R').length;
+        }
+
+        function renderMembersTable(data) {
+            const tbody = document.getElementById("membersTableBody");
+            tbody.innerHTML = "";
+            if(data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="13" style="text-align: center;">لا توجد بيانات مطابقة</td></tr>`;
+                return;
+            }
+            data.forEach(m => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${m.rank}</td>
+                        <td>${m.discord}</td>
+                        <td>${m.name}</td>
+                        <td>${m.id}</td>
+                        <td>${m.code}</td>
+                        <td>${m.title}</td>
+                        <td>${m.logs}</td>
+                        <td>${m.ads}</td>
+                        <td>${m.notes}</td>
+                        <td>${m.warnings}</td>
+                        <td>${m.promoDate}</td>
+                        <td>${m.manualNote}</td>
+                        <td>${m.leave}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        function filterMembers(cat) {
+            if(cat === 'ALL') {
+                renderMembersTable(membersData);
+            } else {
+                const filtered = membersData.filter(m => m.category === cat);
+                renderMembersTable(filtered);
+            }
+        }
+
+        function filterMembersTableBySearch() {
+            const query = document.getElementById("memberSearchInput").value.toLowerCase();
+            const filtered = membersData.filter(m => m.id.toLowerCase().includes(query) || m.name.toLowerCase().includes(query));
+            renderMembersTable(filtered);
+        }
+
+        // إدارة الأسابيع العامة
+        function updateAllWeekSelects() {
+            const selects = ['autoWeekLogsAds', 'autoWeekOps', 'autoWeekAcceptance', 'selectWeekSoldier', 'deleteWeekSelectInv', 'deleteWeekSelectSoldier'];
+            selects.forEach(id => {
+                const el = document.getElementById(id);
+                if(!el) return;
+                const currentVal = el.value;
+                el.innerHTML = "";
+                weeksList.forEach(w => {
+                    const opt = document.createElement("option");
+                    opt.value = w;
+                    opt.innerText = w;
+                    el.appendChild(opt);
+                });
+                if(weeksList.includes(currentVal)) el.value = currentVal;
+            });
+        }
+
+        function addNewWeekFrom(sourceKey) {
+            const inputId = sourceKey === 'Inv' ? 'newWeekInputInv' : 'newWeekInputSoldier';
+            const val = document.getElementById(inputId).value.trim();
+            if(val && !weeksList.includes(val)) {
+                weeksList.push(val);
+                document.getElementById(inputId).value = "";
+                updateAllWeekSelects();
+                alert("تم إضافة الأسبوع بنجاح!");
+            } else {
+                alert("الرجاء كتابة اسم أسبوع صحيح وغير مكرر.");
+            }
+        }
+
+        function deleteSelectedWeekFrom(sourceKey) {
+            const selectId = sourceKey === 'Inv' ? 'deleteWeekSelectInv' : 'deleteWeekSelectSoldier';
+            const selectedWeek = document.getElementById(selectId).value;
+            if(weeksList.length <= 1) {
+                alert("يجب أن يبقى أسبوع واحد على الأقل.");
+                return;
+            }
+            weeksList = weeksList.filter(w => w !== selectedWeek);
+            updateAllWeekSelects();
+            renderInventoryTables();
+            renderSoldierOfWeek();
+            alert("تم حذف الأسبوع بنجاح.");
+        }
+
+        function switchInvTab(tabName, btn) {
+            document.querySelectorAll('.inv-section').forEach(sec => sec.classList.remove('active'));
+            document.querySelectorAll('.inv-tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('inv_' + tabName).classList.add('active');
+            btn.classList.add('active');
+        }
+
+        function processInventoryData(type) {
+            if(type === 'logs_ads') {
+                const text = document.getElementById("bulkLogsAdsText").value.trim();
+                const week = document.getElementById("autoWeekLogsAds").value;
+                if(!text) return;
+                text.split('\n').forEach(line => {
+                    const parts = line.split(',');
+                    if(parts.length >= 3) {
+                        const id = parts[0].trim();
+                        const member = membersData.find(m => m.id === id) || { rank: "عسكري", name: "غير معروف", id: id };
+                        inventoryLogsAdsData.push({ week, id, rank: member.rank, name: member.name, logs: parts[1].trim(), ads: parts[2].trim() });
+                    }
+                });
+                document.getElementById("bulkLogsAdsText").value = "";
+                renderInventoryTables();
+            } else if(type === 'ops') {
+                const text = document.getElementById("bulkOpsText").value.trim();
+                const week = document.getElementById("autoWeekOps").value;
+                if(!text) return;
+                text.split('\n').forEach(line => {
+                    const parts = line.split(',');
+                    if(parts.length >= 2) {
+                        const id = parts[0].trim();
+                        const member = membersData.find(m => m.id === id) || { rank: "عسكري", name: "غير معروف", id: id };
+                        inventoryOpsData.push({ week, id, rank: member.rank, name: member.name, ops: parts[1].trim() });
+                    }
+                });
+                document.getElementById("bulkOpsText").value = "";
+                renderInventoryTables();
+            } else if(type === 'acceptance') {
+                const text = document.getElementById("bulkAcceptanceText").value.trim();
+                const week = document.getElementById("autoWeekAcceptance").value;
+                if(!text) return;
+                text.split('\n').forEach(line => {
+                    const parts = line.split(',');
+                    if(parts.length >= 2) {
+                        const id = parts[0].trim();
+                        const member = membersData.find(m => m.id === id) || { rank: "عسكري", name: "غير معروف", id: id };
+                        inventoryAcceptanceData.push({ week, id, rank: member.rank, name: member.name, accepted: parts[1].trim() });
+                    }
+                });
+                document.getElementById("bulkAcceptanceText").value = "";
+                renderInventoryTables();
+            }
+        }
+
+        function renderInventoryTables() {
+            const weekLogs = document.getElementById("autoWeekLogsAds").value;
+            const tLogs = document.getElementById("tableLogsAds");
+            tLogs.innerHTML = "";
+            const filteredLogs = inventoryLogsAdsData.filter(item => item.week === weekLogs);
+            if(filteredLogs.length === 0) {
+                tLogs.innerHTML = `<tr><td colspan="7" style="text-align: center;">لا توجد بيانات لهذا الأسبوع</td></tr>`;
+            } else {
+                filteredLogs.forEach((item, idx) => {
+                    tLogs.innerHTML += `<tr><td>${item.week}</td><td>${item.id}</td><td>${item.rank}</td><td>${item.name}</td><td>${item.logs}</td><td>${item.ads}</td><td><button class="btn btn-danger" style="padding:4px 8px;" onclick="removeItem('logs', ${idx})">حذف</button></td></tr>`;
+                });
+            }
+
+            const weekOps = document.getElementById("autoWeekOps").value;
+            const tOps = document.getElementById("tableOps");
+            tOps.innerHTML = "";
+            const filteredOps = inventoryOpsData.filter(item => item.week === weekOps);
+            if(filteredOps.length === 0) {
+                tOps.innerHTML = `<tr><td colspan="6" style="text-align: center;">لا توجد بيانات لهذا الأسبوع</td></tr>`;
+            } else {
+                filteredOps.forEach((item, idx) => {
+                    tOps.innerHTML += `<tr><td>${item.week}</td><td>${item.id}</td><td>${item.rank}</td><td>${item.name}</td><td>${item.ops}</td><td><button class="btn btn-danger" style="padding:4px 8px;" onclick="removeItem('ops', ${idx})">حذف</button></td></tr>`;
+                });
+            }
+
+            const weekAcc = document.getElementById("autoWeekAcceptance").value;
+            const tAcc = document.getElementById("tableAcceptance");
+            tAcc.innerHTML = "";
+            const filteredAcc = inventoryAcceptanceData.filter(item => item.week === weekAcc);
+            if(filteredAcc.length === 0) {
+                tAcc.innerHTML = `<tr><td colspan="6" style="text-align: center;">لا توجد بيانات لهذا الأسبوع</td></tr>`;
+            } else {
+                filteredAcc.forEach((item, idx) => {
+                    tAcc.innerHTML += `<tr><td>${item.week}</td><td>${item.id}</td><td>${item.rank}</td><td>${item.name}</td><td>${item.accepted}</td><td><button class="btn btn-danger" style="padding:4px 8px;" onclick="removeItem('acc', ${idx})">حذف</button></td></tr>`;
+                });
+            }
+        }
+
+        function removeItem(type, idx) {
+            if(type === 'logs') inventoryLogsAdsData.splice(idx, 1);
+            if(type === 'ops') inventoryOpsData.splice(idx, 1);
+            if(type === 'acc') inventoryAcceptanceData.splice(idx, 1);
+            renderInventoryTables();
+        }
+
+        function populateCourseMembersDropdown() {
+            const select = document.getElementById("courseMemberSelect");
+            select.innerHTML = '<option value="">اختر العسكري...</option>';
+            membersData.forEach(m => {
+                select.innerHTML += `<option value="${m.id}">${m.name} (${m.id})</option>`;
+            });
+        }
+
+        function onCourseMemberSelected() {
+            const id = document.getElementById("courseMemberSelect").value;
+            const member = membersData.find(m => m.id === id);
+            if(!member) return;
+            document.getElementById("courseViewRank").innerText = member.rank;
+            document.getElementById("courseViewName").innerText = member.name;
+            document.getElementById("courseViewId").innerText = member.id;
+
+            document.getElementById("missingCoursesList").innerHTML = `<div style="padding: 8px; background: rgba(248,81,73,0.1); border-radius:4px; font-size:0.85rem;">دورة الاقتحام التكتيكي</div>`;
+            document.getElementById("earnedCoursesList").innerHTML = `<div style="padding: 8px; background: rgba(46,160,67,0.1); border-radius:4px; font-size:0.85rem;">دورة الأساسيات العسكرية</div>`;
+        }
+
+        function filterCourseDropdownById() {
+            const query = document.getElementById("courseSearchId").value.trim();
+            const member = membersData.find(m => m.id === query);
+            if(member) {
+                document.getElementById("courseMemberSelect").value = member.id;
+                onCourseMemberSelected();
+            }
+        }
+
+        function renderSoldierOfWeek() {
+            const week = document.getElementById("selectWeekSoldier").value;
+            const tbody = document.getElementById("soldierCandidatesTableBody");
+            const winnerSelect = document.getElementById("selectWinnerSoldier");
+            
+            tbody.innerHTML = "";
+            winnerSelect.innerHTML = '<option value="">اختر العسكري الفائز...</option>';
+
+            if(membersData.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align: center;">لا توجد بيانات مرشحين</td></tr>`;
+                return;
+            }
+
+            membersData.forEach(m => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${week}</td>
+                        <td>${m.id}</td>
+                        <td>${m.rank}</td>
+                        <td>${m.name}</td>
+                        <td>تفاعل ممتاز (${m.logs} سجلات)</td>
+                        <td><button class="btn" style="padding: 4px 10px;" onclick="selectWinnerCard('${m.id}', '${week}')">اختيار</button></td>
+                    </tr>
+                `;
+                winnerSelect.innerHTML += `<option value="${m.id}">${m.name} (${m.rank})</option>`;
+            });
+
+            const container = document.getElementById("soldierWeekCardContainer");
+            if(soldierWinnersMap[week]) {
+                const w = soldierWinnersMap[week];
+                container.innerHTML = `
+                    <div class="paint-soldier-card">
+                        <div class="paint-card-top-right">
+                            <div>وزارة الدفاع - قطاع الحراسات</div>
+                            <div>الأسـبوع: ${week}</div>
+                            <div>التصنيف: عسكري الأسبوع المثالي</div>
+                        </div>
+                        <div class="paint-card-avatar-section">
+                            <div class="paint-card-circle-avatar"><i class="fa-solid fa-award"></i></div>
+                            <div class="paint-card-curved-line"></div>
+                        </div>
+                        <div style="text-align: center; margin-bottom: 20px;">
+                            <h3 style="color: var(--accent-gold); font-size: 1.3rem;">${w.name}</h3>
+                            <p style="color: var(--text-muted); font-size: 0.9rem;">الرتبة: ${w.rank} | الآيدي: ${w.id}</p>
+                        </div>
+                        <div class="paint-card-bottom-grid">
+                            <div class="paint-metric-item">
+                                <div class="paint-metric-title">السجلات المنجزة</div>
+                                <div class="paint-metric-val">${w.logs}</div>
+                            </div>
+                            <div class="paint-metric-item center-total">
+                                <div class="paint-metric-title">المجموع العام</div>
+                                <div class="paint-metric-val">متميز</div>
+                            </div>
+                            <div class="paint-metric-item">
+                                <div class="paint-metric-title">الإعلانات</div>
+                                <div class="paint-metric-val">${w.ads}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = "";
+            }
+        }
+
+        function selectWinnerCard(id, week) {
+            const member = membersData.find(m => m.id === id);
+            if(member) {
+                soldierWinnersMap[week] = member;
+                renderSoldierOfWeek();
+                alert(`تم اعتماد الفائز ${member.name} لعسكري ${week} بنجاح!`);
+            }
+        }
+
+        function saveSoldierOfWeekWinner() {
+            const week = document.getElementById("selectWeekSoldier").value;
+            const id = document.getElementById("selectWinnerSoldier").value;
+            if(!id) {
+                alert("الرجاء اختيار عسكري أولاً.");
+                return;
+            }
+            selectWinnerCard(id, week);
+        }
+
+        function renderSessionsTable() {
+            const tbody = document.getElementById("sessionsTableBody");
+            tbody.innerHTML = "";
+            sessionsData.forEach(s => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${s.username}</td>
+                        <td>${s.role}</td>
+                        <td style="color: ${s.status === 'متصل' ? 'var(--success)' : 'var(--text-muted)'}">${s.status}</td>
+                        <td>${s.sessionTime}</td>
+                        <td>${s.lastLogout}</td>
+                        <td><button class="btn btn-danger" style="padding:4px 8px;">إنهاء الجلسة</button></td>
+                    </tr>
+                `;
+            });
+        }
+    </script>
+</body>
+</html>
