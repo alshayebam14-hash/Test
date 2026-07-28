@@ -422,7 +422,6 @@
                 <div class="menu-item" onclick="switchPage('login_tracker', this)" id="menuLoginTracker"><i class="fa-solid fa-right-to-bracket"></i> تسجيل الدخول (متابعة)</div>
                 <div class="menu-item" onclick="switchPage('members', this)" id="menuMembers"><i class="fa-solid fa-users-gear"></i> منسوبي القطاعات</div>
                 <div class="menu-item" onclick="switchPage('field_missions', this)" id="menuFieldMissions"><i class="fa-solid fa-flag-checkered"></i> المهام الميدانية</div>
-                <div class="menu-item" onclick="switchPage('courses', this)" id="menuCourses"><i class="fa-solid fa-graduation-cap"></i> الدورات</div>
                 <div class="menu-item" onclick="switchPage('inventory', this)" id="menuInventory"><i class="fa-solid fa-boxes-stacked"></i> صفحة الجرد</div>
                 <div class="menu-item" onclick="switchPage('soldier_week', this)" id="menuSoldierWeek"><i class="fa-solid fa-award"></i> عسكري الأسبوع</div>
             </div>
@@ -570,50 +569,11 @@
                                 <th>تفاصيل المهمة</th>
                                 <th>الإثبات (الصورة)</th>
                                 <th>الحالة</th>
-                                <th>الإجراءات الديناميكية</th>
+                                <th id="thMissionActions">الإجراءات الديناميكية</th>
                             </tr>
                         </thead>
                         <tbody id="fieldMissionsTableBody">
                             <tr><td colspan="6" style="text-align: center;">لا توجد مهام مرفوعة حالياً</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- صفحة الدورات -->
-        <div id="courses" class="page-section">
-            <h2 style="color: var(--accent-gold); margin-bottom: 15px;">إدارة الدورات العسكرية</h2>
-            <div class="card" style="background: #0b0f19; border: 1px solid var(--border-subtle); margin-bottom: 25px;">
-                <h3 style="color: var(--accent-gold); font-size: 1rem; margin-bottom: 15px;"><i class="fa-solid fa-graduation-cap"></i> تسجيل عسكري في دورة جديدة</h3>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
-                    <div>
-                        <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 5px;">رقم الهوية ID للعسكري:</label>
-                        <input type="text" id="courseSoldierId" class="login-input" placeholder="مثال: 779" style="margin:0;">
-                    </div>
-                    <div>
-                        <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 5px;">اسم أو نوع الدورة:</label>
-                        <input type="text" id="courseNameInput" class="login-input" placeholder="مثال: دورة الصاعقة المتقدمة" style="margin:0;">
-                    </div>
-                </div>
-                <button class="btn" onclick="submitCourse()">تسجيل الدورة</button>
-            </div>
-
-            <div class="card">
-                <h3 style="color: var(--accent-gold); font-size: 1rem; margin-bottom: 15px;"><i class="fa-solid fa-clipboard-list"></i> سجل الدورات الحالية</h3>
-                <div class="table-responsive">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>ID العسكري</th>
-                                <th>الاسم</th>
-                                <th>اسم الدورة</th>
-                                <th>الحالة</th>
-                                <th>الإجراءات</th>
-                            </tr>
-                        </thead>
-                        <tbody id="coursesTableBody">
-                            <tr><td colspan="5" style="text-align: center;">لا توجد دورات مسجلة حالياً</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -775,13 +735,13 @@
 
     <script>
         let accounts = {
-            "Ahmed": { pass: "Owner2010629", role: "Owner", loggedIn: true, loginTime: Date.now(), lastLogout: "---", id: "000" },
-            "Nawaf": { pass: "m43d65f65", role: "D-0", loggedIn: false, loginTime: null, lastLogout: "---", id: "101" },
-            "Da": { pass: "m34d54f65", role: "D-1", loggedIn: false, loginTime: null, lastLogout: "---", id: "102" },
-            "Abu Majed": { pass: "m54d23f74", role: "D-2", loggedIn: false, loginTime: null, lastLogout: "---", id: "103" },
-            "Ahmed_D3": { pass: "mdf", role: "D-3", loggedIn: false, loginTime: null, lastLogout: "---", id: "104" },
-            "Nerf": { pass: "m14d27f99", role: "L-1", loggedIn: false, loginTime: null, lastLogout: "---", id: "105" },
-            "leader": { pass: "L483D@r200", role: "Leader", loggedIn: false, loginTime: null, lastLogout: "---", isLeaderPortalOnly: true, id: "779" }
+            "Ahmed": { pass: "Owner2010629", role: "Owner", loggedIn: true, loginTime: Date.now(), lastLogout: "---" },
+            "Nawaf": { pass: "m43d65f65", role: "D-0", loggedIn: false, loginTime: null, lastLogout: "---" },
+            "Da": { pass: "m34d54f65", role: "D-1", loggedIn: false, loginTime: null, lastLogout: "---" },
+            "Abu Majed": { pass: "m54d23f74", role: "D-2", loggedIn: false, loginTime: null, lastLogout: "---" },
+            "Ahmed_D3": { pass: "mdf", role: "D-3", loggedIn: false, loginTime: null, lastLogout: "---" },
+            "Nerf": { pass: "m14d27f99", role: "L-1", loggedIn: false, loginTime: null, lastLogout: "---" },
+            "leader": { pass: "L483D@r200", role: "Leader", loggedIn: false, loginTime: null, lastLogout: "---", isLeaderPortalOnly: true }
         };
 
         let currentUser = "Ahmed";
@@ -794,7 +754,6 @@
         let inventoryAcceptance = JSON.parse(localStorage.getItem('grave_invAcceptance')) || [];
         let soldierOfWeekData = JSON.parse(localStorage.getItem('grave_soldierOfWeekData')) || {};
         let fieldMissionsList = JSON.parse(localStorage.getItem('grave_fieldMissions')) || [];
-        let coursesList = JSON.parse(localStorage.getItem('grave_coursesList')) || [];
 
         let currentMemberFilter = 'ALL';
 
@@ -805,7 +764,6 @@
             localStorage.setItem('grave_invAcceptance', JSON.stringify(inventoryAcceptance));
             localStorage.setItem('grave_soldierOfWeekData', JSON.stringify(soldierOfWeekData));
             localStorage.setItem('grave_fieldMissions', JSON.stringify(fieldMissionsList));
-            localStorage.setItem('grave_coursesList', JSON.stringify(coursesList));
         }
 
         function updateWeekDropdowns() {
@@ -973,7 +931,6 @@
             updateMemberStats();
             renderMembersTable();
             renderFieldMissionsTable();
-            renderCoursesTable();
             renderInventoryTables();
         }
 
@@ -1038,6 +995,10 @@
         }
 
         function switchPage(pageId, element) {
+            if(accounts[currentUser].isLeaderPortalOnly && pageId !== 'field_missions') {
+                return;
+            }
+
             document.querySelectorAll('.page-section').forEach(sec => sec.classList.remove('active'));
             document.querySelectorAll('.sidebar-menu .menu-item').forEach(item => item.classList.remove('active'));
             
@@ -1057,8 +1018,28 @@
                 document.getElementById('loginOverlay').style.display = 'none';
                 document.getElementById('currentRoleDisplay').innerText = accounts[user].role;
 
+                if(accounts[user].isLeaderPortalOnly) {
+                    document.getElementById('menuHome').style.display = 'none';
+                    document.getElementById('menuLoginTracker').style.display = 'none';
+                    document.getElementById('menuMembers').style.display = 'none';
+                    document.getElementById('menuInventory').style.display = 'none';
+                    document.getElementById('menuSoldierWeek').style.display = 'none';
+                    
+                    document.getElementById('menuFieldMissions').style.display = 'flex';
+                    switchPage('field_missions', document.getElementById('menuFieldMissions'));
+                } else {
+                    document.getElementById('menuHome').style.display = 'flex';
+                    document.getElementById('menuLoginTracker').style.display = 'flex';
+                    document.getElementById('menuMembers').style.display = 'flex';
+                    document.getElementById('menuFieldMissions').style.display = 'flex';
+                    document.getElementById('menuInventory').style.display = 'flex';
+                    document.getElementById('menuSoldierWeek').style.display = 'flex';
+
+                    switchPage('home', document.getElementById('menuHome'));
+                }
+
                 renderSessionsTable();
-                switchPage('home', document.getElementById('menuHome'));
+                renderFieldMissionsTable();
             } else {
                 err.style.display = 'block';
             }
@@ -1100,7 +1081,7 @@
             renderSessionsTable();
         }
 
-        /* دوام المهام الميدانية مع قيد منع العسكري من قبول مهمته بنفسه */
+        /* دوام المهام الميدانية مع التحكم بصلاحيات العرض */
         function submitFieldMission() {
             let id = document.getElementById('missionSoldierId').value.trim();
             let link = document.getElementById('missionImageLink').value.trim();
@@ -1133,15 +1114,20 @@
 
         function renderFieldMissionsTable() {
             let tbody = document.getElementById('fieldMissionsTableBody');
+            let thActions = document.getElementById('thMissionActions');
             if(!tbody) return;
 
-            if(fieldMissionsList.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" style="text-align: center;">لا توجد مهام مرفوعة حالياً</td></tr>`;
-                return;
+            let isLeaderOnly = accounts[currentUser] && accounts[currentUser].isLeaderPortalOnly;
+
+            if(thActions) {
+                thActions.style.display = isLeaderOnly ? "none" : "";
             }
 
-            // آيدي المستخدم الحالي لمنع قبول مهمته بنفسه
-            let currentUserId = accounts[currentUser] ? accounts[currentUser].id : "";
+            if(fieldMissionsList.length === 0) {
+                let colSpan = isLeaderOnly ? 5 : 6;
+                tbody.innerHTML = `<tr><td colspan="${colSpan}" style="text-align: center;">لا توجد مهام مرفوعة حالياً</td></tr>`;
+                return;
+            }
 
             tbody.innerHTML = "";
             fieldMissionsList.forEach((item, index) => {
@@ -1149,38 +1135,31 @@
                 if(item.status === "مقبولة") statusColor = "var(--success)";
                 if(item.status === "مرفوضة") statusColor = "var(--danger)";
 
-                let isSelf = (currentUser !== 'Owner' && item.id === currentUserId);
-
-                let actionButtons = '';
-                if(isSelf) {
-                    actionButtons = `<span style="color: var(--text-muted); font-size: 0.8rem;">لا يمكنك تقييم مهمتك الخاصة</span>`;
-                } else {
-                    actionButtons = `
-                        <button class="btn btn-success" style="padding: 4px 10px; font-size: 0.75rem;" onclick="updateMissionStatus(${index}, 'مقبولة')">قبول</button>
-                        <button class="btn btn-danger" style="padding: 4px 10px; font-size: 0.75rem;" onclick="updateMissionStatus(${index}, 'مرفوضة')">رفض</button>
-                    `;
-                }
-                actionButtons += ` <button class="btn btn-danger" style="padding: 4px 10px; font-size: 0.75rem; background: #555;" onclick="deleteMission(${index})">حذف</button>`;
-
                 let tr = document.createElement('tr');
-                tr.innerHTML = `
+                let rowHTML = `
                     <td>${item.id}</td>
                     <td>${item.name}</td>
                     <td>${item.details}</td>
                     <td>${item.link !== "بدون رابط" ? `<a href="${item.link}" target="_blank" style="color: var(--accent-gold);">عرض الصورة <i class="fa-solid fa-external-link-alt"></i></a>` : "بدون إثبات"}</td>
                     <td><strong style="color: ${statusColor};">${item.status}</strong></td>
-                    <td>${actionButtons}</td>
                 `;
+
+                if(!isLeaderOnly) {
+                    rowHTML += `
+                        <td>
+                            <button class="btn btn-success" style="padding: 4px 10px; font-size: 0.75rem;" onclick="updateMissionStatus(${index}, 'مقبولة')">قبول</button>
+                            <button class="btn btn-danger" style="padding: 4px 10px; font-size: 0.75rem;" onclick="updateMissionStatus(${index}, 'مرفوضة')">رفض</button>
+                            <button class="btn btn-danger" style="padding: 4px 10px; font-size: 0.75rem; background: #555;" onclick="deleteMission(${index})">حذف</button>
+                        </td>
+                    `;
+                }
+
+                tr.innerHTML = rowHTML;
                 tbody.appendChild(tr);
             });
         }
 
         function updateMissionStatus(index, newStatus) {
-            let currentUserId = accounts[currentUser] ? accounts[currentUser].id : "";
-            if(currentUser !== 'Owner' && fieldMissionsList[index].id === currentUserId) {
-                alert("عذراً، لا يمكنك قبول أو رفض مهمتك الميدانية بنفسك!");
-                return;
-            }
             fieldMissionsList[index].status = newStatus;
             saveToLocalStorage();
             renderFieldMissionsTable();
@@ -1191,95 +1170,6 @@
                 fieldMissionsList.splice(index, 1);
                 saveToLocalStorage();
                 renderFieldMissionsTable();
-            }
-        }
-
-        /* دوام صفحة الدورات */
-        function submitCourse() {
-            let id = document.getElementById('courseSoldierId').value.trim();
-            let courseName = document.getElementById('courseNameInput').value.trim();
-
-            if(!id || !courseName) {
-                alert("الرجاء إدخال رقم الهوية واسم الدورة.");
-                return;
-            }
-
-            let member = csvData.find(m => m.id === id);
-            let name = member ? member.name : "عسكري غير معروف";
-
-            coursesList.push({
-                id: id,
-                name: name,
-                courseName: courseName,
-                status: "قيد المراجعة"
-            });
-
-            saveToLocalStorage();
-            renderCoursesTable();
-
-            document.getElementById('courseSoldierId').value = "";
-            document.getElementById('courseNameInput').value = "";
-            alert("تم تسجیل الدورة بنجاح!");
-        }
-
-        function renderCoursesTable() {
-            let tbody = document.getElementById('coursesTableBody');
-            if(!tbody) return;
-
-            if(coursesList.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center;">لا توجد دورات مسجلة حالياً</td></tr>`;
-                return;
-            }
-
-            let currentUserId = accounts[currentUser] ? accounts[currentUser].id : "";
-            tbody.innerHTML = "";
-
-            coursesList.forEach((item, index) => {
-                let statusColor = "var(--warning)";
-                if(item.status === "اجتاز الدورة") statusColor = "var(--success)";
-                if(item.status === "رسب في الدورة") statusColor = "var(--danger)";
-
-                let isSelf = (currentUser !== 'Owner' && item.id === currentUserId);
-                let actionBtns = '';
-
-                if(isSelf) {
-                    actionBtns = `<span style="color: var(--text-muted); font-size: 0.8rem;">لا يمكنك تقييم دورتك</span>`;
-                } else {
-                    actionBtns = `
-                        <button class="btn btn-success" style="padding: 4px 10px; font-size: 0.75rem;" onclick="updateCourseStatus(${index}, 'اجتاز الدورة')">اجتاز</button>
-                        <button class="btn btn-danger" style="padding: 4px 10px; font-size: 0.75rem;" onclick="updateCourseStatus(${index}, 'رسب في الدورة')">رسب</button>
-                    `;
-                }
-                actionBtns += ` <button class="btn btn-danger" style="padding: 4px 10px; font-size: 0.75rem; background: #555;" onclick="deleteCourse(${index})">حذف</button>`;
-
-                let tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${item.id}</td>
-                    <td>${item.name}</td>
-                    <td>${item.courseName}</td>
-                    <td><strong style="color: ${statusColor};">${item.status}</strong></td>
-                    <td>${actionBtns}</td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        function updateCourseStatus(index, newStatus) {
-            let currentUserId = accounts[currentUser] ? accounts[currentUser].id : "";
-            if(currentUser !== 'Owner' && coursesList[index].id === currentUserId) {
-                alert("عذراً، لا يمكنك تقييم دورتك الخاصة!");
-                return;
-            }
-            coursesList[index].status = newStatus;
-            saveToLocalStorage();
-            renderCoursesTable();
-        }
-
-        function deleteCourse(index) {
-            if(confirm("هل أنت متأكد من حذف هذه الدورة؟")) {
-                coursesList.splice(index, 1);
-                saveToLocalStorage();
-                renderCoursesTable();
             }
         }
 
@@ -1297,7 +1187,7 @@
                 alert("الرجاء اختيار الأسبوع أولاً");
                 return;
             }
-            if(confirm(`هل أنت متأكد من تفريغ وحذف جميع بيانات الجرد الخاصة بـ (${currentWeek})؟`)) {
+            if(confirm(`هل أنت متأكد من تفريغ وحذف جميع بيانات الجرد (السجلات، العمليات، القبول) الخاصة بـ (${currentWeek})؟`)) {
                 inventoryLogsAds = inventoryLogsAds.filter(i => i.week !== currentWeek);
                 inventoryOps = inventoryOps.filter(i => i.week !== currentWeek);
                 inventoryAcceptance = inventoryAcceptance.filter(i => i.week !== currentWeek);
@@ -1336,7 +1226,7 @@
             report += `--- قائمة السجلات والإعلانات ---\n`;
             if(weekLogs.length === 0) report += `لا توجد بيانات مسجلة.\n`;
             weekLogs.forEach((item, idx) => {
-                report += `${idx + 1}. ID: ${item.id} | الاسم: ${item.name} | السجلات: ${item.logs} | الإعلانات: ${item.ads}\n`;
+                report += `${idx + 1}. ID: ${item.id} | الاسم: ${item.name} | الرتبة: ${item.rank} | السجلات: ${item.logs} | الإعلانات: ${item.ads}\n`;
             });
 
             report += `\n--- قائمة العمليات ---\n`;
@@ -1629,8 +1519,8 @@
             fetchSheetData();
             renderSessionsTable();
             renderFieldMissionsTable();
-            renderCoursesTable();
         };
     </script>
 </body>
 </html>
+```[cite: 3]
