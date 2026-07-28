@@ -470,6 +470,9 @@
                 <div class="menu-item" onclick="switchPage('courses', this)"><i class="fa-solid fa-graduation-cap"></i> دورات القطاع</div>
                 <div class="menu-item" onclick="switchPage('inventory', this)"><i class="fa-solid fa-boxes-stacked"></i> صفحة الجرد</div>
                 <div class="menu-item" onclick="switchPage('soldier_week', this)"><i class="fa-solid fa-award"></i> عسكري الأسبوع</div>
+                <!-- الأفكار الجديدة في القائمة الجانبية -->
+                <div class="menu-item" onclick="switchPage('public_diwan', this)"><i class="fa-solid fa-comments"></i> ديوان المنسوبين (عام)</div>
+                <div class="menu-item" onclick="switchPage('field_missions', this)"><i class="fa-solid fa-person-military-pointing"></i> المهام الميدانية</div>
             </div>
         </div>
 
@@ -489,7 +492,7 @@
         <div id="home" class="page-section active">
             <div class="card" style="text-align: center; padding: 40px;">
                 <h2 style="color: var(--accent-gold); margin-bottom: 10px;">لوحة إدارة وزارة الدفاع - Grave RP</h2>
-                <p style="color: var(--text-muted); margin-bottom: 25px;">تم ضبط كارت عسكري الأسبوع ليظهر عند النقر على (اختيار) للمرشحين مع الأفكار الإضافية.</p>
+                <p style="color: var(--text-muted); margin-bottom: 25px;">تم دمج أفكار ديوان المنسوبين، المهام الميدانية، وأرشيف التنبيهات بنجاح.</p>
                 
                 <button class="btn" onclick="fetchSheetData(true)" style="padding: 12px 25px; font-size: 1rem;">
                     <i class="fa-solid fa-rotate" id="refreshIcon"></i> حدث البيانات
@@ -572,10 +575,11 @@
                                 <th>تاريخ آخر ترقية</th>
                                 <th>ملاحظات يدوية</th>
                                 <th>حالة الإجازة</th>
+                                <th>أرشيف التنبيهات</th>
                             </tr>
                         </thead>
                         <tbody id="membersTableBody">
-                            <tr><td colspan="13" style="text-align: center;">جاري تحميل البيانات...</td></tr>
+                            <tr><td colspan="14" style="text-align: center;">جاري تحميل البيانات...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -648,7 +652,6 @@
                     <button class="inv-tab-btn active" onclick="switchInvTab('logs_ads', this)">جرد السجلات والإعلانات</button>
                     <button class="inv-tab-btn" onclick="switchInvTab('ops', this)">جرد العمليات</button>
                     <button class="inv-tab-btn" onclick="switchInvTab('acceptance', this)">جرد القبول</button>
-                    <!-- الفكرة الأولى: زر تفريغ جرد الأسبوع المحدد -->
                     <button class="inv-tab-btn" style="background: rgba(239, 68, 68, 0.15); border-color: var(--danger); color: var(--danger);" onclick="clearCurrentWeekInventoryData()"><i class="fa-solid fa-trash-can"></i> تفريغ بيانات الأسبوع الحالي</button>
                 </div>
 
@@ -756,7 +759,6 @@
                         <label style="color: var(--text-muted);">اختر الأسبوع لعرض المرشحين:</label>
                         <select id="selectWeekSoldier" class="login-input" style="width: 250px; margin:0;" onchange="renderSoldierOfWeek()"></select>
                     </div>
-                    <!-- الفكرة الثانية: زر تصدير بيانات الأسبوع كتقرير نصي -->
                     <button class="btn" style="background: #0ea5e9; color: #fff;" onclick="exportWeekReportAsText()"><i class="fa-solid fa-file-arrow-down"></i> تصدير تقرير الأسبوع</button>
                 </div>
 
@@ -767,7 +769,6 @@
                     </div>
                 </div>
 
-                <!-- حاوية عرض الكارت للمرشح عند النقر على اختيار -->
                 <div id="candidateCardPreview"></div>
                 
                 <h3 style="color: var(--accent-gold); margin-bottom: 10px; margin-top: 25px;">اعتماد عسكري الأسبوع يدوياً (اختياري):</h3>
@@ -780,6 +781,106 @@
                 <div id="currentApprovedSoldier" style="margin-top: 15px;"></div>
             </div>
         </div>
+
+        <!-- فكرة 1: ديوان منسوبي القطاع (صفحة الاستفسارات العامة + بريد المنسوبين للإدارة) -->
+        <div id="public_diwan" class="page-section">
+            <h2 style="color: var(--accent-gold); margin-bottom: 15px;"><i class="fa-solid fa-comments"></i> ديوان منسوبي القطاع (الاستفسارات والشكاوى)</h2>
+            <div class="card" style="background: #0b0f19; margin-bottom: 25px;">
+                <h3 style="color: var(--accent-gold); font-size: 1rem; margin-bottom: 15px;">رفع شكوى أو طلب جديد (واجهة مفتوحة للجميع بدون تسجيل دخول)</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                    <div>
+                        <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 5px;">اسم المرسل / العسكري:</label>
+                        <input type="text" id="diwanSenderName" class="login-input" placeholder="اكتب اسمك الثلاثي أو الرتبة...">
+                    </div>
+                    <div>
+                        <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 5px;">رقم الهوية (ID):</label>
+                        <input type="text" id="diwanSenderId" class="login-input" placeholder="مثال: 779">
+                    </div>
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 5px;">موضوع أو عنوان الطلب/الشكوى:</label>
+                    <input type="text" id="diwanSubject" class="login-input" placeholder="مثال: استفسار بشأن موعد الترقية...">
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 5px;">نص الشكوى أو الطلب بالتفصيل:</label>
+                    <textarea id="diwanMessage" class="login-input" rows="4" placeholder="اكتب تفاصيل طلبك هنا..." style="resize: vertical;"></textarea>
+                </div>
+                <button class="btn" onclick="submitPublicDiwanTicket()">إرسال للإدارة العليا</button>
+            </div>
+
+            <div class="card">
+                <h3 style="color: var(--accent-gold); font-size: 1rem; margin-bottom: 15px;"><i class="fa-solid fa-envelope-open-text"></i> بريد المنسوبين (للإدارة العليا)</h3>
+                <div id="diwanTicketsContainer" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px;">
+                    <p style="color: var(--text-muted);">لا توجد شكاوى أو طلبات مرفوعة حالياً.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- فكرة 2: المهام الميدانية (بوابة إرسال الإثباتات + نظام الدخول leader/L483D@r200 + سجل المهام) -->
+        <div id="field_missions" class="page-section">
+            <h2 style="color: var(--accent-gold); margin-bottom: 15px;"><i class="fa-solid fa-person-military-pointing"></i> المهام الميدانية وبوابة إرسال الإثباتات</h2>
+            
+            <!-- بوابة تسجيل الدخول الخاصة بالمهام الميدانية (القادة/الإدارة) -->
+            <div id="fieldLoginBox" class="card" style="max-width: 450px; margin: 0 auto 25px auto; background: #0b0f19; border: 1px solid var(--accent-gold);">
+                <h3 style="color: var(--accent-gold); font-size: 1rem; margin-bottom: 15px; text-align: center;"><i class="fa-solid fa-lock"></i> تسجيل دخول القادة / الإدارة للمهام</h3>
+                <p style="font-size: 0.8rem; color: var(--text-muted); text-align: center; margin-bottom: 15px;">استخدم اليوزر الموحد <code>leader</code> والباسورد <code>L483D@r200</code></p>
+                <input type="text" id="fieldUserLogin" class="login-input" placeholder="اسم المستخدم (leader)">
+                <input type="password" id="fieldPassLogin" class="login-input" placeholder="كلمة المرور (L483D@r200)">
+                <button class="btn" style="width: 100%;" onclick="handleFieldLogin()">دخول بوابة القادة</button>
+                <p id="fieldLoginErr" style="color: var(--danger); font-size: 0.8rem; text-align: center; margin-top: 10px; display: none;">بيانات الدخول غير صحيحة</p>
+            </div>
+
+            <!-- محتوى البوابة الميدانية يظهر بعد تسجيل الدخول الناجح -->
+            <div id="fieldPortalContent" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.3); padding: 12px 20px; border-radius: 8px;">
+                    <span style="color: var(--success); font-weight: bold;"><i class="fa-solid fa-circle-check"></i> تم تسجيل الدخول بنجاح بصلاحية قائد/إدارة (Leader)</span>
+                    <button class="btn btn-danger" style="padding: 5px 12px; font-size: 0.8rem;" onclick="handleFieldLogout()">تسجيل خروج البوابة</button>
+                </div>
+
+                <div class="card" style="background: #0b0f19; margin-bottom: 25px;">
+                    <h3 style="color: var(--accent-gold); font-size: 1rem; margin-bottom: 15px;">رفع تفاصيل المهمة وصورتها</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                        <div>
+                            <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 5px;">رقم الهوية (ID) للعسكري المنفذ:</label>
+                            <input type="text" id="missionSoldierId" class="login-input" placeholder="مثال: 779">
+                        </div>
+                        <div>
+                            <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 5px;">رابط صورة الإثبات:</label>
+                            <input type="text" id="missionImageUrl" class="login-input" placeholder="ضع رابط الصورة هنا (URL)...">
+                        </div>
+                    </div>
+                    <div style="margin-bottom: 15px;">
+                        <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 5px;">تفاصيل المهمة الميدانية:</label>
+                        <textarea id="missionDetailsText" class="login-input" rows="3" placeholder="اكتب تفاصيل المهمة والنتائج..." style="resize: vertical;"></textarea>
+                    </div>
+                    <button class="btn" onclick="submitFieldMissionProof()">رفع الإثبات وتقديم المهمة</button>
+                </div>
+            </div>
+
+            <!-- سجل المهام الميدانية للإدارة والقادة -->
+            <div class="card">
+                <h3 style="color: var(--accent-gold); font-size: 1rem; margin-bottom: 15px;"><i class="fa-solid fa-clipboard-list"></i> سجل المهام الميدانية (أزرار قبول / رفض لتحديث النقاط)</h3>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>رقم المهمة</th>
+                                <th>ID المنفذ</th>
+                                <th>اسم العسكري</th>
+                                <th>تفاصيل المهمة</th>
+                                <th>صورة الإثبات</th>
+                                <th>الحالة</th>
+                                <th>الإجراء الديناميكي (قبول / رفض)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="fieldMissionsTableBody">
+                            <tr><td colspan="7" style="text-align: center;">لا توجد مهام ميدانية مرفوعة حالياً</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
     </main>
 
     <script>
@@ -803,6 +904,12 @@
         let soldierOfWeekData = JSON.parse(localStorage.getItem('grave_soldierOfWeekData')) || {};
         let memberCoursesState = JSON.parse(localStorage.getItem('grave_memberCoursesState')) || {};
 
+        // بيانات الأفكار الجديدة المخزنة محلياً
+        let publicDiwanTickets = JSON.parse(localStorage.getItem('grave_publicDiwanTickets')) || [];
+        let fieldMissionsList = JSON.parse(localStorage.getItem('grave_fieldMissionsList')) || [];
+        let isFieldLoggedIn = JSON.parse(localStorage.getItem('grave_isFieldLoggedIn')) || false;
+        let militaryArchiveState = JSON.parse(localStorage.getItem('grave_militaryArchiveState')) || {}; // الأفكار 3: أرشيف التنبيهات
+
         let currentMemberFilter = 'ALL';
 
         const allAvailableCourses = [
@@ -822,6 +929,10 @@
             localStorage.setItem('grave_invAcceptance', JSON.stringify(inventoryAcceptance));
             localStorage.setItem('grave_soldierOfWeekData', JSON.stringify(soldierOfWeekData));
             localStorage.setItem('grave_memberCoursesState', JSON.stringify(memberCoursesState));
+            localStorage.setItem('grave_publicDiwanTickets', JSON.stringify(publicDiwanTickets));
+            localStorage.setItem('grave_fieldMissionsList', JSON.stringify(fieldMissionsList));
+            localStorage.setItem('grave_isFieldLoggedIn', JSON.stringify(isFieldLoggedIn));
+            localStorage.setItem('grave_militaryArchiveState', JSON.stringify(militaryArchiveState));
         }
 
         function updateWeekDropdowns() {
@@ -971,6 +1082,9 @@
             renderMembersTable();
             populateCourseDropdown();
             renderInventoryTables();
+            renderPublicDiwanTickets();
+            renderFieldMissionsTable();
+            checkFieldLoginState();
         }
 
         function updateMemberStats() {
@@ -998,7 +1112,7 @@
             });
 
             if(filtered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="13" style="text-align: center;">لا توجد نتائج مطابقة</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="14" style="text-align: center;">لا توجد نتائج مطابقة</td></tr>`;
                 return;
             }
 
@@ -1018,6 +1132,7 @@
                     <td>${m.promotionDate}</td>
                     <td>${m.manualNotes}</td>
                     <td>${m.vacationStatus}</td>
+                    <td><button class="btn" style="padding: 4px 10px; font-size: 0.75rem;" onclick="openSoldierArchiveModal('${m.id}')"><i class="fa-solid fa-folder-open"></i> عرض الأرشيف</button></td>
                 `;
                 tbody.appendChild(tr);
             });
@@ -1100,7 +1215,6 @@
             btnElement.classList.add('active');
         }
 
-        /* تنفيذ الفكرة الأولى: تفريغ بيانات الأسبوع الحالي المحدد من الجرد */
         function clearCurrentWeekInventoryData() {
             let currentWeek = document.getElementById('autoWeekLogsAds').value;
             if(!currentWeek) {
@@ -1117,7 +1231,6 @@
             }
         }
 
-        /* تنفيذ الفكرة الثانية: تصدير تقرير الأسبوع كملف نصي TXT أو نافذة معاينة ونسخ */
         function exportWeekReportAsText() {
             let week = document.getElementById('selectWeekSoldier').value;
             if(!week) {
@@ -1163,7 +1276,6 @@
             });
             report += `\n========================================`;
 
-            // الفكرة الثالثة: إضافة نافذة منبثقة أو خيار نسخ سريع للتقرير المنسق
             let modalOverlay = document.createElement('div');
             modalOverlay.style.cssText = "position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.8);display:flex;justify-content:center;align-items:center;z-index:2000;";
             modalOverlay.innerHTML = `
@@ -1376,7 +1488,6 @@
                 document.getElementById('candidateCardPreview').innerHTML = "";
             }
 
-            // عرض الكارت للمعتمد نهائياً
             let approvedData = soldierOfWeekData[week];
             if(approvedData) {
                 let id = approvedData.id;
@@ -1432,7 +1543,6 @@
             }
         }
 
-        // دالة لعرض الكارت عند النقر على (اختيار) في جدول المرشحين
         function previewCandidateCard(id, week) {
             document.getElementById('selectedSoldierInput').value = id;
             let previewContainer = document.getElementById('candidateCardPreview');
@@ -1516,10 +1626,334 @@
             }
         }
 
+        /* --- الفكرة الأولى: تنفيذ ديوان منسوبي القطاع وبريد المنسوبين --- */
+        function submitPublicDiwanTicket() {
+            let senderName = document.getElementById('diwanSenderName').value.trim();
+            let senderId = document.getElementById('diwanSenderId').value.trim();
+            let subject = document.getElementById('diwanSubject').value.trim();
+            let message = document.getElementById('diwanMessage').value.trim();
+
+            if(!senderName || !senderId || !subject || !message) {
+                alert("الرجاء تعبئة كافة الحقول المطلوبة لرفع الشكوى أو الطلب.");
+                return;
+            }
+
+            let newTicket = {
+                id: 'T-' + Date.now().toString().slice(-4),
+                senderName,
+                senderId,
+                subject,
+                message,
+                date: new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString()
+            };
+
+            publicDiwanTickets.unshift(newTicket);
+            saveToLocalStorage();
+            renderPublicDiwanTickets();
+
+            document.getElementById('diwanSenderName').value = '';
+            document.getElementById('diwanSenderId').value = '';
+            document.getElementById('diwanSubject').value = '';
+            document.getElementById('diwanMessage').value = '';
+            alert("تم إرسال طلبك أو شكواك إلى بريد المنسوبين للإدارة العليا بنجاح!");
+        }
+
+        function renderPublicDiwanTickets() {
+            let container = document.getElementById('diwanTicketsContainer');
+            if(!container) return;
+
+            if(publicDiwanTickets.length === 0) {
+                container.innerHTML = `<p style="color: var(--text-muted);">لا توجد شكاوى أو طلبات مرفوعة حالياً.</p>`;
+                return;
+            }
+
+            let html = "";
+            publicDiwanTickets.forEach((t, idx) => {
+                html += `
+                    <div style="background: #0b0f19; border: 1px solid var(--border-subtle); border-radius: 10px; padding: 15px; display: flex; flex-direction: column; justify-content: space-between;">
+                        <div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                <span style="color: var(--accent-gold); font-size: 0.8rem; font-weight: bold;">${t.id}</span>
+                                <span style="color: var(--text-muted); font-size: 0.75rem;">${t.date}</span>
+                            </div>
+                            <h4 style="color: #fff; font-size: 0.95rem; margin-bottom: 5px;">${t.subject}</h4>
+                            <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 10px;">المرسل: ${t.senderName} (ID: ${t.senderId})</p>
+                        </div>
+                        <div style="display: flex; gap: 10px; justify-content: flex-end; border-top: 1px solid var(--border-subtle); padding-top: 10px;">
+                            <button class="btn" style="padding: 5px 12px; font-size: 0.75rem;" onclick="previewDiwanTicket(${idx})"><i class="fa-solid fa-eye"></i> معاينة</button>
+                            <button class="btn btn-danger" style="padding: 5px 12px; font-size: 0.75rem;" onclick="deleteDiwanTicket(${idx})">حذف</button>
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function previewDiwanTicket(idx) {
+            let t = publicDiwanTickets[idx];
+            let modalOverlay = document.createElement('div');
+            modalOverlay.style.cssText = "position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.8);display:flex;justify-content:center;align-items:center;z-index:2000;";
+            modalOverlay.innerHTML = `
+                <div style="background:var(--bg-sidebar);border:1px solid var(--accent-gold);padding:25px;border-radius:12px;width:90%;max-width:550px;box-shadow:0 10px 30px rgba(0,0,0,0.9);">
+                    <h3 style="color:var(--accent-gold);margin-bottom:10px;"><i class="fa-solid fa-envelope"></i> ${t.subject}</h3>
+                    <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:15px;">المرسل: ${t.senderName} | الهوية ID: ${t.senderId} | التاريخ: ${t.date}</p>
+                    <div style="background:var(--bg-card);border:1px solid var(--border-subtle);padding:15px;border-radius:8px;color:#fff;font-size:0.9rem;min-height:100px;margin-bottom:20px;white-space:pre-wrap;">${t.message}</div>
+                    <div style="display:flex;justify-content:flex-end;">
+                        <button class="btn btn-danger" onclick="this.closest('div').parentElement.parentElement.remove()">إغلاق المعاينة</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modalOverlay);
+        }
+
+        function deleteDiwanTicket(idx) {
+            if(confirm("هل أنت متأكد من حذف هذه الشكوى/الطلب من السجل؟")) {
+                publicDiwanTickets.splice(idx, 1);
+                saveToLocalStorage();
+                renderPublicDiwanTickets();
+            }
+        }
+
+        /* --- الفكرة الثانية: المهام الميدانية وبوابة إرسال الإثباتات --- */
+        function handleFieldLogin() {
+            let u = document.getElementById('fieldUserLogin').value.trim();
+            let p = document.getElementById('fieldPassLogin').value.trim();
+            let err = document.getElementById('fieldLoginErr');
+
+            if(u === 'leader' && p === 'L483D@r200') {
+                isFieldLoggedIn = true;
+                saveToLocalStorage();
+                checkFieldLoginState();
+                document.getElementById('fieldUserLogin').value = '';
+                document.getElementById('fieldPassLogin').value = '';
+                err.style.display = 'none';
+            } else {
+                err.style.display = 'block';
+            }
+        }
+
+        function handleFieldLogout() {
+            isFieldLoggedIn = false;
+            saveToLocalStorage();
+            checkFieldLoginState();
+        }
+
+        function checkFieldLoginState() {
+            let loginBox = document.getElementById('fieldLoginBox');
+            let portalContent = document.getElementById('fieldPortalContent');
+            if(!loginBox || !portalContent) return;
+
+            if(isFieldLoggedIn) {
+                loginBox.style.display = 'none';
+                portalContent.style.display = 'block';
+            } else {
+                loginBox.style.display = 'block';
+                portalContent.style.display = 'none';
+            }
+        }
+
+        function submitFieldMissionProof() {
+            let soldierId = document.getElementById('missionSoldierId').value.trim();
+            let imageUrl = document.getElementById('missionImageUrl').value.trim();
+            let details = document.getElementById('missionDetailsText').value.trim();
+
+            if(!soldierId || !imageUrl || !details) {
+                alert("الرجاء تعبئة جميع حقول المهمة الميدانية (رقم الهوية، رابط الصورة، والتفاصيل).");
+                return;
+            }
+
+            let member = csvData.find(m => m.id === soldierId);
+            let soldierName = member ? member.name : "عسكري غير متطابق";
+
+            let newMission = {
+                id: 'M-' + Date.now().toString().slice(-4),
+                soldierId,
+                soldierName,
+                imageUrl,
+                details,
+                status: 'معلق',
+                date: new Date().toLocaleDateString()
+            };
+
+            fieldMissionsList.unshift(newMission);
+            saveToLocalStorage();
+            renderFieldMissionsTable();
+
+            document.getElementById('missionSoldierId').value = '';
+            document.getElementById('missionImageUrl').value = '';
+            document.getElementById('missionDetailsText').value = '';
+            alert("تم رفع إثبات المهمة الميدانية بنجاح وتظهر الآن في السجل للإدارة والقادة!");
+        }
+
+        function renderFieldMissionsTable() {
+            let tbody = document.getElementById('fieldMissionsTableBody');
+            if(!tbody) return;
+
+            if(fieldMissionsList.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center;">لا توجد مهام ميدانية مرفوعة حالياً</td></tr>`;
+                return;
+            }
+
+            let html = "";
+            fieldMissionsList.forEach((m, idx) => {
+                let statusColor = m.status === 'مقبول' ? 'var(--success)' : (m.status === 'مرفوض' ? 'var(--danger)' : 'var(--warning)');
+                html += `
+                    <tr>
+                        <td>${m.id}</td>
+                        <td>${m.soldierId}</td>
+                        <td>${m.soldierName}</td>
+                        <td>${m.details}</td>
+                        <td><a href="${m.imageUrl}" target="_blank" style="color: var(--accent-gold); text-decoration: underline;"><i class="fa-solid fa-image"></i> عرض الصورة</a></td>
+                        <td><span style="color: ${statusColor}; font-weight: bold;">${m.status}</span></td>
+                        <td>
+                            ${m.status === 'معلق' ? `
+                                <button class="btn" style="padding: 4px 10px; font-size: 0.75rem; background: var(--success); color: #fff;" onclick="updateMissionStatus(${idx}, 'مقبول')">قبول</button>
+                                <button class="btn btn-danger" style="padding: 4px 10px; font-size: 0.75rem;" onclick="updateMissionStatus(${idx}, 'مرفوض')">رفض</button>
+                            ` : `<span>تم التحديث</span>`}
+                        </td>
+                    </tr>
+                `;
+            });
+            tbody.innerHTML = html;
+        }
+
+        function updateMissionStatus(idx, newStatus) {
+            fieldMissionsList[idx].status = newStatus;
+            saveToLocalStorage();
+            renderFieldMissionsTable();
+            alert(`تم تحديث حالة المهمة إلى (${newStatus}) بنجاح!`);
+        }
+
+        /* --- الفكرة الثالثة: أرشيف التنبيهات والملاحظات التراكمي لكل عسكري --- */
+        function openSoldierArchiveModal(id) {
+            let member = csvData.find(m => m.id === id);
+            if(!member) return;
+
+            if(!militaryArchiveState[id]) {
+                militaryArchiveState[id] = [];
+            }
+
+            let archives = militaryArchiveState[id];
+
+            let modalOverlay = document.createElement('div');
+            modalOverlay.style.cssText = "position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.8);display:flex;justify-content:center;align-items:center;z-index:2000;";
+            
+            function renderArchiveContent() {
+                let listHtml = "";
+                if(archives.length === 0) {
+                    listHtml = `<p style="color: var(--text-muted); text-align: center; padding: 15px;">لا توجد تنبيهات أو جزاءات مسجلة في الأرشيف لهذا العسكري.</p>`;
+                } else {
+                    archives.forEach((item, archiveIdx) => {
+                        listHtml += `
+                            <div style="background:var(--bg-card);border:1px solid var(--border-subtle);padding:12px;border-radius:8px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;">
+                                <div>
+                                    <div style="color:var(--accent-gold);font-weight:bold;font-size:0.85rem;">${item.type} - ${item.date}</div>
+                                    <div style="color:#fff;font-size:0.9rem;margin-top:4px;">${item.details}</div>
+                                    <div style="color:var(--text-muted);font-size:0.75rem;margin-top:2px;">مسؤول الإدارة: ${item.adminName}</div>
+                                </div>
+                                <button class="btn btn-danger" style="padding:4px 8px;font-size:0.7rem;" onclick="deleteSoldierArchive('${id}', ${archiveIdx})">حذف</button>
+                            </div>
+                        `;
+                    });
+                }
+                return listHtml;
+            }
+
+            modalOverlay.innerHTML = `
+                <div style="background:var(--bg-sidebar);border:1px solid var(--accent-gold);padding:25px;border-radius:12px;width:90%;max-width:650px;box-shadow:0 10px 30px rgba(0,0,0,0.9);max-height:85vh;overflow-y:auto;">
+                    <h3 style="color:var(--accent-gold);margin-bottom:5px;"><i class="fa-solid fa-shield-halved"></i> أرشيف التنبيهات والجزاءات التراكمي</h3>
+                    <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:20px;">العسكري: ${member.name} (رقم الهوية: ${member.id} - ${member.rank})</p>
+                    
+                    <div style="background:#0b0f19;border:1px solid var(--border-subtle);padding:15px;border-radius:10px;margin-bottom:20px;">
+                        <h4 style="color:#fff;font-size:0.9rem;margin-bottom:10px;">إضافة جزاء أو تنبيه جديد للأرشيف:</h4>
+                        <select id="archiveTypeSelect" class="login-input" style="margin-bottom:10px;">
+                            <option value="تنبيه رسمي">تنبيه رسمي</option>
+                            <option value="جزاء / خصم نقاط">جزاء / خصم نقاط</option>
+                            <option value="ملاحظة سلوكية">ملاحظة سلوكية</option>
+                            <option value="إنذار نهائي">إنذار نهائي</option>
+                        </select>
+                        <input type="text" id="archiveAdminInput" class="login-input" placeholder="اسمؤول الإدارة (المسؤول)..." style="margin-bottom:10px;">
+                        <textarea id="archiveDetailsInput" class="login-input" rows="3" placeholder="تفاصيل التحذير أو الجزاء..." style="resize:vertical;margin-bottom:10px;"></textarea>
+                        <button class="btn" style="width:100%;" onclick="addSoldierArchive('${id}')">إضافة للأرشيف</button>
+                    </div>
+
+                    <h4 style="color:var(--accent-gold);font-size:0.95rem;margin-bottom:10px;">السجل السابق (مرجع الترقيات):</h4>
+                    <div id="soldierArchiveListContainer">
+                        ${renderArchiveContent()}
+                    </div>
+
+                    <div style="display:flex;justify-content:flex-end;margin-top:20px;">
+                        <button class="btn btn-danger" onclick="this.closest('div').parentElement.parentElement.remove()">إغلاق الأرشيف</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modalOverlay);
+        }
+
+        function addSoldierArchive(id) {
+            let type = document.getElementById('archiveTypeSelect').value;
+            let adminName = document.getElementById('archiveAdminInput').value.trim();
+            let details = document.getElementById('archiveDetailsInput').value.trim();
+
+            if(!adminName || !details) {
+                alert("الرجاء تعبئة اسمؤول الإدارة وتفاصيل الجزاء/التنبيه.");
+                return;
+            }
+
+            if(!militaryArchiveState[id]) militaryArchiveState[id] = [];
+
+            militaryArchiveState[id].unshift({
+                type,
+                adminName,
+                details,
+                date: new Date().toLocaleDateString()
+            });
+
+            saveToLocalStorage();
+            alert("تم إضافة السجل بنجاح إلى أرشيف العسكري.");
+            
+            // تحديث محتوى النافذة المنبثقة مباشرة
+            let container = document.getElementById('soldierArchiveListContainer');
+            if(container) {
+                let archives = militaryArchiveState[id];
+                let listHtml = "";
+                archives.forEach((item, archiveIdx) => {
+                    listHtml += `
+                        <div style="background:var(--bg-card);border:1px solid var(--border-subtle);padding:12px;border-radius:8px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;">
+                            <div>
+                                <div style="color:var(--accent-gold);font-weight:bold;font-size:0.85rem;">${item.type} - ${item.date}</div>
+                                <div style="color:#fff;font-size:0.9rem;margin-top:4px;">${item.details}</div>
+                                <div style="color:var(--text-muted);font-size:0.75rem;margin-top:2px;">مسؤول الإدارة: ${item.adminName}</div>
+                            </div>
+                            <button class="btn btn-danger" style="padding:4px 8px;font-size:0.7rem;" onclick="deleteSoldierArchive('${id}', ${archiveIdx})">حذف</button>
+                        </div>
+                    `;
+                });
+                container.innerHTML = listHtml;
+            }
+            document.getElementById('archiveAdminInput').value = '';
+            document.getElementById('archiveDetailsInput').value = '';
+        }
+
+        function deleteSoldierArchive(id, archiveIdx) {
+            if(confirm("هل أنت متأكد من حذف هذا البند من الأرشيف؟")) {
+                militaryArchiveState[id].splice(archiveIdx, 1);
+                saveToLocalStorage();
+                openSoldierArchiveModal(id);
+                // إغلاق النافذة السابقة المفتوحة لتجنب التكرار
+                document.querySelectorAll('div[style*="position:fixed"]').forEach((el, idx, arr) => {
+                    if(idx < arr.length - 1) el.remove();
+                });
+            }
+        }
+
         window.onload = function() {
             updateWeekDropdowns();
             fetchSheetData();
             renderSessionsTable();
+            renderPublicDiwanTickets();
+            renderFieldMissionsTable();
+            checkFieldLoginState();
         };
     </script>
 </body>
