@@ -463,12 +463,12 @@
             </div>
 
             <div class="sidebar-menu" id="sidebarMenuContainer">
-                <div class="menu-item active" onclick="switchPage('home', this)"><i class="fa-solid fa-house"></i> الرئيسية</div>
+                <div class="menu-item active" onclick="switchPage('home', this)" id="menuHome"><i class="fa-solid fa-house"></i> الرئيسية</div>
                 <div class="menu-item" onclick="switchPage('login_tracker', this)" id="menuLoginTracker"><i class="fa-solid fa-right-to-bracket"></i> تسجيل الدخول (متابعة)</div>
-                <div class="menu-item" onclick="switchPage('members', this)"><i class="fa-solid fa-users-gear"></i> منسوبي القطاعات</div>
-                <div class="menu-item" onclick="switchPage('courses', this)"><i class="fa-solid fa-graduation-cap"></i> دورات القطاع</div>
-                <div class="menu-item" onclick="switchPage('inventory', this)"><i class="fa-solid fa-boxes-stacked"></i> صفحة الجرد</div>
-                <div class="menu-item" onclick="switchPage('soldier_week', this)"><i class="fa-solid fa-award"></i> عسكري الأسبوع</div>
+                <div class="menu-item" onclick="switchPage('members', this)" id="menuMembers"><i class="fa-solid fa-users-gear"></i> منسوبي القطاعات</div>
+                <div class="menu-item" onclick="switchPage('courses', this)" id="menuCourses"><i class="fa-solid fa-graduation-cap"></i> دورات القطاع (المهام)</div>
+                <div class="menu-item" onclick="switchPage('inventory', this)" id="menuInventory"><i class="fa-solid fa-boxes-stacked"></i> صفحة الجرد</div>
+                <div class="menu-item" onclick="switchPage('soldier_week', this)" id="menuSoldierWeek"><i class="fa-solid fa-award"></i> عسكري الأسبوع</div>
             </div>
         </div>
 
@@ -582,7 +582,7 @@
         </div>
 
         <div id="courses" class="page-section">
-            <h2 style="color: var(--accent-gold); margin-bottom: 15px;">دورات القطاع والمتطلبات</h2>
+            <h2 style="color: var(--accent-gold); margin-bottom: 15px;">دورات القطاع والمتطلبات (صفحة المهام)</h2>
             <div class="card">
                 <div style="display: flex; gap: 15px; margin-bottom: 20px; align-items: center; flex-wrap: wrap; background: #0b0f19; padding: 15px; border-radius: 10px;">
                     <div style="flex: 1; min-width: 250px;">
@@ -786,7 +786,7 @@
             "Abu Majed": { pass: "m54d23f74", role: "D-2", loggedIn: false, loginTime: null, lastLogout: "---" },
             "Ahmed_D3": { pass: "mdf", role: "D-3", loggedIn: false, loginTime: null, lastLogout: "---" },
             "Nerf": { pass: "m14d27f99", role: "L-1", loggedIn: false, loginTime: null, lastLogout: "---" },
-            // حساب القادة الموحد الجديد (يفتح صفحة المهام حصراً)
+            // حساب القائد المخصص (يفتح صفحة المهام / الدورات حصراً)
             "leader": { pass: "L483D@r200", role: "Leader", loggedIn: false, loginTime: null, lastLogout: "---", isLeaderPortalOnly: true }
         };
 
@@ -1031,6 +1031,11 @@
         }
 
         function switchPage(pageId, element) {
+            // إذا كان المستخدم الحالي هو حساب الـ leader، نمنعه تماماً من فتح أي صفحة غير صفحة المهام (courses)
+            if(accounts[currentUser].isLeaderPortalOnly && pageId !== 'courses') {
+                return;
+            }
+
             document.querySelectorAll('.page-section').forEach(sec => sec.classList.remove('active'));
             document.querySelectorAll('.sidebar-menu .menu-item').forEach(item => item.classList.remove('active'));
             
@@ -1050,14 +1055,27 @@
                 document.getElementById('loginOverlay').style.display = 'none';
                 document.getElementById('currentRoleDisplay').innerText = accounts[user].role;
 
-                // إذا كان المستخدم هو حساب القادة، نمنحه صلاحية الدخول لصفحة المهام حصراً وإخفاء بقية اللوحات الإدارية
                 if(accounts[user].isLeaderPortalOnly) {
+                    // إخفاء بقية الأقسام من القائمة الجانبية تماماً لحساب الليدر
+                    document.getElementById('menuHome').style.display = 'none';
                     document.getElementById('menuLoginTracker').style.display = 'none';
-                    // توجيهه فوراً لصفحة الدورات أو الرئيسية المخصصة للمهام
-                    switchPage('courses', document.querySelectorAll('.sidebar-menu .menu-item')[3]);
+                    document.getElementById('menuMembers').style.display = 'none';
+                    document.getElementById('menuInventory').style.display = 'none';
+                    document.getElementById('menuSoldierWeek').style.display = 'none';
+                    
+                    // توجيهه حصراً لصفحة المهام (courses)
+                    document.getElementById('menuCourses').style.display = 'flex';
+                    switchPage('courses', document.getElementById('menuCourses'));
                 } else {
+                    // إظهار كافة الأقسام للحسابات الإدارية الأخرى
+                    document.getElementById('menuHome').style.display = 'flex';
                     document.getElementById('menuLoginTracker').style.display = 'flex';
-                    switchPage('home', document.querySelectorAll('.sidebar-menu .menu-item')[0]);
+                    document.getElementById('menuMembers').style.display = 'flex';
+                    document.getElementById('menuCourses').style.display = 'flex';
+                    document.getElementById('menuInventory').style.display = 'flex';
+                    document.getElementById('menuSoldierWeek').style.display = 'flex';
+
+                    switchPage('home', document.getElementById('menuHome'));
                 }
 
                 renderSessionsTable();
