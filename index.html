@@ -422,6 +422,7 @@
                 <div class="menu-item" onclick="switchPage('login_tracker', this)" id="menuLoginTracker"><i class="fa-solid fa-right-to-bracket"></i> تسجيل الدخول (متابعة)</div>
                 <div class="menu-item" onclick="switchPage('members', this)" id="menuMembers"><i class="fa-solid fa-users-gear"></i> منسوبي القطاعات</div>
                 <div class="menu-item" onclick="switchPage('field_missions', this)" id="menuFieldMissions"><i class="fa-solid fa-flag-checkered"></i> المهام الميدانية</div>
+                <div class="menu-item" onclick="switchPage('courses', this)" id="menuCourses"><i class="fa-solid fa-graduation-cap"></i> الدورات</div>
                 <div class="menu-item" onclick="switchPage('inventory', this)" id="menuInventory"><i class="fa-solid fa-boxes-stacked"></i> صفحة الجرد</div>
                 <div class="menu-item" onclick="switchPage('soldier_week', this)" id="menuSoldierWeek"><i class="fa-solid fa-award"></i> عسكري الأسبوع</div>
             </div>
@@ -577,6 +578,14 @@
                         </tbody>
                     </table>
                 </div>
+            </div>
+        </div>
+
+        <!-- الدورات -->
+        <div id="courses" class="page-section">
+            <h2 style="color: var(--accent-gold); margin-bottom: 15px;">الدورات العسكرية</h2>
+            <div class="card">
+                <p style="color: var(--text-muted);">قسم الدورات العسكرية وتدريب المنسوبين.</p>
             </div>
         </div>
 
@@ -1022,6 +1031,7 @@
                     document.getElementById('menuHome').style.display = 'none';
                     document.getElementById('menuLoginTracker').style.display = 'none';
                     document.getElementById('menuMembers').style.display = 'none';
+                    document.getElementById('menuCourses').style.display = 'none';
                     document.getElementById('menuInventory').style.display = 'none';
                     document.getElementById('menuSoldierWeek').style.display = 'none';
                     
@@ -1032,6 +1042,7 @@
                     document.getElementById('menuLoginTracker').style.display = 'flex';
                     document.getElementById('menuMembers').style.display = 'flex';
                     document.getElementById('menuFieldMissions').style.display = 'flex';
+                    document.getElementById('menuCourses').style.display = 'flex';
                     document.getElementById('menuInventory').style.display = 'flex';
                     document.getElementById('menuSoldierWeek').style.display = 'flex';
 
@@ -1081,7 +1092,6 @@
             renderSessionsTable();
         }
 
-        /* دوام المهام الميدانية مع التحكم بصلاحيات العرض */
         function submitFieldMission() {
             let id = document.getElementById('missionSoldierId').value.trim();
             let link = document.getElementById('missionImageLink').value.trim();
@@ -1523,4 +1533,3 @@
     </script>
 </body>
 </html>
-```[cite: 3]
