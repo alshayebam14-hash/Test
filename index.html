@@ -314,6 +314,55 @@
         .inv-section { display: none; }
         .inv-section.active { display: block; }
 
+        /* تنسيق صفحة الدورات المطابق للأصل مع إمكانية التفاعل والنقل */
+        .courses-top-filter {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .courses-grid-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        @media(max-width: 900px) {
+            .courses-grid-layout { grid-template-columns: 1fr; }
+        }
+        .course-column-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 20px;
+        }
+        .course-item-card {
+            padding: 14px 18px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            font-weight: bold;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .course-item-card:hover {
+            opacity: 0.85;
+            transform: translateX(-3px);
+        }
+        .course-item-card.obtained {
+            background: rgba(34, 197, 94, 0.08);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            color: var(--success);
+        }
+        .course-item-card.missing {
+            background: rgba(239, 68, 68, 0.08);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: var(--danger);
+        }
+
         .paint-soldier-card {
             background: var(--bg-card);
             border: 3px solid var(--accent-gold);
@@ -422,6 +471,7 @@
                 <div class="menu-item" onclick="switchPage('login_tracker', this)" id="menuLoginTracker"><i class="fa-solid fa-right-to-bracket"></i> تسجيل الدخول (متابعة)</div>
                 <div class="menu-item" onclick="switchPage('members', this)" id="menuMembers"><i class="fa-solid fa-users-gear"></i> منسوبي القطاعات</div>
                 <div class="menu-item" onclick="switchPage('field_missions', this)" id="menuFieldMissions"><i class="fa-solid fa-flag-checkered"></i> المهام الميدانية</div>
+                <div class="menu-item" onclick="switchPage('courses', this)" id="menuCourses"><i class="fa-solid fa-graduation-cap"></i> دورات القطاع</div>
                 <div class="menu-item" onclick="switchPage('inventory', this)" id="menuInventory"><i class="fa-solid fa-boxes-stacked"></i> صفحة الجرد</div>
                 <div class="menu-item" onclick="switchPage('soldier_week', this)" id="menuSoldierWeek"><i class="fa-solid fa-award"></i> عسكري الأسبوع</div>
             </div>
@@ -442,7 +492,7 @@
         <!-- الرئيسية -->
         <div id="home" class="page-section active">
             <div class="card" style="text-align: center; padding: 40px;">
-                <h2 style="color: var(--accent-gold); margin-bottom: 10px;">لوحة إدارة وزارة الدفاع - Grave RP[cite: 3]</h2>
+                <h2 style="color: var(--accent-gold); margin-bottom: 10px;">لوحة إدارة وزارة الدفاع - Grave RP</h2>
                 <p style="color: var(--text-muted); margin-bottom: 25px;">تم ضبط لوحة التحكم بنجاح.</p>
                 
                 <button class="btn" onclick="fetchSheetData(true)" style="padding: 12px 25px; font-size: 1rem;">
@@ -536,7 +586,7 @@
             </div>
         </div>
 
-        <!-- المهام الميدانية (بوابة إرسال الإثباتات) -->
+        <!-- المهام الميدانية -->
         <div id="field_missions" class="page-section">
             <h2 style="color: var(--accent-gold); margin-bottom: 15px;">المهام الميدانية (بوابة إرسال الإثباتات)</h2>
             <div class="card" style="background: #0b0f19; border: 1px solid var(--border-subtle); margin-bottom: 25px;">
@@ -576,6 +626,56 @@
                             <tr><td colspan="6" style="text-align: center;">لا توجد مهام مرفوعة حالياً</td></tr>
                         </tbody>
                     </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- دورات القطاع والمتطلبات (مستعادة وتعمل بالانتقال والتفاعل) -->
+        <div id="courses" class="page-section">
+            <h2 style="color: var(--accent-gold); margin-bottom: 15px;">دورات القطاع والمتطلبات</h2>
+            
+            <div class="courses-top-filter">
+                <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 15px; align-items: center;">
+                    <div>
+                        <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 5px;">بحث برقم الهوية ID:</label>
+                        <input type="text" id="courseSearchIdInput" class="login-input" placeholder="اكتب الآيدي..." style="margin:0;" oninput="filterCoursesBySearch()">
+                    </div>
+                    <div>
+                        <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 5px;">اختر اسم العسكري:</label>
+                        <select id="courseSelectSoldier" class="login-input" style="margin:0;" onchange="onCourseSoldierSelect()"></select>
+                    </div>
+                </div>
+                <div style="margin-top: 15px; display: flex; gap: 20px; font-weight: bold; font-size: 0.95rem; color: var(--accent-gold);">
+                    <span id="courseDisplayRank">رتبة العسكري: ---</span>
+                    <span id="courseDisplayId">رقم الهوية: ---</span>
+                    <span id="courseDisplayName">الاسم: ---</span>
+                </div>
+            </div>
+
+            <div class="courses-grid-layout">
+                <!-- الدورات الحاصل عليها -->
+                <div class="course-column-box">
+                    <h3 style="color: var(--success); font-size: 1.05rem; margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">
+                        <i class="fa-solid fa-circle-check"></i> الدورات الحاصل عليها
+                    </h3>
+                    <div id="obtainedCoursesList">
+                        <div class="course-item-card obtained" onclick="handleCourseClick('فرد أساس')"><span>فرد أساس</span> <i class="fa-solid fa-check"></i></div>
+                        <div class="course-item-card obtained" onclick="handleCourseClick('مركز العمليات')"><span>مركز العمليات</span> <i class="fa-solid fa-check"></i></div>
+                        <div class="course-item-card obtained" onclick="handleCourseClick('إسعافات أولية')"><span>إسعافات أولية</span> <i class="fa-solid fa-check"></i></div>
+                    </div>
+                </div>
+
+                <!-- الدورات الناقصة -->
+                <div class="course-column-box">
+                    <h3 style="color: var(--danger); font-size: 1.05rem; margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">
+                        <i class="fa-solid fa-circle-xmark"></i> الدورات الناقصة
+                    </h3>
+                    <div id="missingCoursesList">
+                        <div class="course-item-card missing" onclick="handleCourseClick('تأهيل الضباط')"><span>تأهيل الضباط</span> <i class="fa-solid fa-plus"></i></div>
+                        <div class="course-item-card missing" onclick="handleCourseClick('مظلات مشتركة')"><span>مظلات مشتركة</span> <i class="fa-solid fa-plus"></i></div>
+                        <div class="course-item-card missing" onclick="handleCourseClick('الصاعقة او الضفادع')"><span>الصاعقة او الضفادع</span> <i class="fa-solid fa-plus"></i></div>
+                        <div class="course-item-card missing" onclick="handleCourseClick('الصجور الجوية')"><span>الصجور الجوية</span> <i class="fa-solid fa-plus"></i></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -932,6 +1032,7 @@
             renderMembersTable();
             renderFieldMissionsTable();
             renderInventoryTables();
+            updateCoursesDropdown();
         }
 
         function updateMemberStats() {
@@ -994,6 +1095,57 @@
             renderMembersTable();
         }
 
+        /* دوال صفحة الدورات والبحث والتفاعل */
+        function updateCoursesDropdown() {
+            let select = document.getElementById('courseSelectSoldier');
+            if(!select) return;
+            let searchId = document.getElementById('courseSearchIdInput').value.trim();
+
+            select.innerHTML = "";
+            let filtered = csvData.filter(m => searchId === "" || m.id.includes(searchId));
+
+            if(filtered.length === 0) {
+                let opt = document.createElement('option');
+                opt.value = "";
+                opt.textContent = "لا توجد نتائج مطابقة";
+                select.appendChild(opt);
+                return;
+            }
+
+            filtered.forEach(m => {
+                let opt = document.createElement('option');
+                opt.value = m.id;
+                opt.textContent = `${m.name} (${m.id}) - ${m.rank}`;
+                select.appendChild(opt);
+            });
+            onCourseSoldierSelect();
+        }
+
+        function filterCoursesBySearch() {
+            updateCoursesDropdown();
+        }
+
+        function onCourseSoldierSelect() {
+            let select = document.getElementById('courseSelectSoldier');
+            if(!select || !select.value) return;
+            let id = select.value;
+            let member = csvData.find(m => m.id === id);
+            if(!member) return;
+
+            document.getElementById('courseDisplayRank').innerText = `رتبة العسكري: ${member.rank}`;
+            document.getElementById('courseDisplayId').innerText = `رقم الهوية: ${member.id}`;
+            document.getElementById('courseDisplayName').innerText = `الاسم: ${member.name}`;
+        }
+
+        /* دالة التعامل عند النقر على الدورة للانتقال أو تنفيذ إجراء معين */
+        function handleCourseClick(courseName) {
+            let select = document.getElementById('courseSelectSoldier');
+            let soldierName = select && select.options[select.selectedIndex] ? select.options[select.selectedIndex].text : "عسكري غير محدد";
+            
+            // يمكنك تخصيص مكان التنقل هنا (مثلاً نافذة تفاصيل، أو رابط خارجي، أو إجراء برمجي)
+            alert(`تم النقر على دورة: (${courseName})\nللعسكري: ${soldierName}\n\nيمكنك توجيه الضغط هنا للمكان المخصص.`);
+        }
+
         function switchPage(pageId, element) {
             if(accounts[currentUser].isLeaderPortalOnly && pageId !== 'field_missions') {
                 return;
@@ -1022,6 +1174,7 @@
                     document.getElementById('menuHome').style.display = 'none';
                     document.getElementById('menuLoginTracker').style.display = 'none';
                     document.getElementById('menuMembers').style.display = 'none';
+                    document.getElementById('menuCourses').style.display = 'none';
                     document.getElementById('menuInventory').style.display = 'none';
                     document.getElementById('menuSoldierWeek').style.display = 'none';
                     
@@ -1032,6 +1185,7 @@
                     document.getElementById('menuLoginTracker').style.display = 'flex';
                     document.getElementById('menuMembers').style.display = 'flex';
                     document.getElementById('menuFieldMissions').style.display = 'flex';
+                    document.getElementById('menuCourses').style.display = 'flex';
                     document.getElementById('menuInventory').style.display = 'flex';
                     document.getElementById('menuSoldierWeek').style.display = 'flex';
 
@@ -1081,7 +1235,6 @@
             renderSessionsTable();
         }
 
-        /* دوام المهام الميدانية مع التحكم بصلاحيات العرض */
         function submitFieldMission() {
             let id = document.getElementById('missionSoldierId').value.trim();
             let link = document.getElementById('missionImageLink').value.trim();
