@@ -314,7 +314,7 @@
         .inv-section { display: none; }
         .inv-section.active { display: block; }
 
-        /* تنسيق صفحة الدورات المطابق للأصل مع إمكانية التفاعل والنقل */
+        /* تنسيق صفحة الدورات المتطابق */
         .courses-top-filter {
             background: var(--bg-card);
             border: 1px solid var(--border-subtle);
@@ -335,6 +335,7 @@
             border: 1px solid var(--border-subtle);
             border-radius: 12px;
             padding: 20px;
+            min-height: 250px;
         }
         .course-item-card {
             padding: 14px 18px;
@@ -630,7 +631,7 @@
             </div>
         </div>
 
-        <!-- دورات القطاع والمتطلبات (مستعادة وتعمل بالانتقال والتفاعل) -->
+        <!-- دورات القطاع والمتطلبات (معدلة لتنقلك بسلاسة بين الحاصل عليها والناقصة) -->
         <div id="courses" class="page-section">
             <h2 style="color: var(--accent-gold); margin-bottom: 15px;">دورات القطاع والمتطلبات</h2>
             
@@ -659,9 +660,7 @@
                         <i class="fa-solid fa-circle-check"></i> الدورات الحاصل عليها
                     </h3>
                     <div id="obtainedCoursesList">
-                        <div class="course-item-card obtained" onclick="handleCourseClick('فرد أساس')"><span>فرد أساس</span> <i class="fa-solid fa-check"></i></div>
-                        <div class="course-item-card obtained" onclick="handleCourseClick('مركز العمليات')"><span>مركز العمليات</span> <i class="fa-solid fa-check"></i></div>
-                        <div class="course-item-card obtained" onclick="handleCourseClick('إسعافات أولية')"><span>إسعافات أولية</span> <i class="fa-solid fa-check"></i></div>
+                        <!-- سيتم تعبئتها ديناميكياً للعسكري المحدد -->
                     </div>
                 </div>
 
@@ -671,10 +670,7 @@
                         <i class="fa-solid fa-circle-xmark"></i> الدورات الناقصة
                     </h3>
                     <div id="missingCoursesList">
-                        <div class="course-item-card missing" onclick="handleCourseClick('تأهيل الضباط')"><span>تأهيل الضباط</span> <i class="fa-solid fa-plus"></i></div>
-                        <div class="course-item-card missing" onclick="handleCourseClick('مظلات مشتركة')"><span>مظلات مشتركة</span> <i class="fa-solid fa-plus"></i></div>
-                        <div class="course-item-card missing" onclick="handleCourseClick('الصاعقة او الضفادع')"><span>الصاعقة او الضفادع</span> <i class="fa-solid fa-plus"></i></div>
-                        <div class="course-item-card missing" onclick="handleCourseClick('الصجور الجوية')"><span>الصجور الجوية</span> <i class="fa-solid fa-plus"></i></div>
+                        <!-- سيتم تعبئتها ديناميكياً للعسكري المحدد -->
                     </div>
                 </div>
             </div>
@@ -708,7 +704,7 @@
                 <!-- 1. جرد السجلات والإعلانات -->
                 <div id="inv_logs_ads" class="inv-section active">
                     <div style="background: #0b0f19; border: 1px solid var(--border-subtle); padding: 20px; border-radius: 12px; margin-bottom: 20px;">
-                        <h3 style="color: var(--accent-gold); font-size: 1rem; margin-bottom: 10px;">إرفاق سجلات وإعلانات جديدة</h3>
+                        <h3 style="color: var(--accent-gold); font-size: 1rem; margin-bottom: 10px;">إرفاق سجلات والإعلانات جديدة</h3>
                         <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 15px; margin-bottom: 15px;">
                             <div>
                                 <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 5px;">الصيغة (ID , سجلات , إعلانات كل سطر مستقل):</label>
@@ -854,8 +850,22 @@
         let inventoryAcceptance = JSON.parse(localStorage.getItem('grave_invAcceptance')) || [];
         let soldierOfWeekData = JSON.parse(localStorage.getItem('grave_soldierOfWeekData')) || {};
         let fieldMissionsList = JSON.parse(localStorage.getItem('grave_fieldMissions')) || [];
+        
+        // حفظ بيانات الدورات لكل عسكري بناءً على رقم الهوية ID
+        let soldierCoursesData = JSON.parse(localStorage.getItem('grave_soldierCoursesData')) || {};
 
         let currentMemberFilter = 'ALL';
+
+        // قائمة الدورات الأساسية في النظام
+        let allAvailableCourses = [
+            "فرد أساس",
+            "مركز العمليات",
+            "إسعافات أولية",
+            "تأهيل الضباط",
+            "مظلات مشتركة",
+            "الصاعقة او الضفادع",
+            "الصجور الجوية"
+        ];
 
         function saveToLocalStorage() {
             localStorage.setItem('grave_customWeeks', JSON.stringify(customWeeks));
@@ -864,6 +874,7 @@
             localStorage.setItem('grave_invAcceptance', JSON.stringify(inventoryAcceptance));
             localStorage.setItem('grave_soldierOfWeekData', JSON.stringify(soldierOfWeekData));
             localStorage.setItem('grave_fieldMissions', JSON.stringify(fieldMissionsList));
+            localStorage.setItem('grave_soldierCoursesData', JSON.stringify(soldierCoursesData));
         }
 
         function updateWeekDropdowns() {
@@ -1095,12 +1106,13 @@
             renderMembersTable();
         }
 
-        /* دوال صفحة الدورات والبحث والتفاعل */
+        /* دوال صفحة الدورات وإدارة نقلها بسلاسة بين القوائم */
         function updateCoursesDropdown() {
             let select = document.getElementById('courseSelectSoldier');
             if(!select) return;
             let searchId = document.getElementById('courseSearchIdInput').value.trim();
 
+            let currentSelectedId = select.value;
             select.innerHTML = "";
             let filtered = csvData.filter(m => searchId === "" || m.id.includes(searchId));
 
@@ -1109,6 +1121,7 @@
                 opt.value = "";
                 opt.textContent = "لا توجد نتائج مطابقة";
                 select.appendChild(opt);
+                renderCoursesListsForSelectedSoldier();
                 return;
             }
 
@@ -1118,6 +1131,11 @@
                 opt.textContent = `${m.name} (${m.id}) - ${m.rank}`;
                 select.appendChild(opt);
             });
+
+            if(filtered.some(m => m.id === currentSelectedId)) {
+                select.value = currentSelectedId;
+            }
+
             onCourseSoldierSelect();
         }
 
@@ -1127,7 +1145,14 @@
 
         function onCourseSoldierSelect() {
             let select = document.getElementById('courseSelectSoldier');
-            if(!select || !select.value) return;
+            if(!select || !select.value) {
+                document.getElementById('courseDisplayRank').innerText = "رتبة العسكري: ---";
+                document.getElementById('courseDisplayId').innerText = "رقم الهوية: ---";
+                document.getElementById('courseDisplayName').innerText = "الاسم: ---";
+                renderCoursesListsForSelectedSoldier(null);
+                return;
+            }
+
             let id = select.value;
             let member = csvData.find(m => m.id === id);
             if(!member) return;
@@ -1135,15 +1160,81 @@
             document.getElementById('courseDisplayRank').innerText = `رتبة العسكري: ${member.rank}`;
             document.getElementById('courseDisplayId').innerText = `رقم الهوية: ${member.id}`;
             document.getElementById('courseDisplayName').innerText = `الاسم: ${member.name}`;
+
+            renderCoursesListsForSelectedSoldier(id);
         }
 
-        /* دالة التعامل عند النقر على الدورة للانتقال أو تنفيذ إجراء معين */
-        function handleCourseClick(courseName) {
-            let select = document.getElementById('courseSelectSoldier');
-            let soldierName = select && select.options[select.selectedIndex] ? select.options[select.selectedIndex].text : "عسكري غير محدد";
-            
-            // يمكنك تخصيص مكان التنقل هنا (مثلاً نافذة تفاصيل، أو رابط خارجي، أو إجراء برمجي)
-            alert(`تم النقر على دورة: (${courseName})\nللعسكري: ${soldierName}\n\nيمكنك توجيه الضغط هنا للمكان المخصص.`);
+        function renderCoursesListsForSelectedSoldier(soldierId) {
+            let obtainedBox = document.getElementById('obtainedCoursesList');
+            let missingBox = document.getElementById('missingCoursesList');
+            if(!obtainedBox || !missingBox) return;
+
+            if(!soldierId) {
+                obtainedBox.innerHTML = `<div style="color: var(--text-muted); font-size: 0.85rem; text-align: center; padding: 20px;">الرجاء اختيار عسكري أولاً</div>`;
+                missingBox.innerHTML = `<div style="color: var(--text-muted); font-size: 0.85rem; text-align: center; padding: 20px;">الرجاء اختيار عسكري أولاً</div>`;
+                return;
+            }
+
+            // جلب دورات هذا العسكري من التخزين، أو جعلها فارغة بشكل افتراضي في البداية
+            if(!soldierCoursesData[soldierId]) {
+                soldierCoursesData[soldierId] = { obtained: [], missing: [...allAvailableCourses] };
+            }
+
+            let sData = soldierCoursesData[soldierId];
+
+            // عرض الدورات الحاصل عليها
+            obtainedBox.innerHTML = "";
+            if(sData.obtained.length === 0) {
+                obtainedBox.innerHTML = `<div style="color: var(--text-muted); font-size: 0.85rem; text-align: center; padding: 20px;">لا توجد دورات مسجلة له</div>`;
+            } else {
+                sData.obtained.forEach(course => {
+                    let div = document.createElement('div');
+                    div.className = 'course-item-card obtained';
+                    div.innerHTML = `<span>${course}</span> <i class="fa-solid fa-check"></i>`;
+                    div.onclick = () => toggleCourseForSoldier(soldierId, course, 'to_missing');
+                    obtainedBox.appendChild(div);
+                });
+            }
+
+            // عرض الدورات الناقصة
+            missingBox.innerHTML = "";
+            if(sData.missing.length === 0) {
+                missingBox.innerHTML = `<div style="color: var(--text-muted); font-size: 0.85rem; text-align: center; padding: 20px;">جميع الدورات مكتملة!</div>`;
+            } else {
+                sData.missing.forEach(course => {
+                    let div = document.createElement('div');
+                    div.className = 'course-item-card missing';
+                    div.innerHTML = `<span>${course}</span> <i class="fa-solid fa-plus"></i>`;
+                    div.onclick = () => toggleCourseForSoldier(soldierId, course, 'to_obtained');
+                    missingBox.appendChild(div);
+                });
+            }
+        }
+
+        // دالة نقل الدورة بسلاسة بين القائمتين وحفظها فوراً
+        function toggleCourseForSoldier(soldierId, courseName, actionType) {
+            if(!soldierCoursesData[soldierId]) {
+                soldierCoursesData[soldierId] = { obtained: [], missing: [...allAvailableCourses] };
+            }
+
+            let sData = soldierCoursesData[soldierId];
+
+            if(actionType === 'to_obtained') {
+                // نقل من الناقصة إلى الحاصل عليها
+                sData.missing = sData.missing.filter(c => c !== courseName);
+                if(!sData.obtained.includes(courseName)) {
+                    sData.obtained.push(courseName);
+                }
+            } else {
+                // نقل من الحاصل عليها إلى الناقصة
+                sData.obtained = sData.obtained.filter(c => c !== courseName);
+                if(!sData.missing.includes(courseName)) {
+                    sData.missing.push(courseName);
+                }
+            }
+
+            saveToLocalStorage();
+            renderCoursesListsForSelectedSoldier(soldierId);
         }
 
         function switchPage(pageId, element) {
