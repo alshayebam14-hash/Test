@@ -444,7 +444,6 @@
             font-size: 1.05rem;
         }
 
-        /* تنسيقات كارد أرشيف الملاحظات الجديد */
         .military-note-card {
             background: #131722;
             border: 1px solid var(--border-subtle);
@@ -884,7 +883,6 @@
                     <h3 style="color: var(--accent-gold); font-size: 1rem;"><i class="fa-solid fa-box-archive"></i> قائمة الملاحظات المؤرشفة</h3>
                     <input type="text" id="archiveSearchInput" class="login-input" placeholder="بحث في الملاحظات..." style="margin:0; max-width: 250px;" oninput="renderNotesArchiveTable()">
                 </div>
-                <!-- حاوية عرض الكاردات بدلاً من الجدول التقليدي -->
                 <div id="notesArchiveContainer">
                     <p style="color: var(--text-muted); text-align: center; padding: 20px;">لا توجد ملاحظات مؤرشفة حالياً</p>
                 </div>
@@ -1142,7 +1140,7 @@
                         warnings: r[11] ? r[11].trim() : "0",
                         promotionDate: r[12] ? r[12].trim() : "---",
                         manualNotes: r[13] ? r[13].trim() : "",
-                        vacationStatus: r[14] ? r[14].trim() : "على رأس العمل",
+                        vacationStatus: r[14] ? r[14].trim() : "FALSE",
                         category: category
                     });
                 }
@@ -1186,6 +1184,12 @@
             }
 
             filtered.forEach(m => {
+                // تحويل قيمة حالة الإجازة إلى نص واضح وملون
+                let isLeave = m.vacationStatus === true || m.vacationStatus === "TRUE" || m.vacationStatus === "true" || m.vacationStatus === "في إجازة";
+                let leaveStatusHtml = isLeave 
+                    ? '<span style="color: var(--danger); font-weight: bold;">في إجازة</span>' 
+                    : '<span style="color: var(--success); font-weight: bold;">على رأس عمل</span>';
+
                 let tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td>${m.rank}</td>
@@ -1200,7 +1204,7 @@
                     <td>${m.warnings}</td>
                     <td>${m.promotionDate}</td>
                     <td>${m.manualNotes}</td>
-                    <td>${m.vacationStatus}</td>
+                    <td>${leaveStatusHtml}</td>
                 `;
                 tbody.appendChild(tr);
             });
