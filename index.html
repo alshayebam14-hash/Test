@@ -443,6 +443,94 @@
             font-weight: bold;
             font-size: 1.05rem;
         }
+
+        /* تنسيقات كارد أرشيف الملاحظات الجديد */
+        .military-note-card {
+            background: #131722;
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 14px;
+            color: #fff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+        .military-note-card:hover {
+            border-color: var(--accent-gold);
+        }
+        .card-header-note {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-subtle);
+            padding-bottom: 10px;
+            margin-bottom: 12px;
+        }
+        .soldier-info-note {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            color: var(--accent-gold);
+        }
+        .military-icon {
+            font-size: 1rem;
+        }
+        .card-timestamp {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+        .card-body-note {
+            padding: 6px 0;
+            margin-bottom: 12px;
+        }
+        .note-text-content {
+            font-size: 0.9rem;
+            color: #d1d4dc;
+            line-height: 1.6;
+            background: #0b0e14;
+            padding: 12px;
+            border-radius: 6px;
+            border-right: 3px solid var(--accent-gold);
+        }
+        .card-footer-note {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid var(--border-subtle);
+            padding-top: 10px;
+            font-size: 0.85rem;
+        }
+        .author-info {
+            color: var(--text-muted);
+        }
+        .author-name {
+            color: #fff;
+            font-weight: 600;
+        }
+        .card-actions {
+            display: flex;
+            gap: 8px;
+        }
+        .btn-action {
+            background: transparent;
+            border: 1px solid var(--border-subtle);
+            padding: 5px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            color: #ccc;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.2s;
+        }
+        .delete-btn:hover {
+            background: var(--danger);
+            color: #fff;
+            border-color: var(--danger);
+        }
     </style>
 </head>
 <body>
@@ -796,22 +884,9 @@
                     <h3 style="color: var(--accent-gold); font-size: 1rem;"><i class="fa-solid fa-box-archive"></i> قائمة الملاحظات المؤرشفة</h3>
                     <input type="text" id="archiveSearchInput" class="login-input" placeholder="بحث في الملاحظات..." style="margin:0; max-width: 250px;" oninput="renderNotesArchiveTable()">
                 </div>
-                <div class="table-responsive">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>التاريخ والوقت</th>
-                                <th>ID العسكري</th>
-                                <th>اسم العسكري</th>
-                                <th>الملاحظة</th>
-                                <th>الكاتب أو المسؤول</th>
-                                <th>الإجراء</th>
-                            </tr>
-                        </thead>
-                        <tbody id="notesArchiveTableBody">
-                            <tr><td colspan="6" style="text-align: center;">لا توجد ملاحظات مؤرشفة حالياً</td></tr>
-                        </tbody>
-                    </table>
+                <!-- حاوية عرض الكاردات بدلاً من الجدول التقليدي -->
+                <div id="notesArchiveContainer">
+                    <p style="color: var(--text-muted); text-align: center; padding: 20px;">لا توجد ملاحظات مؤرشفة حالياً</p>
                 </div>
             </div>
         </div>
@@ -1294,8 +1369,8 @@
         }
 
         function renderNotesArchiveTable() {
-            let tbody = document.getElementById('notesArchiveTableBody');
-            if(!tbody) return;
+            let container = document.getElementById('notesArchiveContainer');
+            if(!container) return;
 
             let searchVal = document.getElementById('archiveSearchInput') ? document.getElementById('archiveSearchInput').value.toLowerCase() : "";
 
@@ -1304,23 +1379,39 @@
             });
 
             if(filtered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" style="text-align: center;">لا توجد ملاحظات مؤرشفة مطابقة</td></tr>`;
+                container.innerHTML = `<p style="color: var(--text-muted); text-align: center; padding: 20px;">لا توجد ملاحظات مؤرشفة مطابقة</p>`;
                 return;
             }
 
-            tbody.innerHTML = "";
-            filtered.forEach((item, index) => {
+            container.innerHTML = "";
+            filtered.forEach((item) => {
                 let originalIndex = notesArchiveList.indexOf(item);
-                let tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${item.date}</td>
-                    <td>${item.id}</td>
-                    <td>${item.name}</td>
-                    <td>${item.note}</td>
-                    <td><span style="color: var(--accent-gold);">${item.author}</span></td>
-                    <td><button class="btn btn-danger" style="padding: 4px 10px; font-size: 0.75rem;" onclick="deleteArchiveNote(${originalIndex})">حذف</button></td>
+                let cardDiv = document.createElement('div');
+                cardDiv.className = 'military-note-card';
+                cardDiv.innerHTML = `
+                    <div class="card-header-note">
+                        <div class="soldier-info-note">
+                            <i class="fas fa-shield-alt military-icon"></i>
+                            <span>[${item.id}] ${item.name}</span>
+                        </div>
+                        <div class="card-timestamp">${item.date}</div>
+                    </div>
+                    <div class="card-body-note">
+                        <p class="note-text-content">${item.note}</p>
+                    </div>
+                    <div class="card-footer-note">
+                        <div class="author-info">
+                            <span>المسؤول: </span>
+                            <span class="author-name">${item.author}</span>
+                        </div>
+                        <div class="card-actions">
+                            <button class="btn-action delete-btn" onclick="deleteArchiveNote(${originalIndex})">
+                                <i class="fas fa-trash-alt"></i> حذف
+                            </button>
+                        </div>
+                    </div>
                 `;
-                tbody.appendChild(tr);
+                container.appendChild(cardDiv);
             });
         }
 
