@@ -837,7 +837,8 @@
             "Abu Majed": { pass: "m54d23f74", role: "D-2", loggedIn: false, loginTime: null, lastLogout: "---" },
             "Ahmed_D3": { pass: "mdf", role: "D-3", loggedIn: false, loginTime: null, lastLogout: "---" },
             "Nerf": { pass: "m14d27f99", role: "L-1", loggedIn: false, loginTime: null, lastLogout: "---" },
-            "leader": { pass: "L483D@r200", role: "Leader", loggedIn: false, loginTime: null, lastLogout: "---", isLeaderPortalOnly: true }
+            "leader": { pass: "L483D@r200", role: "Leader", loggedIn: false, loginTime: null, lastLogout: "---", isLeaderPortalOnly: true },
+            "الحاسبات الادارية": { pass: "admin_pc_2026", role: "IT", loggedIn: false, loginTime: null, lastLogout: "---", isITPortalOnly: true }
         };
 
         let currentUser = "Ahmed";
@@ -851,12 +852,10 @@
         let soldierOfWeekData = JSON.parse(localStorage.getItem('grave_soldierOfWeekData')) || {};
         let fieldMissionsList = JSON.parse(localStorage.getItem('grave_fieldMissions')) || [];
         
-        // حفظ بيانات الدورات لكل عسكري بناءً على رقم الهوية ID
         let soldierCoursesData = JSON.parse(localStorage.getItem('grave_soldierCoursesData')) || {};
 
         let currentMemberFilter = 'ALL';
 
-        // قائمة الدورات الأساسية في النظام
         let allAvailableCourses = [
             "فرد أساس",
             "مركز العمليات",
@@ -1106,7 +1105,6 @@
             renderMembersTable();
         }
 
-        /* دوال صفحة الدورات وإدارة نقلها بسلاسة بين القوائم */
         function updateCoursesDropdown() {
             let select = document.getElementById('courseSelectSoldier');
             if(!select) return;
@@ -1175,14 +1173,12 @@
                 return;
             }
 
-            // جلب دورات هذا العسكري من التخزين، أو جعلها فارغة بشكل افتراضي في البداية
             if(!soldierCoursesData[soldierId]) {
                 soldierCoursesData[soldierId] = { obtained: [], missing: [...allAvailableCourses] };
             }
 
             let sData = soldierCoursesData[soldierId];
 
-            // عرض الدورات الحاصل عليها
             obtainedBox.innerHTML = "";
             if(sData.obtained.length === 0) {
                 obtainedBox.innerHTML = `<div style="color: var(--text-muted); font-size: 0.85rem; text-align: center; padding: 20px;">لا توجد دورات مسجلة له</div>`;
@@ -1196,7 +1192,6 @@
                 });
             }
 
-            // عرض الدورات الناقصة
             missingBox.innerHTML = "";
             if(sData.missing.length === 0) {
                 missingBox.innerHTML = `<div style="color: var(--text-muted); font-size: 0.85rem; text-align: center; padding: 20px;">جميع الدورات مكتملة!</div>`;
@@ -1211,7 +1206,6 @@
             }
         }
 
-        // دالة نقل الدورة بسلاسة بين القائمتين وحفظها فوراً
         function toggleCourseForSoldier(soldierId, courseName, actionType) {
             if(!soldierCoursesData[soldierId]) {
                 soldierCoursesData[soldierId] = { obtained: [], missing: [...allAvailableCourses] };
@@ -1220,13 +1214,11 @@
             let sData = soldierCoursesData[soldierId];
 
             if(actionType === 'to_obtained') {
-                // نقل من الناقصة إلى الحاصل عليها
                 sData.missing = sData.missing.filter(c => c !== courseName);
                 if(!sData.obtained.includes(courseName)) {
                     sData.obtained.push(courseName);
                 }
             } else {
-                // نقل من الحاصل عليها إلى الناقصة
                 sData.obtained = sData.obtained.filter(c => c !== courseName);
                 if(!sData.missing.includes(courseName)) {
                     sData.missing.push(courseName);
@@ -1239,6 +1231,9 @@
 
         function switchPage(pageId, element) {
             if(accounts[currentUser].isLeaderPortalOnly && pageId !== 'field_missions') {
+                return;
+            }
+            if(accounts[currentUser].isITPortalOnly && pageId !== 'home' && pageId !== 'members') {
                 return;
             }
 
@@ -1271,6 +1266,16 @@
                     
                     document.getElementById('menuFieldMissions').style.display = 'flex';
                     switchPage('field_missions', document.getElementById('menuFieldMissions'));
+                } else if(accounts[user].isITPortalOnly) {
+                    document.getElementById('menuHome').style.display = 'flex';
+                    document.getElementById('menuLoginTracker').style.display = 'none';
+                    document.getElementById('menuMembers').style.display = 'flex';
+                    document.getElementById('menuFieldMissions').style.display = 'none';
+                    document.getElementById('menuCourses').style.display = 'none';
+                    document.getElementById('menuInventory').style.display = 'none';
+                    document.getElementById('menuSoldierWeek').style.display = 'none';
+
+                    switchPage('home', document.getElementById('menuHome'));
                 } else {
                     document.getElementById('menuHome').style.display = 'flex';
                     document.getElementById('menuLoginTracker').style.display = 'flex';
