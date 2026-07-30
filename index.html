@@ -314,7 +314,6 @@
         .inv-section { display: none; }
         .inv-section.active { display: block; }
 
-        /* تنسيق صفحة الدورات المتطابق */
         .courses-top-filter {
             background: var(--bg-card);
             border: 1px solid var(--border-subtle);
@@ -474,6 +473,7 @@
                 <div class="menu-item" onclick="switchPage('field_missions', this)" id="menuFieldMissions"><i class="fa-solid fa-flag-checkered"></i> المهام الميدانية</div>
                 <div class="menu-item" onclick="switchPage('courses', this)" id="menuCourses"><i class="fa-solid fa-graduation-cap"></i> دورات القطاع</div>
                 <div class="menu-item" onclick="switchPage('inventory', this)" id="menuInventory"><i class="fa-solid fa-boxes-stacked"></i> صفحة الجرد</div>
+                <div class="menu-item" onclick="switchPage('notes_archive', this)" id="menuNotesArchive"><i class="fa-solid fa-box-archive"></i> أرشيف الملاحظات</div>
                 <div class="menu-item" onclick="switchPage('soldier_week', this)" id="menuSoldierWeek"><i class="fa-solid fa-award"></i> عسكري الأسبوع</div>
             </div>
         </div>
@@ -503,6 +503,7 @@
             </div>
         </div>
 
+        <!-- تسجيل الدخول (متابعة) -->
         <div id="login_tracker" class="page-section">
             <h2 style="color: var(--accent-gold); margin-bottom: 15px;">إدارة وحالة تسجيل الدخول لأعضاء المجلس و L1</h2>
             <div class="card">
@@ -631,7 +632,7 @@
             </div>
         </div>
 
-        <!-- دورات القطاع والمتطلبات (معدلة لتنقلك بسلاسة بين الحاصل عليها والناقصة) -->
+        <!-- دورات القطاع والمتطلبات -->
         <div id="courses" class="page-section">
             <h2 style="color: var(--accent-gold); margin-bottom: 15px;">دورات القطاع والمتطلبات</h2>
             
@@ -654,24 +655,18 @@
             </div>
 
             <div class="courses-grid-layout">
-                <!-- الدورات الحاصل عليها -->
                 <div class="course-column-box">
                     <h3 style="color: var(--success); font-size: 1.05rem; margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">
                         <i class="fa-solid fa-circle-check"></i> الدورات الحاصل عليها
                     </h3>
-                    <div id="obtainedCoursesList">
-                        <!-- سيتم تعبئتها ديناميكياً للعسكري المحدد -->
-                    </div>
+                    <div id="obtainedCoursesList"></div>
                 </div>
 
-                <!-- الدورات الناقصة -->
                 <div class="course-column-box">
                     <h3 style="color: var(--danger); font-size: 1.05rem; margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">
                         <i class="fa-solid fa-circle-xmark"></i> الدورات الناقصة
                     </h3>
-                    <div id="missingCoursesList">
-                        <!-- سيتم تعبئتها ديناميكياً للعسكري المحدد -->
-                    </div>
+                    <div id="missingCoursesList"></div>
                 </div>
             </div>
         </div>
@@ -701,7 +696,6 @@
                     <button class="inv-tab-btn" style="background: rgba(239, 68, 68, 0.15); border-color: var(--danger); color: var(--danger);" onclick="clearCurrentWeekInventoryData()"><i class="fa-solid fa-trash-can"></i> تفريغ بيانات الأسبوع الحالي</button>
                 </div>
 
-                <!-- 1. جرد السجلات والإعلانات -->
                 <div id="inv_logs_ads" class="inv-section active">
                     <div style="background: #0b0f19; border: 1px solid var(--border-subtle); padding: 20px; border-radius: 12px; margin-bottom: 20px;">
                         <h3 style="color: var(--accent-gold); font-size: 1rem; margin-bottom: 10px;">إرفاق سجلات والإعلانات جديدة</h3>
@@ -727,7 +721,6 @@
                     </div>
                 </div>
 
-                <!-- 2. جرد العمليات -->
                 <div id="inv_ops" class="inv-section">
                     <div style="background: #0b0f19; border: 1px solid var(--border-subtle); padding: 20px; border-radius: 12px; margin-bottom: 20px;">
                         <h3 style="color: var(--accent-gold); font-size: 1rem; margin-bottom: 10px;">إرفاق جرد العمليات</h3>
@@ -753,7 +746,6 @@
                     </div>
                 </div>
 
-                <!-- 3. جرد القبول -->
                 <div id="inv_acceptance" class="inv-section">
                     <div style="background: #0b0f19; border: 1px solid var(--border-subtle); padding: 20px; border-radius: 12px; margin-bottom: 20px;">
                         <h3 style="color: var(--accent-gold); font-size: 1rem; margin-bottom: 10px;">إرفاق جرد القبول</h3>
@@ -778,7 +770,49 @@
                         </table>
                     </div>
                 </div>
+            </div>
+        </div>
 
+        <!-- أرشيف الملاحظات -->
+        <div id="notes_archive" class="page-section">
+            <h2 style="color: var(--accent-gold); margin-bottom: 15px;">أرشيف الملاحظات وسجلات المنسوبين</h2>
+            <div class="card" style="background: #0b0f19; border: 1px solid var(--border-subtle); margin-bottom: 20px;">
+                <h3 style="color: var(--accent-gold); font-size: 1rem; margin-bottom: 10px;"><i class="fa-solid fa-pen-to-square"></i> إضافة ملاحظة جديدة للأرشيف</h3>
+                <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 15px; margin-bottom: 15px;">
+                    <div>
+                        <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 5px;">رقم الهوية ID للعسكري:</label>
+                        <input type="text" id="archiveSoldierId" class="login-input" placeholder="مثال: 779" style="margin:0;">
+                    </div>
+                    <div>
+                        <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 5px;">نص الملاحظة أو التدوينة:</label>
+                        <input type="text" id="archiveNoteText" class="login-input" placeholder="اكتب الملاحظة هنا..." style="margin:0;">
+                    </div>
+                </div>
+                <button class="btn" onclick="saveArchiveNote()">حفظ في أرشيف الملاحظات</button>
+            </div>
+
+            <div class="card">
+                <div style="margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                    <h3 style="color: var(--accent-gold); font-size: 1rem;"><i class="fa-solid fa-box-archive"></i> قائمة الملاحظات المؤرشفة</h3>
+                    <input type="text" id="archiveSearchInput" class="login-input" placeholder="بحث في الملاحظات..." style="margin:0; max-width: 250px;" oninput="renderNotesArchiveTable()">
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>التاريخ والوقت</th>
+                                <th>ID العسكري</th>
+                                <th>اسم العسكري</th>
+                                <th>الملاحظة</th>
+                                <th>الكاتب أو المسؤول</th>
+                                <th>الإجراء</th>
+                            </tr>
+                        </thead>
+                        <tbody id="notesArchiveTableBody">
+                            <tr><td colspan="6" style="text-align: center;">لا توجد ملاحظات مؤرشفة حالياً</td></tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
@@ -850,13 +884,11 @@
         let inventoryAcceptance = JSON.parse(localStorage.getItem('grave_invAcceptance')) || [];
         let soldierOfWeekData = JSON.parse(localStorage.getItem('grave_soldierOfWeekData')) || {};
         let fieldMissionsList = JSON.parse(localStorage.getItem('grave_fieldMissions')) || [];
-        
-        // حفظ بيانات الدورات لكل عسكري بناءً على رقم الهوية ID
         let soldierCoursesData = JSON.parse(localStorage.getItem('grave_soldierCoursesData')) || {};
+        let notesArchiveList = JSON.parse(localStorage.getItem('grave_notesArchiveList')) || [];
 
         let currentMemberFilter = 'ALL';
 
-        // قائمة الدورات الأساسية في النظام
         let allAvailableCourses = [
             "فرد أساس",
             "مركز العمليات",
@@ -875,6 +907,7 @@
             localStorage.setItem('grave_soldierOfWeekData', JSON.stringify(soldierOfWeekData));
             localStorage.setItem('grave_fieldMissions', JSON.stringify(fieldMissionsList));
             localStorage.setItem('grave_soldierCoursesData', JSON.stringify(soldierCoursesData));
+            localStorage.setItem('grave_notesArchiveList', JSON.stringify(notesArchiveList));
         }
 
         function updateWeekDropdowns() {
@@ -1044,6 +1077,7 @@
             renderFieldMissionsTable();
             renderInventoryTables();
             updateCoursesDropdown();
+            renderNotesArchiveTable();
         }
 
         function updateMemberStats() {
@@ -1106,7 +1140,6 @@
             renderMembersTable();
         }
 
-        /* دوال صفحة الدورات وإدارة نقلها بسلاسة بين القوائم */
         function updateCoursesDropdown() {
             let select = document.getElementById('courseSelectSoldier');
             if(!select) return;
@@ -1175,14 +1208,12 @@
                 return;
             }
 
-            // جلب دورات هذا العسكري من التخزين، أو جعلها فارغة بشكل افتراضي في البداية
             if(!soldierCoursesData[soldierId]) {
                 soldierCoursesData[soldierId] = { obtained: [], missing: [...allAvailableCourses] };
             }
 
             let sData = soldierCoursesData[soldierId];
 
-            // عرض الدورات الحاصل عليها
             obtainedBox.innerHTML = "";
             if(sData.obtained.length === 0) {
                 obtainedBox.innerHTML = `<div style="color: var(--text-muted); font-size: 0.85rem; text-align: center; padding: 20px;">لا توجد دورات مسجلة له</div>`;
@@ -1196,7 +1227,6 @@
                 });
             }
 
-            // عرض الدورات الناقصة
             missingBox.innerHTML = "";
             if(sData.missing.length === 0) {
                 missingBox.innerHTML = `<div style="color: var(--text-muted); font-size: 0.85rem; text-align: center; padding: 20px;">جميع الدورات مكتملة!</div>`;
@@ -1211,7 +1241,6 @@
             }
         }
 
-        // دالة نقل الدورة بسلاسة بين القائمتين وحفظها فوراً
         function toggleCourseForSoldier(soldierId, courseName, actionType) {
             if(!soldierCoursesData[soldierId]) {
                 soldierCoursesData[soldierId] = { obtained: [], missing: [...allAvailableCourses] };
@@ -1220,13 +1249,11 @@
             let sData = soldierCoursesData[soldierId];
 
             if(actionType === 'to_obtained') {
-                // نقل من الناقصة إلى الحاصل عليها
                 sData.missing = sData.missing.filter(c => c !== courseName);
                 if(!sData.obtained.includes(courseName)) {
                     sData.obtained.push(courseName);
                 }
             } else {
-                // نقل من الحاصل عليها إلى الناقصة
                 sData.obtained = sData.obtained.filter(c => c !== courseName);
                 if(!sData.missing.includes(courseName)) {
                     sData.missing.push(courseName);
@@ -1235,6 +1262,74 @@
 
             saveToLocalStorage();
             renderCoursesListsForSelectedSoldier(soldierId);
+        }
+
+        function saveArchiveNote() {
+            let id = document.getElementById('archiveSoldierId').value.trim();
+            let noteText = document.getElementById('archiveNoteText').value.trim();
+
+            if(!id || !noteText) {
+                alert("الرجاء إدخال رقم الهوية (ID) ونص الملاحظة.");
+                return;
+            }
+
+            let member = csvData.find(m => m.id === id);
+            let name = member ? member.name : "عسكري غير معروف";
+            let now = new Date().toLocaleString('ar-SA');
+
+            notesArchiveList.unshift({
+                date: now,
+                id: id,
+                name: name,
+                note: noteText,
+                author: currentUser
+            });
+
+            saveToLocalStorage();
+            renderNotesArchiveTable();
+
+            document.getElementById('archiveSoldierId').value = "";
+            document.getElementById('archiveNoteText').value = "";
+            alert("تم حفظ الملاحظة في الأرشيف بنجاح!");
+        }
+
+        function renderNotesArchiveTable() {
+            let tbody = document.getElementById('notesArchiveTableBody');
+            if(!tbody) return;
+
+            let searchVal = document.getElementById('archiveSearchInput') ? document.getElementById('archiveSearchInput').value.toLowerCase() : "";
+
+            let filtered = notesArchiveList.filter(item => {
+                return item.name.toLowerCase().includes(searchVal) || item.id.toLowerCase().includes(searchVal) || item.note.toLowerCase().includes(searchVal);
+            });
+
+            if(filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align: center;">لا توجد ملاحظات مؤرشفة مطابقة</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = "";
+            filtered.forEach((item, index) => {
+                let originalIndex = notesArchiveList.indexOf(item);
+                let tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${item.date}</td>
+                    <td>${item.id}</td>
+                    <td>${item.name}</td>
+                    <td>${item.note}</td>
+                    <td><span style="color: var(--accent-gold);">${item.author}</span></td>
+                    <td><button class="btn btn-danger" style="padding: 4px 10px; font-size: 0.75rem;" onclick="deleteArchiveNote(${originalIndex})">حذف</button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function deleteArchiveNote(index) {
+            if(confirm("هل أنت متأكد من حذف هذه الملاحظة من الأرشيف؟")) {
+                notesArchiveList.splice(index, 1);
+                saveToLocalStorage();
+                renderNotesArchiveTable();
+            }
         }
 
         function switchPage(pageId, element) {
@@ -1267,6 +1362,7 @@
                     document.getElementById('menuMembers').style.display = 'none';
                     document.getElementById('menuCourses').style.display = 'none';
                     document.getElementById('menuInventory').style.display = 'none';
+                    document.getElementById('menuNotesArchive').style.display = 'none';
                     document.getElementById('menuSoldierWeek').style.display = 'none';
                     
                     document.getElementById('menuFieldMissions').style.display = 'flex';
@@ -1278,6 +1374,7 @@
                     document.getElementById('menuFieldMissions').style.display = 'flex';
                     document.getElementById('menuCourses').style.display = 'flex';
                     document.getElementById('menuInventory').style.display = 'flex';
+                    document.getElementById('menuNotesArchive').style.display = 'flex';
                     document.getElementById('menuSoldierWeek').style.display = 'flex';
 
                     switchPage('home', document.getElementById('menuHome'));
@@ -1763,6 +1860,7 @@
             fetchSheetData();
             renderSessionsTable();
             renderFieldMissionsTable();
+            renderNotesArchiveTable();
         };
     </script>
 </body>
