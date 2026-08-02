@@ -943,6 +943,7 @@
             "Da": { pass: "m34d54f65", role: "D-1", loggedIn: false, loginTime: null, lastLogout: "---" },
             "Abu Majed": { pass: "m54d23f74", role: "D-2", loggedIn: false, loginTime: null, lastLogout: "---" },
             "Ahmed_D3": { pass: "mdf", role: "D-3", loggedIn: false, loginTime: null, lastLogout: "---" },
+            "Silent": { pass: "M543D43@o400", role: "D4", loggedIn: false, loginTime: null, lastLogout: "---" },                         
             "Nerf": { pass: "m14d27f99", role: "L-1", loggedIn: false, loginTime: null, lastLogout: "---" },
             "leader": { pass: "L483D@r200", role: "Leader", loggedIn: false, loginTime: null, lastLogout: "---", isLeaderPortalOnly: true }
         };
@@ -1184,6 +1185,7 @@
             }
 
             filtered.forEach(m => {
+                // تحويل قيمة حالة الإجازة إلى نص واضح وملون
                 let isLeave = m.vacationStatus === true || m.vacationStatus === "TRUE" || m.vacationStatus === "true" || m.vacationStatus === "في إجازة";
                 let leaveStatusHtml = isLeave 
                     ? '<span style="color: var(--danger); font-weight: bold;">في إجازة</span>' 
