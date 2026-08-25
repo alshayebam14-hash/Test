@@ -1699,18 +1699,19 @@
                 text = document.getElementById('bulkLogsAdsText').value;
                 week = document.getElementById('autoWeekLogsAds').value;
 
-                // معالجة ذكية تدعم الصيغتين (المباشرة أو الديسكورد)
-                let blocks = text.split(/(?=\b\d{3,6}\b|@!|القطاع:)/g);
+                // التقسيم حسب فواصل الأسطر أو الرسائل (معالجة ذكية تلتقط الآيدي من رسائل الديسكورد)
+                let blocks = text.split(/(?=R-\d+|\b\d{3,6}\b|القطاع:)/g);
                 
                 blocks.forEach(block => {
                     block = block.trim();
                     if(!block) return;
 
+                    // البحث عن الآيدي (مثل 81275 أو 773) الموجود في النص
                     let idMatch = block.match(/\b(\d{3,6})\b/);
                     let recordsMatch = block.match(/السجل\s*الجنائي[:\s]*(\d+)/i) || block.match(/سجلات[:\s]*(\d+)/i);
                     let adsMatch = block.match(/الإعلانات[:\s]*(\d+)/i) || block.match(/اعلانات[:\s]*(\d+)/i);
 
-                    // إذا كانت الصيغة عبارة عن أسطر عادية مفصولة بفواصل
+                    // إذا كانت الصيغة كلاسيكية (ID, سجلات, إعلانات)
                     if (block.match(/^\d+[,.\s]+\d+[,.\s]+\d+$/)) {
                         let parts = block.split(/[,.\s]+/);
                         let id = parts[0];
@@ -1719,10 +1720,25 @@
                             inventoryLogsAds.push({ week, id, rank: member.rank, name: member.name, logs: Number(parts[1]) || 0, ads: Number(parts[2]) || 0 });
                         }
                     } 
-                    // إذا كانت الصيغة مستخرجة من رسالة ديسكورد وتحتوي على البيانات
+                    // إذا كانت رسالة ديسكورد منسوخة
                     else if (idMatch && (recordsMatch || adsMatch)) {
                         let id = idMatch[1];
                         let member = csvData.find(m => m.id === id);
+                        
+                        // لو لم يوجد مطابقة بالآيدي الأول، نبحث عن آيدي آخر في نفس النص
+                        if(!member) {
+                            let allIds = block.match(/\b\d{3,6}\b/g);
+                            if(allIds) {
+                                for(let candidateId of allIds) {
+                                    member = csvData.find(m => m.id === candidateId);
+                                    if(member) {
+                                        id = candidateId;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+
                         if(member) {
                             let recVal = recordsMatch ? Number(recordsMatch[1]) : 0;
                             let adsVal = adsMatch ? Number(adsMatch[1]) : 0;
@@ -1734,6 +1750,7 @@
                 saveToLocalStorage();
                 renderInventoryTables();
                 document.getElementById('bulkLogsAdsText').value = "";
+                alert("تم إرفاق البيانات بنجاح!");
                 return;
             } 
             
@@ -1766,6 +1783,7 @@
             renderInventoryTables();
             if(type === 'ops') document.getElementById('bulkOpsText').value = "";
             if(type === 'acceptance') document.getElementById('bulkAcceptanceText').value = "";
+            alert("تم إرفاق البيانات بنجاح!");
         }
 
         function renderInventoryTables() {
