@@ -788,8 +788,8 @@
                         <h3 style="color: var(--accent-gold); font-size: 1rem; margin-bottom: 10px;">إرفاق سجلات والإعلانات جديدة</h3>
                         <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 15px; margin-bottom: 15px;">
                             <div>
-                                <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 5px;">الصيغة (ID , سجلات , إعلانات كل سطر مستقل):</label>
-                                <textarea id="bulkLogsAdsText" class="login-input" rows="4" placeholder="مثال:&#10;779,38,3" style="resize: vertical; font-family: monospace;"></textarea>
+                                <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 5px;">الصيغة (ID , سجلات , إعلانات أو نص رسالة الديسكورد):</label>
+                                <textarea id="bulkLogsAdsText" class="login-input" rows="4" placeholder="مثال:&#10;779,38,3&#10;أو لصق رسالة الديسكورد مباشرة" style="resize: vertical; font-family: monospace;"></textarea>
                             </div>
                             <div>
                                 <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 5px;">اختر الأسبوع:</label>
@@ -916,7 +916,7 @@
                 </div>
 
                 <div style="background: #0b0f19; border: 1px solid var(--border-subtle); padding: 15px; border-radius: 10px; margin-bottom: 20px;">
-                    <h3 style="color: var(--accent-gold); font-size: 0.95rem; margin-bottom: 12px;"><i class="fa-solid fa-medal"></i> أعلى العساكر في هذا الأسبوع (حسب السجلات):</h3>
+                    <h3 style="color: var(--accent-gold); font-size: 0.95rem; margin-bottom: 12px;"><i class="fa-solid fa-medal"></i> أعلى العساكر في هذا الأسبوع (حسب مجموع النقاط):</h3>
                     <div id="topSoldiersList">
                         <p style="color: var(--text-muted); font-size: 0.85rem;">لا توجد بيانات مسجلة لهذا الأسبوع بعد.</p>
                     </div>
@@ -1053,7 +1053,7 @@
         }
 
         async function fetchSheetData(isManualClick = false) {
-            const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ7uEHabKYeaZHnG5Icl7NuhiqFJEdhVcGSP-sZONBZRSzZsUu8ek-x1qo-Fxu2gzexraVrxQASrvsR/pub?gid=2081140975&single=true&output=csv";
+            const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT5IjG47ogq2fHCI_clfxmoYcs9G-6uoTRfojuRRaj9dc82XFo-ydNNFNYawGBdXIv4kT4BfXkoQvNj/pub?gid=2094506019&single=true&output=csv";
             
             let statusText = document.getElementById('refreshStatus');
             let icon = document.getElementById('refreshIcon');
@@ -1698,7 +1698,47 @@
             if(type === 'logs_ads') {
                 text = document.getElementById('bulkLogsAdsText').value;
                 week = document.getElementById('autoWeekLogsAds').value;
-            } else if(type === 'ops') {
+
+                // معالجة ذكية تدعم الصيغتين (المباشرة أو الديسكورد)
+                let blocks = text.split(/(?=\b\d{3,6}\b|@!|القطاع:)/g);
+                
+                blocks.forEach(block => {
+                    block = block.trim();
+                    if(!block) return;
+
+                    let idMatch = block.match(/\b(\d{3,6})\b/);
+                    let recordsMatch = block.match(/السجل\s*الجنائي[:\s]*(\d+)/i) || block.match(/سجلات[:\s]*(\d+)/i);
+                    let adsMatch = block.match(/الإعلانات[:\s]*(\d+)/i) || block.match(/اعلانات[:\s]*(\d+)/i);
+
+                    // إذا كانت الصيغة عبارة عن أسطر عادية مفصولة بفواصل
+                    if (block.match(/^\d+[,.\s]+\d+[,.\s]+\d+$/)) {
+                        let parts = block.split(/[,.\s]+/);
+                        let id = parts[0];
+                        let member = csvData.find(m => m.id === id);
+                        if(member) {
+                            inventoryLogsAds.push({ week, id, rank: member.rank, name: member.name, logs: Number(parts[1]) || 0, ads: Number(parts[2]) || 0 });
+                        }
+                    } 
+                    // إذا كانت الصيغة مستخرجة من رسالة ديسكورد وتحتوي على البيانات
+                    else if (idMatch && (recordsMatch || adsMatch)) {
+                        let id = idMatch[1];
+                        let member = csvData.find(m => m.id === id);
+                        if(member) {
+                            let recVal = recordsMatch ? Number(recordsMatch[1]) : 0;
+                            let adsVal = adsMatch ? Number(adsMatch[1]) : 0;
+                            inventoryLogsAds.push({ week, id, rank: member.rank, name: member.name, logs: recVal, ads: adsVal });
+                        }
+                    }
+                });
+
+                saveToLocalStorage();
+                renderInventoryTables();
+                document.getElementById('bulkLogsAdsText').value = "";
+                return;
+            } 
+            
+            // للأقسام الأخرى (العمليات والقبول)
+            if(type === 'ops') {
                 text = document.getElementById('bulkOpsText').value;
                 week = document.getElementById('autoWeekOps').value;
             } else if(type === 'acceptance') {
@@ -1713,9 +1753,7 @@
                     let id = parts[0];
                     let member = csvData.find(m => m.id === id);
                     if(member) {
-                        if(type === 'logs_ads' && parts.length >= 3) {
-                            inventoryLogsAds.push({ week, id, rank: member.rank, name: member.name, logs: Number(parts[1]) || 0, ads: Number(parts[2]) || 0 });
-                        } else if(type === 'ops') {
+                        if(type === 'ops') {
                             inventoryOps.push({ week, id, rank: member.rank, name: member.name, ops: Number(parts[1]) || 0 });
                         } else if(type === 'acceptance') {
                             inventoryAcceptance.push({ week, id, rank: member.rank, name: member.name, acceptance: Number(parts[1]) || 0 });
@@ -1726,7 +1764,6 @@
 
             saveToLocalStorage();
             renderInventoryTables();
-            if(type === 'logs_ads') document.getElementById('bulkLogsAdsText').value = "";
             if(type === 'ops') document.getElementById('bulkOpsText').value = "";
             if(type === 'acceptance') document.getElementById('bulkAcceptanceText').value = "";
         }
@@ -1786,27 +1823,64 @@
             if(!week) return;
 
             let weekLogs = inventoryLogsAds.filter(i => i.week === week);
-            
-            if(weekLogs.length > 0) {
-                weekLogs.sort((a, b) => b.logs - a.logs);
+            let weekOps = inventoryOps.filter(i => i.week === week);
+            let weekAcc = inventoryAcceptance.filter(i => i.week === week);
+
+            let soldiersMap = {};
+
+            weekLogs.forEach(item => {
+                if(!soldiersMap[item.id]) {
+                    soldiersMap[item.id] = { id: item.id, name: item.name, rank: item.rank, logs: 0, ads: 0, ops: 0, acceptance: 0 };
+                }
+                soldiersMap[item.id].logs += Number(item.logs) || 0;
+                soldiersMap[item.id].ads += Number(item.ads) || 0;
+            });
+
+            weekOps.forEach(item => {
+                if(!soldiersMap[item.id]) {
+                    let member = csvData.find(m => m.id === item.id) || {};
+                    soldiersMap[item.id] = { id: item.id, name: item.name, rank: member.rank || '---', logs: 0, ads: 0, ops: 0, acceptance: 0 };
+                }
+                soldiersMap[item.id].ops += Number(item.ops) || 0;
+            });
+
+            weekAcc.forEach(item => {
+                if(!soldiersMap[item.id]) {
+                    let member = csvData.find(m => m.id === item.id) || {};
+                    soldiersMap[item.id] = { id: item.id, name: item.name, rank: member.rank || '---', logs: 0, ads: 0, ops: 0, acceptance: 0 };
+                }
+                soldiersMap[item.id].acceptance += Number(item.acceptance) || 0;
+            });
+
+            let combinedList = Object.values(soldiersMap);
+
+            if(combinedList.length > 0) {
+                combinedList.forEach(s => {
+                    s.totalScore = s.logs + s.ads + s.ops + s.acceptance;
+                });
+
+                combinedList.sort((a, b) => b.totalScore - a.totalScore);
                 
-                let html = `<div class="table-responsive"><table><thead><tr><th>المركز</th><th>ID</th><th>الاسم</th><th>الرتبة</th><th>السجلات</th><th>الإعلانات</th><th>اختيار</th></tr></thead><tbody>`;
+                let html = `<div class="table-responsive"><table><thead><tr><th>المركز</th><th>ID</th><th>الاسم</th><th>الرتبة</th><th>السجلات</th><th>الإعلانات</th><th>العمليات</th><th>القبول</th><th>مجموع النقاط</th><th>اختيار</th></tr></thead><tbody>`;
                 
-                weekLogs.forEach((item, idx) => {
+                combinedList.forEach((item, idx) => {
                     html += `<tr>
                         <td>#${idx + 1}</td>
                         <td>${item.id}</td>
                         <td>${item.name}</td>
                         <td>${item.rank}</td>
-                        <td><strong style="color: var(--accent-gold);">${item.logs}</strong></td>
+                        <td>${item.logs}</td>
                         <td>${item.ads}</td>
+                        <td>${item.ops}</td>
+                        <td>${item.acceptance}</td>
+                        <td><strong style="color: var(--accent-gold); font-size: 1.05rem;">${item.totalScore}</strong></td>
                         <td><button class="btn" style="padding: 4px 10px; font-size: 0.75rem;" onclick="previewCandidateCard('${item.id}', '${week}')">اختيار</button></td>
                     </tr>`;
                 });
                 html += `</tbody></table></div>`;
                 topContainer.innerHTML = html;
             } else {
-                topContainer.innerHTML = `<p style="color: var(--text-muted); font-size: 0.85rem;">لا توجد بيانات سجلات مرفقة لهذا الأسبوع حتى الآن.</p>`;
+                topContainer.innerHTML = `<p style="color: var(--text-muted); font-size: 0.85rem;">لا توجد بيانات جرد مرفقة لهذا الأسبوع حتى الآن.</p>`;
                 let candidatePreview = document.getElementById('candidateCardPreview');
                 if(candidatePreview) candidatePreview.innerHTML = "";
             }
