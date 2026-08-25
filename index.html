@@ -788,8 +788,8 @@
                         <h3 style="color: var(--accent-gold); font-size: 1rem; margin-bottom: 10px;">إرفاق سجلات والإعلانات جديدة</h3>
                         <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 15px; margin-bottom: 15px;">
                             <div>
-                                <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 5px;">الصيغة (ID , سجلات , إعلانات أو نص رسالة الديسكورد):</label>
-                                <textarea id="bulkLogsAdsText" class="login-input" rows="4" placeholder="مثال:&#10;779,38,3&#10;أو لصق رسالة الديسكورد مباشرة" style="resize: vertical; font-family: monospace;"></textarea>
+                                <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 5px;">الصيغة (ID , سجلات , إعلانات كل سطر مستقل):</label>
+                                <textarea id="bulkLogsAdsText" class="login-input" rows="4" placeholder="مثال:&#10;779,38,3" style="resize: vertical; font-family: monospace;"></textarea>
                             </div>
                             <div>
                                 <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 5px;">اختر الأسبوع:</label>
@@ -1698,64 +1698,7 @@
             if(type === 'logs_ads') {
                 text = document.getElementById('bulkLogsAdsText').value;
                 week = document.getElementById('autoWeekLogsAds').value;
-
-                // التقسيم حسب فواصل الأسطر أو الرسائل (معالجة ذكية تلتقط الآيدي من رسائل الديسكورد)
-                let blocks = text.split(/(?=R-\d+|\b\d{3,6}\b|القطاع:)/g);
-                
-                blocks.forEach(block => {
-                    block = block.trim();
-                    if(!block) return;
-
-                    // البحث عن الآيدي (مثل 81275 أو 773) الموجود في النص
-                    let idMatch = block.match(/\b(\d{3,6})\b/);
-                    let recordsMatch = block.match(/السجل\s*الجنائي[:\s]*(\d+)/i) || block.match(/سجلات[:\s]*(\d+)/i);
-                    let adsMatch = block.match(/الإعلانات[:\s]*(\d+)/i) || block.match(/اعلانات[:\s]*(\d+)/i);
-
-                    // إذا كانت الصيغة كلاسيكية (ID, سجلات, إعلانات)
-                    if (block.match(/^\d+[,.\s]+\d+[,.\s]+\d+$/)) {
-                        let parts = block.split(/[,.\s]+/);
-                        let id = parts[0];
-                        let member = csvData.find(m => m.id === id);
-                        if(member) {
-                            inventoryLogsAds.push({ week, id, rank: member.rank, name: member.name, logs: Number(parts[1]) || 0, ads: Number(parts[2]) || 0 });
-                        }
-                    } 
-                    // إذا كانت رسالة ديسكورد منسوخة
-                    else if (idMatch && (recordsMatch || adsMatch)) {
-                        let id = idMatch[1];
-                        let member = csvData.find(m => m.id === id);
-                        
-                        // لو لم يوجد مطابقة بالآيدي الأول، نبحث عن آيدي آخر في نفس النص
-                        if(!member) {
-                            let allIds = block.match(/\b\d{3,6}\b/g);
-                            if(allIds) {
-                                for(let candidateId of allIds) {
-                                    member = csvData.find(m => m.id === candidateId);
-                                    if(member) {
-                                        id = candidateId;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-
-                        if(member) {
-                            let recVal = recordsMatch ? Number(recordsMatch[1]) : 0;
-                            let adsVal = adsMatch ? Number(adsMatch[1]) : 0;
-                            inventoryLogsAds.push({ week, id, rank: member.rank, name: member.name, logs: recVal, ads: adsVal });
-                        }
-                    }
-                });
-
-                saveToLocalStorage();
-                renderInventoryTables();
-                document.getElementById('bulkLogsAdsText').value = "";
-                alert("تم إرفاق البيانات بنجاح!");
-                return;
-            } 
-            
-            // للأقسام الأخرى (العمليات والقبول)
-            if(type === 'ops') {
+            } else if(type === 'ops') {
                 text = document.getElementById('bulkOpsText').value;
                 week = document.getElementById('autoWeekOps').value;
             } else if(type === 'acceptance') {
@@ -1770,7 +1713,9 @@
                     let id = parts[0];
                     let member = csvData.find(m => m.id === id);
                     if(member) {
-                        if(type === 'ops') {
+                        if(type === 'logs_ads' && parts.length >= 3) {
+                            inventoryLogsAds.push({ week, id, rank: member.rank, name: member.name, logs: Number(parts[1]) || 0, ads: Number(parts[2]) || 0 });
+                        } else if(type === 'ops') {
                             inventoryOps.push({ week, id, rank: member.rank, name: member.name, ops: Number(parts[1]) || 0 });
                         } else if(type === 'acceptance') {
                             inventoryAcceptance.push({ week, id, rank: member.rank, name: member.name, acceptance: Number(parts[1]) || 0 });
@@ -1781,9 +1726,9 @@
 
             saveToLocalStorage();
             renderInventoryTables();
+            if(type === 'logs_ads') document.getElementById('bulkLogsAdsText').value = "";
             if(type === 'ops') document.getElementById('bulkOpsText').value = "";
             if(type === 'acceptance') document.getElementById('bulkAcceptanceText').value = "";
-            alert("تم إرفاق البيانات بنجاح!");
         }
 
         function renderInventoryTables() {
