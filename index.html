@@ -562,7 +562,7 @@
                 <div class="menu-item" onclick="switchPage('inventory', this)" id="menuInventory" data-page="inventory"><i class="fa-solid fa-boxes-stacked"></i> صفحة الجرد</div>
                 <div class="menu-item" onclick="switchPage('notes_archive', this)" id="menuNotesArchive" data-page="notes_archive"><i class="fa-solid fa-box-archive"></i> أرشيف الملاحظات</div>
                 <div class="menu-item" onclick="switchPage('soldier_week', this)" id="menuSoldierWeek" data-page="soldier_week"><i class="fa-solid fa-award"></i> عسكري الأسبوع</div>
-                <div class="menu-item" onclick="switchPage('role_permissions', this)" id="menuRolePermissions" data-page="role_permissions" style="color: var(--accent-gold);"><i class="fa-solid fa-key"></i> إدارة الصلاحيات</div>
+                <div class="menu-item" onclick="switchPage('role_permissions', this)" id="menuRolePermissions" data-page="role_permissions" style="color: var(--accent-gold);"><i class="fa-solid fa-key"></i> إدارة الحسابات</div>
             </div>
         </div>
 
@@ -582,7 +582,7 @@
         <div id="home" class="page-section active">
             <div class="card" style="text-align: center; padding: 40px;">
                 <h2 style="color: var(--accent-gold); margin-bottom: 10px;">لوحة إدارة وزارة الدفاع - Grave RP</h2>
-                <p style="color: var(--text-muted); margin-bottom: 25px;">تم ضبط لوحة التحكم بنجاح مع نظام صلاحيات الصفحات الديناميكي.</p>
+                <p style="color: var(--text-muted); margin-bottom: 25px;">تم ضبط لوحة التحكم بنجاح.</p>
                 
                 <button class="btn" onclick="fetchSheetData(true)" style="padding: 12px 25px; font-size: 1rem;">
                     <i class="fa-solid fa-rotate" id="refreshIcon"></i> حدث البيانات
@@ -936,24 +936,40 @@
             </div>
         </div>
 
-        <!-- إدارة الصلاحيات المخصصة -->
+        <!-- إدارة الحسابات -->
         <div id="role_permissions" class="page-section">
-            <h2 style="color: var(--accent-gold); margin-bottom: 15px;"><i class="fa-solid fa-key"></i> إدارة صلاحيات الحسابات للوحات والصفحات</h2>
+            <h2 style="color: var(--accent-gold); margin-bottom: 15px;"><i class="fa-solid fa-key"></i> إدارة حسابات وصلاحيات الدخول</h2>
+            
+            <!-- فورم إضافة حساب جديد بدون خانة الصلاحية -->
+            <div class="card" style="background: #0b0f19; border: 1px solid var(--border-subtle); margin-bottom: 20px;">
+                <h3 style="color: var(--accent-gold); font-size: 1rem; margin-bottom: 15px;"><i class="fa-solid fa-user-plus"></i> إضافة حساب مسئول جديد</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                    <div>
+                        <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 5px;">اسم الحساب / المستخدم:</label>
+                        <input type="text" id="newAccountName" class="login-input" placeholder="اسم المستخدم" style="margin:0;">
+                    </div>
+                    <div>
+                        <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 5px;">كلمة المرور:</label>
+                        <input type="text" id="newAccountPass" class="login-input" placeholder="كلمة المرور" style="margin:0;">
+                    </div>
+                </div>
+                <button class="btn" onclick="addNewAccount()">إضافة الحساب</button>
+            </div>
+
+            <!-- قائمة الحسابات المسجلة بدون حساب الأอนر وبدون عمود الرتبة -->
             <div class="card">
-                <p style="color: var(--text-muted); margin-bottom: 20px; font-size: 0.9rem;">
-                    حدد الحسابات التي يمكنها الوصول إلى كل صفحة من صفحات النظام. حساب <strong>Owner</strong> يمتلك كافة الصلاحيات بشكل تلقائي.
-                </p>
+                <h3 style="color: var(--accent-gold); font-size: 1rem; margin-bottom: 15px;"><i class="fa-solid fa-users"></i> قائمة حسابات المشرفين المسجلة</h3>
                 <div class="table-responsive">
                     <table>
                         <thead>
                             <tr>
-                                <th>اسم الصفحة</th>
-                                <th>الحسابات المصرح لها بالوصول</th>
-                                <th>حفظ التعديلات</th>
+                                <th>اسم الحساب</th>
+                                <th>كلمة المرور</th>
+                                <th>الإجراء</th>
                             </tr>
                         </thead>
-                        <tbody id="permissionsTableBody">
-                            <!-- سيتم تعبئتها ديناميكياً -->
+                        <tbody id="accountsTableBody">
+                            <!-- يتم تعبئتها ديناميكياً -->
                         </tbody>
                     </table>
                 </div>
@@ -962,7 +978,7 @@
     </main>
 
     <script>
-        let accounts = {
+        let accounts = JSON.parse(localStorage.getItem('grave_accountsData')) || {
             "Ahmed": { pass: "Owner2010629", role: "Owner", loggedIn: true, loginTime: Date.now(), lastLogout: "---" },
             "Nawaf": { pass: "m43d65f65", role: "D-0", loggedIn: false, loginTime: null, lastLogout: "---" },
             "Da": { pass: "m34d54f65", role: "D-1", loggedIn: false, loginTime: null, lastLogout: "---" },
@@ -972,34 +988,22 @@
             "leader": { pass: "L483D@r200", role: "Leader", loggedIn: false, loginTime: null, lastLogout: "---", isLeaderPortalOnly: true }
         };
 
-        // تعريف الصفحات واسمائها الافتراضية والحسابات المسموحة لها
         let pageDefinitions = [
             { id: 'home', name: 'الرئيسية', allowed: Object.keys(accounts) },
-            { id: 'login_tracker', name: 'تسجيل الدخول (متابعة)', allowed: ["Ahmed", "Nawaf", "Da", "Abu Majed", "Ahmed_D3", "Nerf"] },
+            { id: 'login_tracker', name: 'تسجيل الدخول (متابعة)', allowed: Object.keys(accounts) },
             { id: 'members', name: 'منسوبي القطاعات', allowed: Object.keys(accounts) },
             { id: 'field_missions', name: 'المهام الميدانية', allowed: Object.keys(accounts) },
             { id: 'courses', name: 'دورات القطاع', allowed: Object.keys(accounts) },
             { id: 'inventory', name: 'صفحة الجرد', allowed: Object.keys(accounts) },
             { id: 'notes_archive', name: 'أرشيف الملاحظات', allowed: Object.keys(accounts) },
             { id: 'soldier_week', name: 'عسكري الأسبوع', allowed: Object.keys(accounts) },
-            { id: 'role_permissions', name: 'إدارة الصلاحيات', allowed: ["Ahmed"] } // مقتصر افتراضياً على المالك
+            { id: 'role_permissions', name: 'إدارة الحسابات', allowed: ["Ahmed"] }
         ];
-
-        // تحميل الصلاحيات المخزنة محلياً إذا وجدت
-        let savedPermissions = JSON.parse(localStorage.getItem('grave_pagePermissions'));
-        if(savedPermissions) {
-            pageDefinitions.forEach(p => {
-                if(savedPermissions[p.id]) {
-                    p.allowed = savedPermissions[p.id];
-                }
-            });
-        }
 
         let currentUser = "Ahmed";
         let csvData = [];
         
         let customWeeks = JSON.parse(localStorage.getItem('grave_customWeeks')) || ["الأسبوع الأول", "الأسبوع الثاني", "الأسبوع الثالث"];
-
         let inventoryLogsAds = JSON.parse(localStorage.getItem('grave_invLogsAds')) || [];
         let inventoryOps = JSON.parse(localStorage.getItem('grave_invOps')) || [];
         let inventoryAcceptance = JSON.parse(localStorage.getItem('grave_invAcceptance')) || [];
@@ -1009,15 +1013,8 @@
         let notesArchiveList = JSON.parse(localStorage.getItem('grave_notesArchiveList')) || [];
 
         let currentMemberFilter = 'ALL';
-
         let allAvailableCourses = [
-            "فرد أساس",
-            "مركز العمليات",
-            "إسعافات أولية",
-            "تأهيل الضباط",
-            "مظلات مشتركة",
-            "الصاعقة او الضفادع",
-            "الصجور الجوية"
+            "فرد أساس", "مركز العمليات", "إسعافات أولية", "تأهيل الضباط", "مظلات مشتركة", "الصاعقة او الضفادع", "الصجور الجوية"
         ];
 
         function saveToLocalStorage() {
@@ -1029,17 +1026,13 @@
             localStorage.setItem('grave_fieldMissions', JSON.stringify(fieldMissionsList));
             localStorage.setItem('grave_soldierCoursesData', JSON.stringify(soldierCoursesData));
             localStorage.setItem('grave_notesArchiveList', JSON.stringify(notesArchiveList));
-            
-            let permObj = {};
-            pageDefinitions.forEach(p => { permObj[p.id] = p.allowed; });
-            localStorage.setItem('grave_pagePermissions', JSON.stringify(permObj));
+            localStorage.setItem('grave_accountsData', JSON.stringify(accounts));
         }
 
         function updateSidebarMenuVisibility() {
             pageDefinitions.forEach(p => {
                 let menuItem = document.querySelector(`.sidebar-menu [data-page="${p.id}"]`);
                 if(menuItem) {
-                    // التحقق هل الحساب الحالي مصرح له أو هو Owner
                     if(currentUser === 'Owner' || p.allowed.includes(currentUser)) {
                         menuItem.style.display = 'flex';
                     } else {
@@ -1049,46 +1042,61 @@
             });
         }
 
-        function renderPermissionsTable() {
-            let tbody = document.getElementById('permissionsTableBody');
+        // عرض جدول الحسابات بدون حساب الأอนر وبدون عمود الرتبة
+        function renderAccountsTable() {
+            let tbody = document.getElementById('accountsTableBody');
             if(!tbody) return;
             tbody.innerHTML = "";
 
-            pageDefinitions.forEach(p => {
-                let checkboxesHtml = "";
-                for(let acc in accounts) {
-                    let isChecked = p.allowed.includes(acc) ? "checked" : "";
-                    checkboxesHtml += `<label style="margin-left: 15px; display: inline-flex; align-items: center; gap: 5px; cursor: pointer;">
-                        <input type="checkbox" value="${acc}" ${isChecked} class="perm-checkbox-${p.id}"> ${acc} (${accounts[acc].role})
-                    </label>`;
-                }
+            for(let acc in accounts) {
+                // استثناء حساب الأอนر نهائياً من العرض هنا
+                if(acc === "Ahmed" || accounts[acc].role === "Owner") continue;
 
                 let tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td><strong>${p.name}</strong></td>
-                    <td>${checkboxesHtml}</td>
-                    <td><button class="btn" style="padding: 5px 12px; font-size: 0.8rem;" onclick="savePagePermissions('${p.id}')">حفظ</button></td>
+                    <td><strong>${acc}</strong></td>
+                    <td>${accounts[acc].pass}</td>
+                    <td><button class="btn btn-danger" style="padding: 5px 12px; font-size: 0.8rem;" onclick="deleteAccount('${acc}')">حذف</button></td>
                 `;
                 tbody.appendChild(tr);
-            });
+            }
         }
 
-        function savePagePermissions(pageId) {
-            let checkboxes = document.querySelectorAll(`.perm-checkbox-${pageId}`);
-            let selectedAccounts = [];
-            checkboxes.forEach(cb => {
-                if(cb.checked) selectedAccounts.push(cb.value);
+        function addNewAccount() {
+            let name = document.getElementById('newAccountName').value.trim();
+            let pass = document.getElementById('newAccountPass').value.trim();
+
+            if(!name || !pass) {
+                alert("الرجاء إدخال اسم الحساب وكلمة المرور.");
+                return;
+            }
+
+            if(accounts[name]) {
+                alert("هذا الحساب موجود مسبقاً!");
+                return;
+            }
+
+            accounts[name] = { pass: pass, role: "مشرف", loggedIn: false, loginTime: null, lastLogout: "---" };
+            
+            // منح صلاحية الوصول لجميع الصفحات الافتراضية عدا إدارة الحسابات
+            pageDefinitions.forEach(p => {
+                if(p.id !== 'role_permissions') p.allowed.push(name);
             });
 
-            // ضمان أن الـ Owner يمتلك الصلاحية دائماً
-            if(!selectedAccounts.includes("Ahmed")) selectedAccounts.push("Ahmed");
+            saveToLocalStorage();
+            renderAccountsTable();
 
-            let page = pageDefinitions.find(p => p.id === pageId);
-            if(page) {
-                page.allowed = selectedAccounts;
+            document.getElementById('newAccountName').value = "";
+            document.getElementById('newAccountPass').value = "";
+            alert("تم إضافة الحساب بنجاح!");
+        }
+
+        function deleteAccount(accName) {
+            if(confirm(`هل أنت متأكد من حذف الحساب (${accName})؟`)) {
+                delete accounts[accName];
                 saveToLocalStorage();
-                updateSidebarMenuVisibility();
-                alert(`تم تحديث صلاحيات صفحة (${page.name}) بنجاح!`);
+                renderAccountsTable();
+                alert("تم حذف الحساب بنجاح!");
             }
         }
 
@@ -1536,7 +1544,6 @@
         }
 
         function switchPage(pageId, element) {
-            // التحقق أمنياً من صلاحية الوصول للصفحة
             let pageDef = pageDefinitions.find(p => p.id === pageId);
             if(currentUser !== 'Owner' && pageDef && !pageDef.allowed.includes(currentUser)) {
                 alert("عذراً، هذا الحساب لا يمتلك صلاحية الوصول لهذه الصفحة.");
@@ -1563,10 +1570,8 @@
                 document.getElementById('loginOverlay').style.display = 'none';
                 document.getElementById('currentRoleDisplay').innerText = accounts[user].role;
 
-                // تحديث القوائم المرئية بناءً على الصلاحيات
                 updateSidebarMenuVisibility();
 
-                // التوجيه لأول صفحة مسموحة للمستخدم
                 let firstAllowedPage = pageDefinitions.find(p => currentUser === 'Owner' || p.allowed.includes(currentUser));
                 if(firstAllowedPage) {
                     let menuEl = document.querySelector(`.sidebar-menu [data-page="${firstAllowedPage.id}"]`);
@@ -1575,7 +1580,7 @@
 
                 renderSessionsTable();
                 renderFieldMissionsTable();
-                renderPermissionsTable();
+                renderAccountsTable();
             } else {
                 err.style.display = 'block';
             }
@@ -2042,7 +2047,6 @@
                             <div class="paint-metric-val">${logEntry.ads}</div>
                         </div>
                         <div class="paint-metric-item">
-                            - مساعدة القبول :
                             <div class="paint-metric-title">مسؤول القبول :</div>
                             <div class="paint-metric-val">${accEntry.acceptance}</div>
                         </div>
@@ -2093,7 +2097,7 @@
             renderSessionsTable();
             renderFieldMissionsTable();
             renderNotesArchiveTable();
-            renderPermissionsTable();
+            renderAccountsTable();
         };
     </script>
 </body>
