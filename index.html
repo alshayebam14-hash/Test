@@ -3,724 +3,1997 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>وزارة الدفاع - Grave RP | لوحة التحكم الشاملة</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <title>Grave - لوحة إدارة وزارة الدفاع</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary: #1e293b;
-            --accent: #d97706;
-            --bg: #0f172a;
-            --card-bg: #1e293b;
-            --text: #f8fafc;
-            --text-muted: #94a3b8;
+            --bg-main: #070a12;
+            --bg-sidebar: #0b0f19;
+            --bg-card: #0e1422;
+            --accent-gold: #d4af37;
+            --accent-gold-hover: #f1c40f;
+            --text-main: #f8fafc;
+            --text-muted: #8a94a6;
+            --border-subtle: rgba(255, 255, 255, 0.06);
             --danger: #ef4444;
             --success: #22c55e;
-            --border: #334155;
+            --warning: #f59e0b;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Cairo', sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         body {
-            background-color: var(--bg);
-            color: var(--text);
+            background-color: var(--bg-main);
+            color: var(--text-main);
             min-height: 100vh;
+            display: flex;
+            overflow-x: hidden;
+        }
+
+        #loginOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: var(--bg-main);
             display: flex;
             justify-content: center;
             align-items: center;
+            z-index: 1000;
         }
 
-        .container {
-            width: 100%;
-            max-width: 1280px;
-            padding: 20px;
-        }
-
-        /* Login Screen */
-        .auth-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border);
+        .login-box {
+            background: var(--bg-sidebar);
+            border: 1px solid var(--border-subtle);
             padding: 40px;
-            border-radius: 12px;
-            width: 100%;
-            max-width: 400px;
-            margin: 0 auto;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-        }
-
-        .auth-card h2 {
-            margin-bottom: 20px;
+            border-radius: 16px;
+            width: 380px;
             text-align: center;
-            color: var(--accent);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
         }
 
-        .form-group {
+        .login-box h2 {
+            color: var(--accent-gold);
+            margin-bottom: 20px;
+        }
+
+        .login-input {
+            width: 100%;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            padding: 12px 15px;
+            border-radius: 8px;
+            color: #fff;
+            margin-bottom: 15px;
+            font-size: 0.95rem;
+        }
+
+        .login-btn {
+            width: 100%;
+            background: var(--accent-gold);
+            color: #070a12;
+            border: none;
+            padding: 12px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .login-btn:hover {
+            background: var(--accent-gold-hover);
+        }
+
+        aside {
+            width: 260px;
+            background-color: var(--bg-sidebar);
+            border-left: 1px solid var(--border-subtle);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 20px 15px;
+            height: 100vh;
+            position: fixed;
+            right: 0;
+            top: 0;
+            z-index: 100;
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-subtle);
             margin-bottom: 15px;
         }
 
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            color: var(--text-muted);
-            font-size: 14px;
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-main);
+            font-weight: 800;
+            font-size: 0.95rem;
         }
 
-        .form-control, .form-select {
-            width: 100%;
-            padding: 10px 15px;
-            background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            color: var(--text);
-            font-size: 16px;
+        .sidebar-logo i {
+            color: var(--accent-gold);
+            font-size: 1.2rem;
         }
 
-        .form-control:focus, .form-select:focus {
-            outline: none;
-            border-color: var(--accent);
-        }
-
-        .btn {
-            width: 100%;
-            padding: 12px;
-            background: var(--accent);
-            border: none;
-            border-radius: 6px;
-            color: white;
-            font-weight: bold;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .btn:hover { opacity: 0.9; }
-        .btn-danger { background: var(--danger); }
-        .btn-success { background: var(--success); }
-
-        /* Dashboard Layout */
-        .dashboard {
-            display: none;
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-            min-height: 650px;
-            width: 100%;
-        }
-
-        .sidebar {
-            background: #0f172a;
-            border-left: 1px solid var(--border);
-            width: 260px;
-            float: right;
-            height: 650px;
-            padding: 20px;
-        }
-
-        .main-content {
-            margin-right: 260px;
-            padding: 30px;
-            height: 650px;
+        .sidebar-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
             overflow-y: auto;
+            flex: 1;
         }
 
-        .user-info {
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 15px;
-            margin-bottom: 20px;
-        }
-
-        .user-info h3 {
-            color: var(--accent);
-            font-size: 18px;
-        }
-
-        .nav-links {
-            list-style: none;
-        }
-
-        .nav-links li {
-            margin-bottom: 10px;
-        }
-
-        .nav-links a {
-            display: block;
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
             padding: 10px 15px;
             color: var(--text-muted);
             text-decoration: none;
-            border-radius: 6px;
-            transition: all 0.2s;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: 0.2s;
+            cursor: pointer;
         }
 
-        .nav-links a:hover, .nav-links a.active {
-            background: var(--accent);
-            color: white;
+        .menu-item:hover, .menu-item.active {
+            background-color: rgba(212, 175, 55, 0.1);
+            color: var(--accent-gold);
+        }
+
+        .menu-item.active {
+            background-color: var(--accent-gold);
+            color: #070a12;
+            font-weight: 700;
+        }
+        .menu-item.active i {
+            color: #070a12;
+        }
+
+        .menu-item i {
+            font-size: 1rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        .sidebar-footer {
+            border-top: 1px solid var(--border-subtle);
+            padding-top: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .user-badge {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-subtle);
+            padding: 8px 12px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.8rem;
+        }
+
+        main {
+            margin-right: 260px;
+            flex: 1;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow-y: auto;
         }
 
         .page-section {
             display: none;
         }
-
         .page-section.active {
             display: block;
         }
 
-        /* Tables & Elements */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+            max-width: 100%;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 15px;
+            margin-top: 10px;
+            white-space: nowrap;
         }
 
         th, td {
             padding: 12px;
             text-align: right;
-            border-bottom: 1px solid var(--border);
-            font-size: 14px;
+            border-bottom: 1px solid var(--border-subtle);
+            font-size: 0.85rem;
         }
 
         th {
-            background: var(--bg);
-            color: var(--accent);
+            color: var(--accent-gold);
+            background: rgba(212, 175, 55, 0.05);
+            position: sticky;
+            top: 0;
         }
 
-        .checkbox-grid {
+        .btn {
+            background: var(--accent-gold);
+            color: #070a12;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn:hover { background: var(--accent-gold-hover); }
+
+        .btn-danger {
+            background: var(--danger);
+            color: #fff;
+        }
+        .btn-success {
+            background: var(--success);
+            color: #fff;
+        }
+
+        .stats-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            margin-top: 10px;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
         }
 
-        .checkbox-label {
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-card h4 {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-bottom: 5px;
+        }
+
+        .stat-card .count {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--accent-gold);
+        }
+
+        .inventory-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-subtle);
+            padding-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        .inv-tab-btn {
+            background: #0b0f19;
+            color: var(--text-muted);
+            border: 1px solid var(--border-subtle);
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+        .inv-tab-btn.active {
+            background: var(--accent-gold);
+            color: #070a12;
+            border-color: var(--accent-gold);
+        }
+        .inv-section { display: none; }
+        .inv-section.active { display: block; }
+
+        .courses-top-filter {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .courses-grid-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        @media(max-width: 900px) {
+            .courses-grid-layout { grid-template-columns: 1fr; }
+        }
+        .course-column-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 20px;
+            min-height: 250px;
+        }
+        .course-item-card {
+            padding: 14px 18px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            font-weight: bold;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .course-item-card:hover {
+            opacity: 0.85;
+            transform: translateX(-3px);
+        }
+        .course-item-card.obtained {
+            background: rgba(34, 197, 94, 0.08);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            color: var(--success);
+        }
+        .course-item-card.missing {
+            background: rgba(239, 68, 68, 0.08);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: var(--danger);
+        }
+
+        .paint-soldier-card {
+            background: var(--bg-card);
+            border: 3px solid var(--accent-gold);
+            border-radius: 16px;
+            padding: 30px;
+            max-width: 650px;
+            margin: 25px auto;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.15);
+        }
+
+        .paint-card-top-right {
+            text-align: right;
+            line-height: 1.8;
+            font-size: 0.95rem;
+            font-weight: bold;
+            color: var(--text-main);
+        }
+
+        .paint-card-avatar-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 15px 0 25px 0;
+        }
+
+        .paint-card-circle-avatar {
+            width: 85px;
+            height: 85px;
+            border: 3px solid var(--accent-gold);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #0b0f19;
+            color: var(--accent-gold);
+            font-size: 2rem;
+            margin-bottom: 12px;
+        }
+
+        .paint-card-curved-line {
+            width: 70%;
+            height: 3px;
+            background: var(--accent-gold);
+            border-radius: 50%;
+        }
+
+        .paint-card-bottom-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+            text-align: center;
+            margin-top: 15px;
+            align-items: center;
+        }
+
+        .paint-metric-item {
+            background: #0b0f19;
+            border: 1px solid var(--border-subtle);
+            padding: 12px;
+            border-radius: 8px;
+        }
+
+        .paint-metric-item.center-total {
+            background: rgba(212, 175, 55, 0.08);
+            border-color: var(--accent-gold);
+        }
+
+        .paint-metric-title {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            margin-bottom: 4px;
+        }
+
+        .paint-metric-val {
+            color: var(--accent-gold);
+            font-weight: bold;
+            font-size: 1.05rem;
+        }
+
+        .military-note-card {
+            background: #131722;
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 14px;
+            color: #fff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+        .military-note-card:hover {
+            border-color: var(--accent-gold);
+        }
+        .card-header-note {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-subtle);
+            padding-bottom: 10px;
+            margin-bottom: 12px;
+        }
+        .soldier-info-note {
             display: flex;
             align-items: center;
             gap: 8px;
-            font-size: 14px;
-            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: bold;
+            color: var(--accent-gold);
         }
-
-        .alert {
-            padding: 10px 15px;
+        .military-icon {
+            font-size: 1rem;
+        }
+        .card-timestamp {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+        .card-body-note {
+            padding: 6px 0;
+            margin-bottom: 12px;
+        }
+        .note-text-content {
+            font-size: 0.9rem;
+            color: #d1d4dc;
+            line-height: 1.6;
+            background: #0b0e14;
+            padding: 12px;
             border-radius: 6px;
-            margin-bottom: 15px;
-            font-size: 14px;
+            border-right: 3px solid var(--accent-gold);
         }
-        .alert-error { background: rgba(239, 68, 68, 0.2); border: 1px solid var(--danger); color: #fca5a5; }
-        .alert-success { background: rgba(34, 197, 94, 0.2); border: 1px solid var(--success); color: #86efac; }
-        
-        .action-btns {
+        .card-footer-note {
             display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid var(--border-subtle);
+            padding-top: 10px;
+            font-size: 0.85rem;
+        }
+        .author-info {
+            color: var(--text-muted);
+        }
+        .author-name {
+            color: #fff;
+            font-weight: 600;
+        }
+        .card-actions {
+            display: flex;
+            gap: 8px;
+        }
+        .btn-action {
+            background: transparent;
+            border: 1px solid var(--border-subtle);
+            padding: 5px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            color: #ccc;
+            display: flex;
+            align-items: center;
             gap: 5px;
+            transition: all 0.2s;
         }
-        .btn-sm {
-            padding: 5px 10px;
-            font-size: 12px;
-            width: auto;
-        }
-
-        .card-box {
-            background: var(--bg);
-            padding: 20px;
-            border-radius: 8px;
-            margin-top: 20px;
-            border: 1px solid var(--border);
+        .delete-btn:hover {
+            background: var(--danger);
+            color: #fff;
+            border-color: var(--danger);
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-
-    <!-- شاشة تسجيل الدخول -->
-    <div id="loginScreen" class="auth-card">
-        <h2>تسجيل الدخول - وزارة الدفاع</h2>
-        <div id="loginAlert"></div>
-        <form id="loginForm">
-            <div class="form-group">
-                <label>اسم المستخدم</label>
-                <input type="text" id="loginUser" class="form-control" required>
-            </div>
-            <div class="form-group">
-                <label>كلمة المرور</label>
-                <input type="password" id="loginPass" class="form-control" required>
-            </div>
-            <button type="submit" class="btn">دخول</button>
-        </form>
+    <div id="loginOverlay">
+        <div class="login-box">
+            <h2>تسجيل الدخول (الأنور)</h2>
+            <input type="text" id="usernameInput" class="login-input" placeholder="اسم المستخدم">
+            <input type="password" id="passwordInput" class="login-input" placeholder="كلمة المرور">
+            <button class="login-btn" onclick="handleLogin()">دخول للوحة</button>
+            <p id="loginError" style="color: var(--danger); margin-top: 10px; font-size: 0.85rem; display: none;">اسم المستخدم أو كلمة المرور غير صحيحة</p>
+        </div>
     </div>
 
-    <!-- لوحة التحكم الرئيسية -->
-    <div id="dashboardScreen" class="dashboard">
-        <!-- القائمة الجانبية -->
-        <div class="sidebar">
-            <div class="user-info">
-                <h3 id="currentUserName">المستخدم</h3>
-                <small id="currentUserRole" style="color: var(--text-muted);"></small>
+    <aside>
+        <div>
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    <span>GRAVE ADMIN PANEL</span>
+                </div>
             </div>
-            <ul class="nav-links" id="navLinks">
-                <li><a href="#" data-page="home" class="active">الرئيسية</a></li>
-                <li><a href="#" data-page="tasks" id="navTasks">المهام الميدانية</a></li>
-                <li><a href="#" data-page="records" id="navRecords">السجلات</a></li>
-                <li><a href="#" data-page="announcements" id="navAnnouncements">الإعلانات</a></li>
-                <li><a href="#" data-page="users" id="navUsers" style="display:none;">إدارة الحسابات</a></li>
-                <li><a href="#" onclick="logout()" style="color: var(--danger); margin-top: 20px;">تسجيل الخروج</a></li>
-            </ul>
+
+            <div class="sidebar-menu" id="sidebarMenuContainer">
+                <div class="menu-item active" onclick="switchPage('home', this)" id="menuHome"><i class="fa-solid fa-house"></i> الرئيسية</div>
+                <div class="menu-item" onclick="switchPage('pages_manager', this)" id="menuPagesManager"><i class="fa-solid fa-folder-tree"></i> إدارة الصفحات</div>
+                <div class="menu-item" onclick="switchPage('members', this)" id="menuMembers"><i class="fa-solid fa-users-gear"></i> منسوبي القطاعات</div>
+                <div class="menu-item" onclick="switchPage('field_missions', this)" id="menuFieldMissions"><i class="fa-solid fa-flag-checkered"></i> المهام الميدانية</div>
+                <div class="menu-item" onclick="switchPage('courses', this)" id="menuCourses"><i class="fa-solid fa-graduation-cap"></i> دورات القطاع</div>
+                <div class="menu-item" onclick="switchPage('inventory', this)" id="menuInventory"><i class="fa-solid fa-boxes-stacked"></i> صفحة الجرد</div>
+                <div class="menu-item" onclick="switchPage('notes_archive', this)" id="menuNotesArchive"><i class="fa-solid fa-box-archive"></i> أرشيف الملاحظات</div>
+                <div class="menu-item" onclick="switchPage('soldier_week', this)" id="menuSoldierWeek"><i class="fa-solid fa-award"></i> عسكري الأسبوع</div>
+            </div>
         </div>
 
-        <!-- محتوى الصفحات -->
-        <div class="main-content">
-            
-            <!-- الصفحة الرئيسية -->
-            <div id="page-home" class="page-section active">
-                <h2>أهلاً بك في نظام إدارة وزارة الدفاع</h2>
-                <p style="color: var(--text-muted); margin-top: 10px;">استخدم القائمة الجانبية لتصفح الأقسام المصرح لك بالدخول إليها وإدارة المهام والسجلات بكل سهولة.</p>
+        <div class="sidebar-footer">
+            <div class="user-badge">
+                <span id="currentRoleDisplay">Owner</span>
+                <span style="color: var(--accent-gold); font-weight: 700;" id="currentStatusDisplay">متصل</span>
             </div>
-
-            <!-- المهام الميدانية -->
-            <div id="page-tasks" class="page-section">
-                <h2>إدارة المهام الميدانية</h2>
-                <div class="card-box">
-                    <h3 style="margin-bottom: 15px; color: var(--accent); font-size: 16px;">إضافة مهمة عسكرية جديدة</h3>
-                    <form id="taskForm">
-                        <div class="form-group">
-                            <label>عنوان المهمة</label>
-                            <input type="text" id="taskTitle" class="form-control" required>
-                        </div>
-                        <div class="form-group">
-                            <label>وصف المهمة والتعليمات</label>
-                            <input type="text" id="taskDesc" class="form-control" required>
-                        </div>
-                        <div class="form-group">
-                            <label>حالة المهمة</label>
-                            <select id="taskStatus" class="form-select">
-                                <option value="جاري التنفيذ">جاري التنفيذ</option>
-                                <option value="مكتملة">مكتملة</option>
-                                <option value="معلقة">معلقة</option>
-                            </select>
-                        </div>
-                        <button type="submit" class="btn btn-success btn-sm">إضافة المهمة</button>
-                    </form>
-                </div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>المهمة</th>
-                            <th>الوصف</th>
-                            <th>الحالة</th>
-                            <th>الإجراء</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tasksTableBody"></tbody>
-                </table>
+            <div class="menu-item" onclick="logout()" style="color: var(--danger); justify-content: center; background: rgba(239,68,68,0.1);">
+                <i class="fa-solid fa-power-off"></i> تسجيل الخروج
             </div>
+        </div>
+    </aside>
 
-            <!-- السجلات -->
-            <div id="page-records" class="page-section">
-                <h2>السجلات العسكرية (العقوبات / الترقيات)</h2>
-                <div class="card-box">
-                    <h3 style="margin-bottom: 15px; color: var(--accent); font-size: 16px;">إضافة سجل عسكري جديد</h3>
-                    <form id="recordForm">
-                        <div class="form-group">
-                            <label>اسم العسكري / الفرد</label>
-                            <input type="text" id="recSoldier" class="form-control" required>
-                        </div>
-                        <div class="form-group">
-                            <label>نوع السجل (ترقية، عقوبة، مكافأة)</label>
-                            <input type="text" id="recType" class="form-control" required>
-                        </div>
-                        <div class="form-group">
-                            <label>التفاصيل</label>
-                            <input type="text" id="recDetails" class="form-control" required>
-                        </div>
-                        <button type="submit" class="btn btn-success btn-sm">حفظ السجل</button>
-                    </form>
-                </div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>العسكري</th>
-                            <th>النوع</th>
-                            <th>التفاصيل</th>
-                            <th>الإجراء</th>
-                        </tr>
-                    </thead>
-                    <tbody id="recordsTableBody"></tbody>
-                </table>
-            </div>
-
-            <!-- الإعلانات -->
-            <div id="page-announcements" class="page-section">
-                <h2>لوحة الإعلانات الرسمية</h2>
-                <div class="card-box">
-                    <h3 style="margin-bottom: 15px; color: var(--accent); font-size: 16px;">نشر تعميم أو إعلان رسمي</h3>
-                    <form id="annForm">
-                        <div class="form-group">
-                            <label>عنوان التعميم</label>
-                            <input type="text" id="annTitle" class="form-control" required>
-                        </div>
-                        <div class="form-group">
-                            <label>نص الإعلان</label>
-                            <input type="text" id="annText" class="form-control" required>
-                        </div>
-                        <button type="submit" class="btn btn-success btn-sm">نشر الإعلان</button>
-                    </form>
-                </div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>العنوان</th>
-                            <th>النص</th>
-                            <th>الإجراء</th>
-                        </tr>
-                    </thead>
-                    <tbody id="annTableBody"></tbody>
-                </table>
-            </div>
-
-            <!-- إدارة الحسابات (خاص بالأونر أو من يملك الصلاحية) -->
-            <div id="page-users" class="page-section">
-                <h2>إدارة الحسابات والصلاحيات</h2>
-                <div id="userAlert"></div>
+    <main>
+        <!-- الرئيسية -->
+        <div id="home" class="page-section active">
+            <div class="card" style="text-align: center; padding: 40px;">
+                <h2 style="color: var(--accent-gold); margin-bottom: 10px;">لوحة إدارة وزارة الدفاع - Grave RP</h2>
+                <p style="color: var(--text-muted); margin-bottom: 25px;">تم ضبط لوحة التحكم بنجاح وحصر الصلاحيات بالكامل لحساب الأونر.</p>
                 
-                <div class="card-box">
-                    <h3 id="formTitle" style="margin-bottom: 15px; color: var(--accent); font-size: 16px;">إضافة حساب جديد</h3>
-                    <form id="userForm">
-                        <input type="hidden" id="editIndex" value="">
-                        <div class="form-group">
-                            <label>الاسم الكامل</label>
-                            <input type="text" id="newFullName" class="form-control" required>
-                        </div>
-                        <div class="form-group">
-                            <label>اسم المستخدم</label>
-                            <input type="text" id="newUsername" class="form-control" required>
-                        </div>
-                        <div class="form-group">
-                            <label>كلمة المرور</label>
-                            <input type="password" id="newPassword" class="form-control" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>الصفحات المسموحة:</label>
-                            <div class="checkbox-grid">
-                                <label class="checkbox-label"><input type="checkbox" name="permissions" value="tasks"> المهام الميدانية</label>
-                                <label class="checkbox-label"><input type="checkbox" name="permissions" value="records"> السجلات</label>
-                                <label class="checkbox-label"><input type="checkbox" name="permissions" value="announcements"> الإعلانات</label>
-                            </div>
-                        </div>
+                <button class="btn" onclick="fetchSheetData(true)" style="padding: 12px 25px; font-size: 1rem;">
+                    <i class="fa-solid fa-rotate" id="refreshIcon"></i> حدث البيانات
+                </button>
+                <p id="refreshStatus" style="font-size: 0.8rem; color: var(--text-muted); margin-top: 10px;"></p>
+            </div>
+        </div>
 
-                        <div class="form-group">
-                            <label>الصلاحيات المتقدمة:</label>
-                            <div class="checkbox-grid">
-                                <label class="checkbox-label"><input type="checkbox" id="permManageUsers" value="manage_users"> إدارة الحسابات والصلاحيات</label>
-                            </div>
-                        </div>
-
-                        <button type="submit" class="btn btn-success" id="saveUserBtn">إنشاء الحساب</button>
-                    </form>
-                </div>
-
-                <div style="margin-top: 30px;">
-                    <h3>قائمة الحسابات الحالية</h3>
+        <!-- إدارة الصفحات -->
+        <div id="pages_manager" class="page-section">
+            <h2 style="color: var(--accent-gold); margin-bottom: 15px;">إدارة وحكم الصفحات في اللوحة</h2>
+            <div class="card">
+                <p style="color: var(--text-muted); margin-bottom: 20px; font-size: 0.9rem;">يمكنك من هنا التحكم في إظهار أو إخفاء أي صفحة من القائمة الجانبية بشكل فوري:</p>
+                <div class="table-responsive">
                     <table>
                         <thead>
                             <tr>
-                                <th>الاسم</th>
-                                <th>اسم المستخدم</th>
-                                <th>الصلاحيات</th>
-                                <th>الإجراءات</th>
+                                <th>اسم الصفحة / القسم</th>
+                                <th>الحالة الحالية</th>
+                                <th>إجراء التحكم</th>
                             </tr>
                         </thead>
-                        <tbody id="usersTableBody"></tbody>
+                        <tbody id="pagesManagerTableBody">
+                            <!-- سيتم تعبئتها برمجياً -->
+                        </tbody>
                     </table>
                 </div>
             </div>
-
         </div>
-    </div>
 
-</div>
-
-<script>
-    // الحسابات الأساسية الافتراضية
-    const defaultUsers = [
-        {
-            username: "Ahmed Owner",
-            password: "Owner2006629",
-            fullName: "المالك العام (الأونر)",
-            isOwner: true,
-            permissions: ["tasks", "records", "announcements", "manage_users"]
-        }
-    ];
-
-    function getUsers() {
-        let users = localStorage.getItem('mod_users');
-        if (!users) {
-            users = JSON.stringify(defaultUsers);
-            localStorage.setItem('mod_users', users);
-        }
-        return JSON.parse(users);
-    }
-
-    function saveUsers(users) { localStorage.setItem('mod_users', JSON.stringify(users)); }
-
-    // دوال جلب وحفظ البيانات الخاصة بالمهام، السجلات، والإعلانات
-    function getData(key) { return JSON.parse(localStorage.getItem('mod_' + key)) || []; }
-    function saveData(key, data) { localStorage.setItem('mod_' + key, JSON.stringify(data)); }
-
-    let currentUser = JSON.parse(localStorage.getItem('mod_current_user')) || null;
-
-    window.onload = function() {
-        let users = JSON.parse(localStorage.getItem('mod_users'));
-        if (users && users.length > 0 && (users[0].username === "owner" || !users.some(u => u.isOwner))) {
-            users[0].username = "Ahmed Owner";
-            users[0].password = "Owner2006629";
-            users[0].isOwner = true;
-            localStorage.setItem('mod_users', JSON.stringify(users));
-        }
-
-        getUsers(); 
-        if (currentUser) {
-            if (currentUser.username === "owner") {
-                logout();
-            } else {
-                showDashboard();
-            }
-        }
-    };
-
-    document.getElementById('loginForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        const u = document.getElementById('loginUser').value.trim();
-        const p = document.getElementById('loginPass').value.trim();
-        const users = getUsers();
-
-        const found = users.find(x => x.username === u && x.password === p);
-        if (found) {
-            currentUser = found;
-            localStorage.setItem('mod_current_user', JSON.stringify(currentUser));
-            showDashboard();
-        } else {
-            document.getElementById('loginAlert').innerHTML = '<div class="alert alert-error">اسم المستخدم أو كلمة المرور غير صحيحة!</div>';
-        }
-    });
-
-    function showDashboard() {
-        document.getElementById('loginScreen').style.display = 'none';
-        document.getElementById('dashboardScreen').style.display = 'block';
-        document.getElementById('currentUserName').innerText = currentUser.fullName;
-        document.getElementById('currentUserRole').innerText = currentUser.isOwner ? 'الأونر (المالك)' : 'مستخدم معتمد';
-
-        if (currentUser.permissions.includes('manage_users') || currentUser.isOwner) {
-            document.getElementById('navUsers').style.display = 'block';
-        } else {
-            document.getElementById('navUsers').style.display = 'none';
-        }
-
-        // إخفاء/إظهار أقسام القائمة الجانبية بناءً على الصلاحيات
-        const pages = ['tasks', 'records', 'announcements'];
-        pages.forEach(page => {
-            const navEl = document.getElementById('nav' + page.charAt(0).toUpperCase() + page.slice(1));
-            if (!currentUser.permissions.includes(page) && !currentUser.isOwner) {
-                if(navEl) navEl.parentElement.style.display = 'none';
-            } else {
-                if(navEl) navEl.parentElement.style.display = 'block';
-            }
-        });
-
-        loadUsersTable();
-        loadTasksTable();
-        loadRecordsTable();
-        loadAnnTable();
-    }
-
-    function logout() {
-        localStorage.removeItem('mod_current_user');
-        location.reload();
-    }
-
-    // التنقل بين الصفحات
-    document.querySelectorAll('.nav-links a[data-page]').forEach(link => {
-        link.addEventListener('click', function(e) {
-            e.preventDefault();
-            const page = this.getAttribute('data-page');
+        <!-- منسوبي القطاعات -->
+        <div id="members" class="page-section">
+            <h2 style="color: var(--accent-gold); margin-bottom: 15px;">منسوبي القطاعات</h2>
             
-            document.querySelectorAll('.nav-links a').forEach(l => l.classList.remove('active'));
-            this.classList.add('active');
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h4>إجمالي المنسوبين</h4>
+                    <div class="count" id="count-ALL">0</div>
+                </div>
+                <div class="stat-card">
+                    <h4>عدد القادة (L)</h4>
+                    <div class="count" id="count-L">0</div>
+                </div>
+                <div class="stat-card">
+                    <h4>عدد الضباط (M)</h4>
+                    <div class="count" id="count-M">0</div>
+                </div>
+                <div class="stat-card">
+                    <h4>عدد الأفراد (R)</h4>
+                    <div class="count" id="count-R">0</div>
+                </div>
+            </div>
 
-            document.querySelectorAll('.page-section').forEach(sec => sec.classList.remove('active'));
-            document.getElementById('page-' + page).classList.add('active');
-        });
-    });
+            <div style="display: flex; gap: 15px; margin-bottom: 15px; flex-wrap: wrap; align-items: center; justify-content: space-between;">
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn" onclick="filterMembers('ALL')">الكل</button>
+                    <button class="btn" onclick="filterMembers('L')">القادات (L)</button>
+                    <button class="btn" onclick="filterMembers('M')">الضباط (M)</button>
+                    <button class="btn" onclick="filterMembers('R')">الأفراد (R)</button>
+                </div>
+                <div style="min-width: 250px; flex: 1; max-width: 350px;">
+                    <input type="text" id="memberSearchInput" class="login-input" placeholder="بحث برقم الهوية ID أو الاسم..." style="margin: 0;" oninput="filterMembersTableBySearch()">
+                </div>
+            </div>
 
-    // --- إدارة المهام ---
-    document.getElementById('taskForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        let tasks = getData('tasks');
-        tasks.push({
-            title: document.getElementById('taskTitle').value,
-            desc: document.getElementById('taskDesc').value,
-            status: document.getElementById('taskStatus').value
-        });
-        saveData('tasks', tasks);
-        loadTasksTable();
-        this.reset();
-    });
+            <div class="card">
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>الرتبة</th>
+                                <th>الديسكورد</th>
+                                <th>الاسم</th>
+                                <th>رقم الهوية ID</th>
+                                <th>الكود</th>
+                                <th>المسمى الوظيفي</th>
+                                <th>السجلات</th>
+                                <th>الإعلانات</th>
+                                <th>الملاحظات</th>
+                                <th>التحذيرات</th>
+                                <th>تاريخ آخر ترقية</th>
+                                <th>ملاحظات يدوية</th>
+                                <th>حالة الإجازة</th>
+                            </tr>
+                        </thead>
+                        <tbody id="membersTableBody">
+                            <tr><td colspan="13" style="text-align: center;">جاري تحميل البيانات...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
 
-    function loadTasksTable() {
-        let tasks = getData('tasks');
-        let tbody = document.getElementById('tasksTableBody');
-        tbody.innerHTML = '';
-        tasks.forEach((t, i) => {
-            tbody.innerHTML += `<tr><td>${t.title}</td><td>${t.desc}</td><td>${t.status}</td><td><button class="btn btn-sm btn-danger" onclick="deleteItem('tasks', ${i})">حذف</button></td></tr>`;
-        });
-    }
+        <!-- المهام الميدانية -->
+        <div id="field_missions" class="page-section">
+            <h2 style="color: var(--accent-gold); margin-bottom: 15px;">المهام الميدانية (بوابة إرسال الإثباتات)</h2>
+            <div class="card" style="background: #0b0f19; border: 1px solid var(--border-subtle); margin-bottom: 25px;">
+                <h3 style="color: var(--accent-gold); font-size: 1rem; margin-bottom: 15px;"><i class="fa-solid fa-cloud-arrow-up"></i> رفع إثبات مهمة ميدانية جديدة</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                    <div>
+                        <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 5px;">رقم الهوية ID للعسكري:</label>
+                        <input type="text" id="missionSoldierId" class="login-input" placeholder="مثال: 779" style="margin:0;">
+                    </div>
+                    <div>
+                        <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 5px;">رابط أو تفاصيل الصورة / الإثبات:</label>
+                        <input type="text" id="missionImageLink" class="login-input" placeholder="ضع رابط الصورة هنا..." style="margin:0;">
+                    </div>
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 5px;">تفاصيل ووصف المهمة:</label>
+                    <textarea id="missionDetailsText" class="login-input" rows="3" placeholder="اكتب تفاصيل المهمة الميدانية..." style="resize: vertical;"></textarea>
+                </div>
+                <button class="btn" onclick="submitFieldMission()">إرسال المهمة للسجل</button>
+            </div>
 
-    // --- إدارة السجلات ---
-    document.getElementById('recordForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        let records = getData('records');
-        records.push({
-            soldier: document.getElementById('recSoldier').value,
-            type: document.getElementById('recType').value,
-            details: document.getElementById('recDetails').value
-        });
-        saveData('records', records);
-        loadRecordsTable();
-        this.reset();
-    });
+            <div class="card">
+                <h3 style="color: var(--accent-gold); font-size: 1rem; margin-bottom: 15px;"><i class="fa-solid fa-list-check"></i> سجل إثباتات المهام الميدانية</h3>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID العسكري</th>
+                                <th>الاسم</th>
+                                <th>تفاصيل المهمة</th>
+                                <th>الإثبات (الصورة)</th>
+                                <th>الحالة</th>
+                                <th>الإجراءات الديناميكية</th>
+                            </tr>
+                        </thead>
+                        <tbody id="fieldMissionsTableBody">
+                            <tr><td colspan="6" style="text-align: center;">لا توجد مهام مرفوعة حالياً</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
 
-    function loadRecordsTable() {
-        let records = getData('records');
-        let tbody = document.getElementById('recordsTableBody');
-        tbody.innerHTML = '';
-        records.forEach((r, i) => {
-            tbody.innerHTML += `<tr><td>${r.soldier}</td><td>${r.type}</td><td>${r.details}</td><td><button class="btn btn-sm btn-danger" onclick="deleteItem('records', ${i})">حذف</button></td></tr>`;
-        });
-    }
+        <!-- دورات القطاع والمتطلبات -->
+        <div id="courses" class="page-section">
+            <h2 style="color: var(--accent-gold); margin-bottom: 15px;">دورات القطاع والمتطلبات</h2>
+            
+            <div class="courses-top-filter">
+                <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 15px; align-items: center;">
+                    <div>
+                        <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 5px;">بحث برقم الهوية ID:</label>
+                        <input type="text" id="courseSearchIdInput" class="login-input" placeholder="اكتب الآيدي..." style="margin:0;" oninput="filterCoursesBySearch()">
+                    </div>
+                    <div>
+                        <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 5px;">اختر اسم العسكري:</label>
+                        <select id="courseSelectSoldier" class="login-input" style="margin:0;" onchange="onCourseSoldierSelect()"></select>
+                    </div>
+                </div>
+                <div style="margin-top: 15px; display: flex; gap: 20px; font-weight: bold; font-size: 0.95rem; color: var(--accent-gold);">
+                    <span id="courseDisplayRank">رتبة العسكري: ---</span>
+                    <span id="courseDisplayId">رقم الهوية: ---</span>
+                    <span id="courseDisplayName">الاسم: ---</span>
+                </div>
+            </div>
 
-    // --- إدارة الإعلانات ---
-    document.getElementById('annForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        let anns = getData('anns');
-        anns.push({
-            title: document.getElementById('annTitle').value,
-            text: document.getElementById('annText').value
-        });
-        saveData('anns', anns);
-        loadAnnTable();
-        this.reset();
-    });
+            <div class="courses-grid-layout">
+                <div class="course-column-box">
+                    <h3 style="color: var(--success); font-size: 1.05rem; margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">
+                        <i class="fa-solid fa-circle-check"></i> الدورات الحاصل عليها
+                    </h3>
+                    <div id="obtainedCoursesList"></div>
+                </div>
 
-    function loadAnnTable() {
-        let anns = getData('anns');
-        let tbody = document.getElementById('annTableBody');
-        tbody.innerHTML = '';
-        anns.forEach((a, i) => {
-            tbody.innerHTML += `<tr><td>${a.title}</td><td>${a.text}</td><td><button class="btn btn-sm btn-danger" onclick="deleteItem('anns', ${i})">حذف</button></td></tr>`;
-        });
-    }
+                <div class="course-column-box">
+                    <h3 style="color: var(--danger); font-size: 1.05rem; margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">
+                        <i class="fa-solid fa-circle-xmark"></i> الدورات الناقصة
+                    </h3>
+                    <div id="missingCoursesList"></div>
+                </div>
+            </div>
+        </div>
 
-    function deleteItem(key, index) {
-        let data = getData(key);
-        data.splice(index, 1);
-        saveData(key, data);
-        if(key === 'tasks') loadTasksTable();
-        if(key === 'records') loadRecordsTable();
-        if(key === 'anns') loadAnnTable();
-    }
+        <!-- صفحة الجرد الأسبوعي -->
+        <div id="inventory" class="page-section">
+            <h2 style="color: var(--accent-gold); margin-bottom: 15px;">صفحة الجرد الأسبوعي</h2>
 
-    // --- إدارة الحسابات ---
-    document.getElementById('userForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        const editIndex = document.getElementById('editIndex').value;
-        const fullName = document.getElementById('newFullName').value.trim();
-        const username = document.getElementById('newUsername').value.trim();
-        const password = document.getElementById('newPassword').value.trim();
+            <div class="card" style="background: #0b0f19; border: 1px solid var(--border-subtle);">
+                <h3 style="color: var(--accent-gold); font-size: 1rem; margin-bottom: 10px;">إدارة الأسابيع المتاحة</h3>
+                <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 15px;">
+                    <input type="text" id="newWeekInputInv" class="login-input" placeholder="اسم الأسبوع الجديد (مثال: أسبوع الحسم)..." style="margin:0; flex:1; min-width: 200px;">
+                    <button class="btn" onclick="addNewWeekFrom('Inv')">إضافة أسبوع جديد</button>
+                </div>
+                <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                    <label style="color: var(--text-muted); font-size: 0.85rem;">حذف أسبوع:</label>
+                    <select id="deleteWeekSelectInv" class="login-input" style="margin:0; max-width: 250px;"></select>
+                    <button class="btn btn-danger" onclick="deleteSelectedWeekFrom('Inv')">حذف الأسبوع المحدد</button>
+                </div>
+            </div>
 
-        let permissions = [];
-        document.querySelectorAll('input[name="permissions"]:checked').forEach(cb => permissions.push(cb.value));
-        if (document.getElementById('permManageUsers').checked) permissions.push('manage_users');
+            <div class="card">
+                <div class="inventory-tabs">
+                    <button class="inv-tab-btn active" onclick="switchInvTab('logs_ads', this)">جرد السجلات والإعلانات</button>
+                    <button class="inv-tab-btn" onclick="switchInvTab('ops', this)">جرد العمليات</button>
+                    <button class="inv-tab-btn" onclick="switchInvTab('acceptance', this)">جرد القبول</button>
+                    <button class="inv-tab-btn" style="background: rgba(239, 68, 68, 0.15); border-color: var(--danger); color: var(--danger);" onclick="clearCurrentWeekInventoryData()"><i class="fa-solid fa-trash-can"></i> تفريغ بيانات الأسبوع الحالي</button>
+                </div>
 
-        let users = getUsers();
-        const existingIndex = users.findIndex(x => x.username === username);
-        if (existingIndex !== -1 && existingIndex !== parseInt(editIndex)) {
-            document.getElementById('userAlert').innerHTML = '<div class="alert alert-error">اسم المستخدم موجود مسبقاً!</div>';
-            return;
+                <div id="inv_logs_ads" class="inv-section active">
+                    <div style="background: #0b0f19; border: 1px solid var(--border-subtle); padding: 20px; border-radius: 12px; margin-bottom: 20px;">
+                        <h3 style="color: var(--accent-gold); font-size: 1rem; margin-bottom: 10px;">إرفاق سجلات والإعلانات جديدة</h3>
+                        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 15px; margin-bottom: 15px;">
+                            <div>
+                                <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 5px;">الصيغة (ID , سجلات , إعلانات كل سطر مستقل):</label>
+                                <textarea id="bulkLogsAdsText" class="login-input" rows="4" placeholder="مثال:&#10;779,38,3" style="resize: vertical; font-family: monospace;"></textarea>
+                            </div>
+                            <div>
+                                <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 5px;">اختر الأسبوع:</label>
+                                <select id="autoWeekLogsAds" class="login-input" style="margin-bottom: 15px;" onchange="renderInventoryTables()"></select>
+                                <button class="btn" style="width: 100%;" onclick="processInventoryData('logs_ads')">إرفاق البيانات</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr><th>الأسبوع</th><th>ID</th><th>الرتبة</th><th>الاسم</th><th>السجلات</th><th>الإعلانات</th><th>حذف</th></tr>
+                            </thead>
+                            <tbody id="tableLogsAds"><tr><td colspan="7" style="text-align: center;">لا توجد بيانات مرفقة</td></tr></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="inv_ops" class="inv-section">
+                    <div style="background: #0b0f19; border: 1px solid var(--border-subtle); padding: 20px; border-radius: 12px; margin-bottom: 20px;">
+                        <h3 style="color: var(--accent-gold); font-size: 1rem; margin-bottom: 10px;">إرفاق جرد العمليات</h3>
+                        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 15px; margin-bottom: 15px;">
+                            <div>
+                                <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 5px;">الصيغة (ID , عدد العمليات):</label>
+                                <textarea id="bulkOpsText" class="login-input" rows="4" placeholder="مثال:&#10;779,15" style="resize: vertical; font-family: monospace;"></textarea>
+                            </div>
+                            <div>
+                                <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 5px;">الأسبوع:</label>
+                                <select id="autoWeekOps" class="login-input" style="margin-bottom: 15px;" onchange="renderInventoryTables()"></select>
+                                <button class="btn" style="width: 100%;" onclick="processInventoryData('ops')">إرفاق العمليات</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr><th>الأسبوع</th><th>ID</th><th>الرتبة</th><th>الاسم</th><th>العمليات</th><th>حذف</th></tr>
+                            </thead>
+                            <tbody id="tableOps"><tr><td colspan="6" style="text-align: center;">لا توجد بيانات مرفقة</td></tr></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="inv_acceptance" class="inv-section">
+                    <div style="background: #0b0f19; border: 1px solid var(--border-subtle); padding: 20px; border-radius: 12px; margin-bottom: 20px;">
+                        <h3 style="color: var(--accent-gold); font-size: 1rem; margin-bottom: 10px;">إرفاق جرد القبول</h3>
+                        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 15px; margin-bottom: 15px;">
+                            <div>
+                                <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 5px;">الصيغة (ID , المقبولين):</label>
+                                <textarea id="bulkAcceptanceText" class="login-input" rows="4" placeholder="مثال:&#10;779,5" style="resize: vertical; font-family: monospace;"></textarea>
+                            </div>
+                            <div>
+                                <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 5px;">الأسبوع:</label>
+                                <select id="autoWeekAcceptance" class="login-input" style="margin-bottom: 15px;" onchange="renderInventoryTables()"></select>
+                                <button class="btn" style="width: 100%;" onclick="processInventoryData('acceptance')">إرفاق القبول</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr><th>الأسبوع</th><th>ID</th><th>الرتبة</th><th>الاسم</th><th>المقبولين</th><th>حذف</th></tr>
+                            </thead>
+                            <tbody id="tableAcceptance"><tr><td colspan="6" style="text-align: center;">لا توجد بيانات مرفقة</td></tr></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- أرشيف الملاحظات -->
+        <div id="notes_archive" class="page-section">
+            <h2 style="color: var(--accent-gold); margin-bottom: 15px;">أرشيف الملاحظات وسجلات المنسوبين</h2>
+            <div class="card" style="background: #0b0f19; border: 1px solid var(--border-subtle); margin-bottom: 20px;">
+                <h3 style="color: var(--accent-gold); font-size: 1rem; margin-bottom: 10px;"><i class="fa-solid fa-pen-to-square"></i> إضافة ملاحظة جديدة للأرشيف</h3>
+                <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 15px; margin-bottom: 15px;">
+                    <div>
+                        <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 5px;">رقم الهوية ID للعسكري:</label>
+                        <input type="text" id="archiveSoldierId" class="login-input" placeholder="مثال: 779" style="margin:0;">
+                    </div>
+                    <div>
+                        <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 5px;">نص الملاحظة أو التدوينة:</label>
+                        <input type="text" id="archiveNoteText" class="login-input" placeholder="اكتب الملاحظة هنا..." style="margin:0;">
+                    </div>
+                </div>
+                <button class="btn" onclick="saveArchiveNote()">حفظ في أرشيف الملاحظات</button>
+            </div>
+
+            <div class="card">
+                <div style="margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                    <h3 style="color: var(--accent-gold); font-size: 1rem;"><i class="fa-solid fa-box-archive"></i> قائمة الملاحظات المؤرشفة</h3>
+                    <input type="text" id="archiveSearchInput" class="login-input" placeholder="بحث في الملاحظات..." style="margin:0; max-width: 250px;" oninput="renderNotesArchiveTable()">
+                </div>
+                <div id="notesArchiveContainer">
+                    <p style="color: var(--text-muted); text-align: center; padding: 20px;">لا توجد ملاحظات مؤرشفة حالياً</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- عسكري الأسبوع -->
+        <div id="soldier_week" class="page-section">
+            <h2 style="color: var(--accent-gold); margin-bottom: 15px;">منصة عسكري الأسبوع</h2>
+            
+            <div class="card" style="background: #0b0f19; border: 1px solid var(--border-subtle);">
+                <h3 style="color: var(--accent-gold); font-size: 1rem; margin-bottom: 10px;">إدارة الأسابيع المتاحة</h3>
+                <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 15px;">
+                    <input type="text" id="newWeekInputSoldier" class="login-input" placeholder="اسم الأسبوع الجديد (مثال: أسبوع الحسم)..." style="margin:0; flex:1; min-width: 200px;">
+                    <button class="btn" onclick="addNewWeekFrom('Soldier')">إضافة أسبوع جديد</button>
+                </div>
+                <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                    <label style="color: var(--text-muted); font-size: 0.85rem;">حذف أسبوع:</label>
+                    <select id="deleteWeekSelectSoldier" class="login-input" style="margin:0; max-width: 250px;"></select>
+                    <button class="btn btn-danger" onclick="deleteSelectedWeekFrom('Soldier')">حذف الأسبوع المحدد</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div style="margin-bottom: 20px; display: flex; gap: 10px; align-items:center; flex-wrap: wrap; justify-content: space-between;">
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <label style="color: var(--text-muted);">اختر الأسبوع لعرض المرشحين:</label>
+                        <select id="selectWeekSoldier" class="login-input" style="width: 250px; margin:0;" onchange="renderSoldierOfWeek()"></select>
+                    </div>
+                    <button class="btn" style="background: #0ea5e9; color: #fff;" onclick="exportWeekReportAsText()"><i class="fa-solid fa-file-arrow-down"></i> تصدير تقرير الأسبوع</button>
+                </div>
+
+                <div style="background: #0b0f19; border: 1px solid var(--border-subtle); padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                    <h3 style="color: var(--accent-gold); font-size: 0.95rem; margin-bottom: 12px;"><i class="fa-solid fa-medal"></i> أعلى العساكر في هذا الأسبوع (حسب مجموع النقاط):</h3>
+                    <div id="topSoldiersList">
+                        <p style="color: var(--text-muted); font-size: 0.85rem;">لا توجد بيانات مسجلة لهذا الأسبوع بعد.</p>
+                    </div>
+                </div>
+
+                <div id="candidateCardPreview"></div>
+                
+                <h3 style="color: var(--accent-gold); margin-bottom: 10px; margin-top: 25px;">اعتماد عسكري الأسبوع يدوياً (اختياري):</h3>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px;">
+                    <input type="text" id="selectedSoldierInput" class="login-input" placeholder="أدخل آيدي العسكري" style="margin:0; flex:1; min-width: 200px;">
+                    <button class="btn" onclick="saveSoldierOfWeek()">حفظ واعتماد</button>
+                    <button class="btn btn-danger" onclick="removeSoldierOfWeek()">حذف عسكري الأسبوع المعتمد</button>
+                </div>
+
+                <div id="currentApprovedSoldier" style="margin-top: 15px;"></div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // حساب الأونر الوحيد المتبقي
+        let accounts = {
+            "Ahmed": { pass: "Owner2010629", role: "Owner", loggedIn: true, loginTime: Date.now(), lastLogout: "---" }
+        };
+
+        let currentUser = "Ahmed";
+        let csvData = [];
+        
+        let customWeeks = JSON.parse(localStorage.getItem('grave_customWeeks')) || ["الأسبوع الأول", "الأسبوع الثاني", "الأسبوع الثالث"];
+
+        let inventoryLogsAds = JSON.parse(localStorage.getItem('grave_invLogsAds')) || [];
+        let inventoryOps = JSON.parse(localStorage.getItem('grave_invOps')) || [];
+        let inventoryAcceptance = JSON.parse(localStorage.getItem('grave_invAcceptance')) || [];
+        let soldierOfWeekData = JSON.parse(localStorage.getItem('grave_soldierOfWeekData')) || {};
+        let fieldMissionsList = JSON.parse(localStorage.getItem('grave_fieldMissions')) || [];
+        let soldierCoursesData = JSON.parse(localStorage.getItem('grave_soldierCoursesData')) || {};
+        let notesArchiveList = JSON.parse(localStorage.getItem('grave_notesArchiveList')) || [];
+
+        // إعدادات إدارة الصفحات (إظهار/إخفاء)
+        let pageVisibility = JSON.parse(localStorage.getItem('grave_pageVisibility')) || {
+            'home': true,
+            'pages_manager': true,
+            'members': true,
+            'field_missions': true,
+            'courses': true,
+            'inventory': true,
+            'notes_archive': true,
+            'soldier_week': true
+        };
+
+        let currentMemberFilter = 'ALL';
+
+        let allAvailableCourses = [
+            "فرد أساس",
+            "مركز العمليات",
+            "إسعافات أولية",
+            "تأهيل الضباط",
+            "مظلات مشتركة",
+            "الصاعقة او الضفادع",
+            "الصجور الجوية"
+        ];
+
+        function saveToLocalStorage() {
+            localStorage.setItem('grave_customWeeks', JSON.stringify(customWeeks));
+            localStorage.setItem('grave_invLogsAds', JSON.stringify(inventoryLogsAds));
+            localStorage.setItem('grave_invOps', JSON.stringify(inventoryOps));
+            localStorage.setItem('grave_invAcceptance', JSON.stringify(inventoryAcceptance));
+            localStorage.setItem('grave_soldierOfWeekData', JSON.stringify(soldierOfWeekData));
+            localStorage.setItem('grave_fieldMissions', JSON.stringify(fieldMissionsList));
+            localStorage.setItem('grave_soldierCoursesData', JSON.stringify(soldierCoursesData));
+            localStorage.setItem('grave_notesArchiveList', JSON.stringify(notesArchiveList));
+            localStorage.setItem('grave_pageVisibility', JSON.stringify(pageVisibility));
         }
 
-        if (editIndex === "") {
-            users.push({ username, password, fullName, isOwner: false, permissions });
-            document.getElementById('userAlert').innerHTML = '<div class="alert alert-success">تم إنشاء الحساب بنجاح!</div>';
-        } else {
-            users[editIndex].fullName = fullName;
-            users[editIndex].username = username;
-            if(password) users[editIndex].password = password;
-            users[editIndex].permissions = permissions;
-            document.getElementById('userAlert').innerHTML = '<div class="alert alert-success">تم تحديث الحساب بنجاح!</div>';
-            document.getElementById('editIndex').value = "";
-            document.getElementById('formTitle').innerText = "إضافة حساب جديد";
-            document.getElementById('saveUserBtn').innerText = "إنشاء الحساب";
+        // تطبيق حالة إظهار وإخفاء الصفحات على القائمة الجانبية
+        function applyPageVisibility() {
+            let mapping = {
+                'home': 'menuHome',
+                'pages_manager': 'menuPagesManager',
+                'members': 'menuMembers',
+                'field_missions': 'menuFieldMissions',
+                'courses': 'menuCourses',
+                'inventory': 'menuInventory',
+                'notes_archive': 'menuNotesArchive',
+                'soldier_week': 'menuSoldierWeek'
+            };
+
+            for(let pageKey in mapping) {
+                let menuElem = document.getElementById(mapping[pageKey]);
+                if(menuElem) {
+                    menuElem.style.display = pageVisibility[pageKey] ? 'flex' : 'none';
+                }
+            }
+            renderPagesManagerTable();
         }
 
-        saveUsers(users);
-        loadUsersTable();
-        this.reset();
-    });
+        function renderPagesManagerTable() {
+            let tbody = document.getElementById('pagesManagerTableBody');
+            if(!tbody) return;
 
-    function loadUsersTable() {
-        const users = getUsers();
-        const tbody = document.getElementById('usersTableBody');
-        tbody.innerHTML = '';
+            let pageNames = {
+                'home': 'الرئيسية',
+                'pages_manager': 'إدارة الصفحات',
+                'members': 'منسوبي القطاعات',
+                'field_missions': 'المهام الميدانية',
+                'courses': 'دورات القطاع',
+                'inventory': 'صفحة الجرد',
+                'notes_archive': 'أرشيف الملاحظات',
+                'soldier_week': 'عسكري الأسبوع'
+            };
 
-        users.forEach((user, index) => {
-            tbody.innerHTML += `
-                <tr>
-                    <td>${user.fullName} ${user.isOwner ? '<span style="color:var(--accent);">(أونر)</span>' : ''}</td>
-                    <td>${user.username}</td>
-                    <td>${user.permissions.join(', ')}</td>
+            tbody.innerHTML = "";
+            for(let key in pageVisibility) {
+                let isVisible = pageVisibility[key];
+                let tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${pageNames[key] || key}</strong></td>
+                    <td><span style="color: ${isVisible ? 'var(--success)' : 'var(--danger)'}; font-weight: bold;">${isVisible ? 'مفعلة وتظهر في القائمة' : 'مخفية'}</span></td>
                     <td>
-                        ${!user.isOwner || currentUser.isOwner ? `
-                        <div class="action-btns">
-                            <button class="btn btn-sm" onclick="editUser(${index})">تعديل</button>
-                            ${!user.isOwner ? `<button class="btn btn-sm btn-danger" onclick="deleteUser(${index})">حذف</button>` : ''}
-                        </div>` : 'صلاحية مالك أساسي'}
+                        <button class="btn ${isVisible ? 'btn-danger' : 'btn-success'}" style="padding: 6px 12px; font-size: 0.8rem;" onclick="togglePageStatus('${key}')">
+                            ${isVisible ? 'إخفاء الصفحة' : 'إظهار الصفحة'}
+                        </button>
                     </td>
-                </tr>
-            `;
-        });
-    }
-
-    function editUser(index) {
-        const users = getUsers();
-        const user = users[index];
-        document.getElementById('editIndex').value = index;
-        document.getElementById('newFullName').value = user.fullName;
-        document.getElementById('newUsername').value = user.username;
-        document.getElementById('newPassword').value = user.password;
-        document.getElementById('formTitle').innerText = "تعديل حساب: " + user.fullName;
-        document.getElementById('saveUserBtn').innerText = "حفظ التعديلات";
-
-        document.querySelectorAll('input[name="permissions"]').forEach(cb => {
-            cb.checked = user.permissions.includes(cb.value);
-        });
-        document.getElementById('permManageUsers').checked = user.permissions.includes('manage_users');
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    function deleteUser(index) {
-        if (confirm('هل أنت متأكد من حذف هذا الحساب؟')) {
-            let users = getUsers();
-            users.splice(index, 1);
-            saveUsers(users);
-            loadUsersTable();
-            document.getElementById('userAlert').innerHTML = '<div class="alert alert-success">تم حذف الحساب بنجاح.</div>';
+                `;
+                tbody.appendChild(tr);
+            }
         }
-    }
-</script>
 
+        function togglePageStatus(key) {
+            pageVisibility[key] = !pageVisibility[key];
+            saveToLocalStorage();
+            applyPageVisibility();
+        }
+
+        function updateWeekDropdowns() {
+            const dropdownIds = ['autoWeekLogsAds', 'autoWeekOps', 'autoWeekAcceptance', 'selectWeekSoldier', 'deleteWeekSelectInv', 'deleteWeekSelectSoldier'];
+            
+            dropdownIds.forEach(id => {
+                let select = document.getElementById(id);
+                if(!select) return;
+                let currentValue = select.value;
+                
+                select.innerHTML = "";
+                customWeeks.forEach(week => {
+                    let opt = document.createElement('option');
+                    opt.value = week;
+                    opt.textContent = week;
+                    select.appendChild(opt);
+                });
+                
+                if(customWeeks.includes(currentValue)) {
+                    select.value = currentValue;
+                }
+            });
+            renderInventoryTables();
+            renderSoldierOfWeek();
+        }
+
+        function addNewWeekFrom(source) {
+            let inputId = source === 'Inv' ? 'newWeekInputInv' : 'newWeekInputSoldier';
+            let input = document.getElementById(inputId);
+            let weekName = input.value.trim();
+            
+            if(!weekName) {
+                alert("الرجاء كتابة اسم الأسبوع");
+                return;
+            }
+            if(customWeeks.includes(weekName)) {
+                alert("هذا الأسبوع موجود مسبقاً!");
+                return;
+            }
+            
+            customWeeks.push(weekName);
+            saveToLocalStorage();
+            document.getElementById('newWeekInputInv').value = "";
+            document.getElementById('newWeekInputSoldier').value = "";
+            updateWeekDropdowns();
+            alert("تم إضافة الأسبوع بنجاح!");
+        }
+
+        function deleteSelectedWeekFrom(source) {
+            let selectId = source === 'Inv' ? 'deleteWeekSelectInv' : 'deleteWeekSelectSoldier';
+            let select = document.getElementById(selectId);
+            let weekName = select.value;
+            
+            if(customWeeks.length <= 1) {
+                alert("لا يمكنك حذف جميع الأسابيع، يجب أن يبقى أسبوع واحد على الأقل.");
+                return;
+            }
+            
+            if(confirm(`هل أنت متأكد من حذف الأسبوع (${weekName})؟`)) {
+                customWeeks = customWeeks.filter(w => w !== weekName);
+                inventoryLogsAds = inventoryLogsAds.filter(i => i.week !== weekName);
+                inventoryOps = inventoryOps.filter(i => i.week !== weekName);
+                inventoryAcceptance = inventoryAcceptance.filter(i => i.week !== weekName);
+                delete soldierOfWeekData[weekName];
+                
+                saveToLocalStorage();
+                updateWeekDropdowns();
+                alert("تم حذف الأسبوع بنجاح!");
+            }
+        }
+
+        async function fetchSheetData(isManualClick = false) {
+            const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT5IjG47ogq2fHCI_clfxmoYcs9G-6uoTRfojuRRaj9dc82XFo-ydNNFNYawGBdXIv4kT4BfXkoQvNj/pub?gid=2094506019&single=true&output=csv";
+            
+            let statusText = document.getElementById('refreshStatus');
+            let icon = document.getElementById('refreshIcon');
+
+            if (isManualClick && statusText) {
+                statusText.innerText = "جاري تحديث البيانات من الشيت...";
+                if(icon) icon.classList.add('fa-spin');
+            }
+
+            try {
+                const response = await fetch(url + "&t=" + new Date().getTime());
+                const data = await response.text();
+                parseCSV(data);
+
+                if (isManualClick && statusText) {
+                    statusText.innerText = "تم تحديث البيانات بنجاح! (" + new Date().toLocaleTimeString() + ")";
+                    setTimeout(() => { statusText.innerText = ""; }, 4000);
+                }
+            } catch (e) {
+                console.log("خطأ في جلب الجدول");
+                if (isManualClick && statusText) {
+                    statusText.innerText = "فشل التحديث، تأكد من اتصالك بالإنترنت.";
+                }
+            } finally {
+                if (isManualClick && icon) {
+                    icon.classList.remove('fa-spin');
+                }
+            }
+        }
+
+        function parseCSV(text) {
+            const lines = text.split("\n");
+            csvData = [];
+            for(let i = 1; i < lines.length; i++) {
+                let line = lines[i].trim();
+                if(!line) continue;
+                
+                let r = [];
+                let inQuotes = false;
+                let currentVal = "";
+                
+                for(let c = 0; c < line.length; c++) {
+                    let char = line[c];
+                    if(char === '"') {
+                        inQuotes = !inQuotes;
+                    } else if(char === ',' && !inQuotes) {
+                        r.push(currentVal);
+                        currentVal = "";
+                    } else {
+                        currentVal += char;
+                    }
+                }
+                r.push(currentVal);
+
+                if(r.length >= 3) {
+                    let nameVal = r[4] ? r[4].trim() : "";
+                    let idVal = r[5] ? r[5].trim() : "";
+                    
+                    if(!nameVal || nameVal === "" || !idVal || idVal === "" || nameVal === "---") continue;
+
+                    let rankVal = r[2] ? r[2].trim() : "";
+                    let codeVal = r[6] ? r[6].trim().toUpperCase() : ""; 
+                    let titleVal = r[7] ? r[7].trim() : ""; 
+                    
+                    let category = 'R';
+                    if (codeVal.startsWith('L') || codeVal.startsWith('D')) {
+                        category = 'L';
+                    } else if (titleVal.includes('ضابط') || codeVal.includes('M')) {
+                        category = 'M';
+                    } else {
+                        category = 'R';
+                    }
+
+                    csvData.push({
+                        rank: rankVal,
+                        discord: r[3] ? r[3].trim() : "",
+                        name: nameVal,
+                        id: idVal,
+                        code: codeVal,
+                        title: titleVal,
+                        logs: r[8] ? r[8].trim() : "0",
+                        ads: r[9] ? r[9].trim() : "0",
+                        notes: r[10] ? r[10].trim() : "0",
+                        warnings: r[11] ? r[11].trim() : "0",
+                        promotionDate: r[12] ? r[12].trim() : "---",
+                        manualNotes: r[13] ? r[13].trim() : "",
+                        vacationStatus: r[14] ? r[14].trim() : "FALSE",
+                        category: category
+                    });
+                }
+            }
+            updateMemberStats();
+            renderMembersTable();
+            renderFieldMissionsTable();
+            renderInventoryTables();
+            updateCoursesDropdown();
+            renderNotesArchiveTable();
+        }
+
+        function updateMemberStats() {
+            let total = csvData.length;
+            let countL = csvData.filter(m => m.category === 'L').length;
+            let countM = csvData.filter(m => m.category === 'M').length;
+            let countR = csvData.filter(m => m.category === 'R').length;
+
+            document.getElementById('count-ALL').innerText = total;
+            document.getElementById('count-L').innerText = countL;
+            document.getElementById('count-M').innerText = countM;
+            document.getElementById('count-R').innerText = countR;
+        }
+
+        function renderMembersTable() {
+            let tbody = document.getElementById('membersTableBody');
+            if(!tbody) return;
+            tbody.innerHTML = "";
+
+            let searchVal = document.getElementById('memberSearchInput').value.toLowerCase();
+
+            let filtered = csvData.filter(m => {
+                let matchesCat = (currentMemberFilter === 'ALL' || m.category === currentMemberFilter);
+                let matchesSearch = m.name.toLowerCase().includes(searchVal) || m.id.toLowerCase().includes(searchVal) || m.code.toLowerCase().includes(searchVal);
+                return matchesCat && matchesSearch;
+            });
+
+            if(filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="13" style="text-align: center;">لا توجد نتائج مطابقة</td></tr>`;
+                return;
+            }
+
+            filtered.forEach(m => {
+                let isLeave = m.vacationStatus === true || m.vacationStatus === "TRUE" || m.vacationStatus === "true" || m.vacationStatus === "في إجازة";
+                let leaveStatusHtml = isLeave 
+                    ? '<span style="color: var(--danger); font-weight: bold;">في إجازة</span>' 
+                    : '<span style="color: var(--success); font-weight: bold;">على رأس عمل</span>';
+
+                let tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${m.rank}</td>
+                    <td>${m.discord}</td>
+                    <td>${m.name}</td>
+                    <td>${m.id}</td>
+                    <td>${m.code}</td>
+                    <td>${m.title}</td>
+                    <td>${m.logs}</td>
+                    <td>${m.ads}</td>
+                    <td>${m.notes}</td>
+                    <td>${m.warnings}</td>
+                    <td>${m.promotionDate}</td>
+                    <td>${m.manualNotes}</td>
+                    <td>${leaveStatusHtml}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function filterMembers(cat) {
+            currentMemberFilter = cat;
+            renderMembersTable();
+        }
+
+        function filterMembersTableBySearch() {
+            renderMembersTable();
+        }
+
+        function updateCoursesDropdown() {
+            let select = document.getElementById('courseSelectSoldier');
+            if(!select) return;
+            let searchId = document.getElementById('courseSearchIdInput').value.trim();
+
+            let currentSelectedId = select.value;
+            select.innerHTML = "";
+            let filtered = csvData.filter(m => searchId === "" || m.id.includes(searchId));
+
+            if(filtered.length === 0) {
+                let opt = document.createElement('option');
+                opt.value = "";
+                opt.textContent = "لا توجد نتائج مطابقة";
+                select.appendChild(opt);
+                renderCoursesListsForSelectedSoldier();
+                return;
+            }
+
+            filtered.forEach(m => {
+                let opt = document.createElement('option');
+                opt.value = m.id;
+                opt.textContent = `${m.name} (${m.id}) - ${m.rank}`;
+                select.appendChild(opt);
+            });
+
+            if(filtered.some(m => m.id === currentSelectedId)) {
+                select.value = currentSelectedId;
+            }
+
+            onCourseSoldierSelect();
+        }
+
+        function filterCoursesBySearch() {
+            updateCoursesDropdown();
+        }
+
+        function onCourseSoldierSelect() {
+            let select = document.getElementById('courseSelectSoldier');
+            if(!select || !select.value) {
+                document.getElementById('courseDisplayRank').innerText = "رتبة العسكري: ---";
+                document.getElementById('courseDisplayId').innerText = "رقم الهوية: ---";
+                document.getElementById('courseDisplayName').innerText = "الاسم: ---";
+                renderCoursesListsForSelectedSoldier(null);
+                return;
+            }
+
+            let id = select.value;
+            let member = csvData.find(m => m.id === id);
+            if(!member) return;
+
+            document.getElementById('courseDisplayRank').innerText = `رتبة العسكري: ${member.rank}`;
+            document.getElementById('courseDisplayId').innerText = `رقم الهوية: ${member.id}`;
+            document.getElementById('courseDisplayName').innerText = `الاسم: ${member.name}`;
+
+            renderCoursesListsForSelectedSoldier(id);
+        }
+
+        function renderCoursesListsForSelectedSoldier(soldierId) {
+            let obtainedBox = document.getElementById('obtainedCoursesList');
+            let missingBox = document.getElementById('missingCoursesList');
+            if(!obtainedBox || !missingBox) return;
+
+            if(!soldierId) {
+                obtainedBox.innerHTML = `<div style="color: var(--text-muted); font-size: 0.85rem; text-align: center; padding: 20px;">الرجاء اختيار عسكري أولاً</div>`;
+                missingBox.innerHTML = `<div style="color: var(--text-muted); font-size: 0.85rem; text-align: center; padding: 20px;">الرجاء اختيار عسكري أولاً</div>`;
+                return;
+            }
+
+            if(!soldierCoursesData[soldierId]) {
+                soldierCoursesData[soldierId] = { obtained: [], missing: [...allAvailableCourses] };
+            }
+
+            let sData = soldierCoursesData[soldierId];
+
+            obtainedBox.innerHTML = "";
+            if(sData.obtained.length === 0) {
+                obtainedBox.innerHTML = `<div style="color: var(--text-muted); font-size: 0.85rem; text-align: center; padding: 20px;">لا توجد دورات مسجلة له</div>`;
+            } else {
+                sData.obtained.forEach(course => {
+                    let div = document.createElement('div');
+                    div.className = 'course-item-card obtained';
+                    div.innerHTML = `<span>${course}</span> <i class="fa-solid fa-check"></i>`;
+                    div.onclick = () => toggleCourseForSoldier(soldierId, course, 'to_missing');
+                    obtainedBox.appendChild(div);
+                });
+            }
+
+            missingBox.innerHTML = "";
+            if(sData.missing.length === 0) {
+                missingBox.innerHTML = `<div style="color: var(--text-muted); font-size: 0.85rem; text-align: center; padding: 20px;">جميع الدورات مكتملة!</div>`;
+            } else {
+                sData.missing.forEach(course => {
+                    let div = document.createElement('div');
+                    div.className = 'course-item-card missing';
+                    div.innerHTML = `<span>${course}</span> <i class="fa-solid fa-plus"></i>`;
+                    div.onclick = () => toggleCourseForSoldier(soldierId, course, 'to_obtained');
+                    missingBox.appendChild(div);
+                });
+            }
+        }
+
+        function toggleCourseForSoldier(soldierId, courseName, actionType) {
+            if(!soldierCoursesData[soldierId]) {
+                soldierCoursesData[soldierId] = { obtained: [], missing: [...allAvailableCourses] };
+            }
+
+            let sData = soldierCoursesData[soldierId];
+
+            if(actionType === 'to_obtained') {
+                sData.missing = sData.missing.filter(c => c !== courseName);
+                if(!sData.obtained.includes(courseName)) {
+                    sData.obtained.push(courseName);
+                }
+            } else {
+                sData.obtained = sData.obtained.filter(c => c !== courseName);
+                if(!sData.missing.includes(courseName)) {
+                    sData.missing.push(courseName);
+                }
+            }
+
+            saveToLocalStorage();
+            renderCoursesListsForSelectedSoldier(soldierId);
+        }
+
+        function saveArchiveNote() {
+            let id = document.getElementById('archiveSoldierId').value.trim();
+            let noteText = document.getElementById('archiveNoteText').value.trim();
+
+            if(!id || !noteText) {
+                alert("الرجاء إدخال رقم الهوية (ID) ونص الملاحظة.");
+                return;
+            }
+
+            let member = csvData.find(m => m.id === id);
+            let name = member ? member.name : "عسكري غير معروف";
+            let now = new Date().toLocaleString('ar-SA');
+
+            notesArchiveList.unshift({
+                date: now,
+                id: id,
+                name: name,
+                note: noteText,
+                author: currentUser
+            });
+
+            saveToLocalStorage();
+            renderNotesArchiveTable();
+
+            document.getElementById('archiveSoldierId').value = "";
+            document.getElementById('archiveNoteText').value = "";
+            alert("تم حفظ الملاحظة في الأرشيف بنجاح!");
+        }
+
+        function renderNotesArchiveTable() {
+            let container = document.getElementById('notesArchiveContainer');
+            if(!container) return;
+
+            let searchVal = document.getElementById('archiveSearchInput') ? document.getElementById('archiveSearchInput').value.toLowerCase() : "";
+
+            let filtered = notesArchiveList.filter(item => {
+                return item.name.toLowerCase().includes(searchVal) || item.id.toLowerCase().includes(searchVal) || item.note.toLowerCase().includes(searchVal);
+            });
+
+            if(filtered.length === 0) {
+                container.innerHTML = `<p style="color: var(--text-muted); text-align: center; padding: 20px;">لا توجد ملاحظات مؤرشفة مطابقة</p>`;
+                return;
+            }
+
+            container.innerHTML = "";
+            filtered.forEach((item) => {
+                let originalIndex = notesArchiveList.indexOf(item);
+                let cardDiv = document.createElement('div');
+                cardDiv.className = 'military-note-card';
+                cardDiv.innerHTML = `
+                    <div class="card-header-note">
+                        <div class="soldier-info-note">
+                            <i class="fas fa-shield-alt military-icon"></i>
+                            <span>[${item.id}] ${item.name}</span>
+                        </div>
+                        <div class="card-timestamp">${item.date}</div>
+                    </div>
+                    <div class="card-body-note">
+                        <p class="note-text-content">${item.note}</p>
+                    </div>
+                    <div class="card-footer-note">
+                        <div class="author-info">
+                            <span>المسؤول: </span>
+                            <span class="author-name">${item.author}</span>
+                        </div>
+                        <div class="card-actions">
+                            <button class="btn-action delete-btn" onclick="deleteArchiveNote(${originalIndex})">
+                                <i class="fas fa-trash-alt"></i> حذف
+                            </button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(cardDiv);
+            });
+        }
+
+        function deleteArchiveNote(index) {
+            if(confirm("هل أنت متأكد من حذف هذه الملاحظة من الأرشيف؟")) {
+                notesArchiveList.splice(index, 1);
+                saveToLocalStorage();
+                renderNotesArchiveTable();
+            }
+        }
+
+        function switchPage(pageId, element) {
+            document.querySelectorAll('.page-section').forEach(sec => sec.classList.remove('active'));
+            document.querySelectorAll('.sidebar-menu .menu-item').forEach(item => item.classList.remove('active'));
+            
+            let targetSection = document.getElementById(pageId);
+            if(targetSection) {
+                targetSection.classList.add('active');
+            }
+            if(element) element.classList.add('active');
+        }
+
+        function handleLogin() {
+            let user = document.getElementById('usernameInput').value.trim();
+            let pass = document.getElementById('passwordInput').value.trim();
+            let err = document.getElementById('loginError');
+
+            if(accounts[user] && accounts[user].pass === pass) {
+                currentUser = user;
+                accounts[user].loggedIn = true;
+                accounts[user].loginTime = Date.now();
+                document.getElementById('loginOverlay').style.display = 'none';
+                document.getElementById('currentRoleDisplay').innerText = accounts[user].role;
+
+                switchPage('home', document.getElementById('menuHome'));
+                renderFieldMissionsTable();
+                applyPageVisibility();
+            } else {
+                err.style.display = 'block';
+            }
+        }
+
+        function logout() {
+            accounts[currentUser].loggedIn = false;
+            accounts[currentUser].loginTime = null;
+            document.getElementById('loginOverlay').style.display = 'flex';
+            document.getElementById('usernameInput').value = '';
+            document.getElementById('passwordInput').value = '';
+        }
+
+        function submitFieldMission() {
+            let id = document.getElementById('missionSoldierId').value.trim();
+            let link = document.getElementById('missionImageLink').value.trim();
+            let details = document.getElementById('missionDetailsText').value.trim();
+
+            if(!id || !details) {
+                alert("الرجاء إدخال رقم الهوية وتفاصيل المهمة على الأقل.");
+                return;
+            }
+
+            let member = csvData.find(m => m.id === id);
+            let name = member ? member.name : "عسكري غير معروف";
+
+            fieldMissionsList.push({
+                id: id,
+                name: name,
+                details: details,
+                link: link || "بدون رابط",
+                status: "قيد المراجعة"
+            });
+
+            saveToLocalStorage();
+            renderFieldMissionsTable();
+
+            document.getElementById('missionSoldierId').value = "";
+            document.getElementById('missionImageLink').value = "";
+            document.getElementById('missionDetailsText').value = "";
+            alert("تم إرسال المهمة الميدانية بنجاح إلى السجل!");
+        }
+
+        function renderFieldMissionsTable() {
+            let tbody = document.getElementById('fieldMissionsTableBody');
+            if(!tbody) return;
+
+            if(fieldMissionsList.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align: center;">لا توجد مهام مرفوعة حالياً</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = "";
+            fieldMissionsList.forEach((item, index) => {
+                let statusColor = "var(--warning)";
+                if(item.status === "مقبولة") statusColor = "var(--success)";
+                if(item.status === "مرفوضة") statusColor = "var(--danger)";
+
+                let tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${item.id}</td>
+                    <td>${item.name}</td>
+                    <td>${item.details}</td>
+                    <td>${item.link !== "بدون رابط" ? `<a href="${item.link}" target="_blank" style="color: var(--accent-gold);">عرض الصورة <i class="fa-solid fa-external-link-alt"></i></a>` : "بدون إثبات"}</td>
+                    <td><strong style="color: ${statusColor};">${item.status}</strong></td>
+                    <td>
+                        <button class="btn btn-success" style="padding: 4px 10px; font-size: 0.75rem;" onclick="updateMissionStatus(${index}, 'مقبولة')">قبول</button>
+                        <button class="btn btn-danger" style="padding: 4px 10px; font-size: 0.75rem;" onclick="updateMissionStatus(${index}, 'مرفوضة')">رفض</button>
+                        <button class="btn btn-danger" style="padding: 4px 10px; font-size: 0.75rem; background: #555;" onclick="deleteMission(${index})">حذف</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function updateMissionStatus(index, newStatus) {
+            fieldMissionsList[index].status = newStatus;
+            saveToLocalStorage();
+            renderFieldMissionsTable();
+        }
+
+        function deleteMission(index) {
+            if(confirm("هل أنت متأكد من حذف هذه المهمة؟")) {
+                fieldMissionsList.splice(index, 1);
+                saveToLocalStorage();
+                renderFieldMissionsTable();
+            }
+        }
+
+        function switchInvTab(tabName, btnElement) {
+            document.querySelectorAll('.inv-section').forEach(sec => sec.classList.remove('active'));
+            document.querySelectorAll('.inv-tab-btn').forEach(btn => btn.classList.remove('active'));
+
+            document.getElementById('inv_' + tabName).classList.add('active');
+            btnElement.classList.add('active');
+        }
+
+        function clearCurrentWeekInventoryData() {
+            let currentWeek = document.getElementById('autoWeekLogsAds').value;
+            if(!currentWeek) {
+                alert("الرجاء اختيار الأسبوع أولاً");
+                return;
+            }
+            if(confirm(`هل أنت متأكد من تفريغ وحذف جميع بيانات الجرد (السجلات، العمليات، القبول) الخاصة بـ (${currentWeek})؟`)) {
+                inventoryLogsAds = inventoryLogsAds.filter(i => i.week !== currentWeek);
+                inventoryOps = inventoryOps.filter(i => i.week !== currentWeek);
+                inventoryAcceptance = inventoryAcceptance.filter(i => i.week !== currentWeek);
+                saveToLocalStorage();
+                renderInventoryTables();
+                alert(`تم تفريغ كافة بيانات الأسبوع (${currentWeek}) بنجاح!`);
+            }
+        }
+
+        function exportWeekReportAsText() {
+            let week = document.getElementById('selectWeekSoldier').value;
+            if(!week) {
+                alert("الرجاء تحديد الأسبوع المطلوب تصدير تقريره");
+                return;
+            }
+
+            let weekLogs = inventoryLogsAds.filter(i => i.week === week);
+            let weekOps = inventoryOps.filter(i => i.week === week);
+            let weekAcc = inventoryAcceptance.filter(i => i.week === week);
+            let approved = soldierOfWeekData[week];
+
+            let report = `========================================\n`;
+            report += ` تقرير وزارة الدفاع - حصاد (${week})\n`;
+            report += `========================================\n\n`;
+
+            if(approved) {
+                let memberObj = csvData.find(m => m.id === approved.id) || {};
+                report += ` [★] عسكري الأسبوع المعتمد:\n`;
+                report += ` - الاسم: ${approved.name}\n`;
+                report += ` - رقم الهوية (ID): ${approved.id}\n`;
+                report += ` - الكود العسكري: ${memberObj.code || '---'}\n\n`;
+            } else {
+                report += ` [★] عسكري الأسبوع المعتمد: لم يتم الاعتماد بعد\n\n`;
+            }
+
+            report += `--- قائمة السجلات والإعلانات ---\n`;
+            if(weekLogs.length === 0) report += `لا توجد بيانات مسجلة.\n`;
+            weekLogs.forEach((item, idx) => {
+                report += `${idx + 1}. ID: ${item.id} | الاسم: ${item.name} | الرتبة: ${item.rank} | السجلات: ${item.logs} | الإعلانات: ${item.ads}\n`;
+            });
+
+            report += `\n--- قائمة العمليات ---\n`;
+            if(weekOps.length === 0) report += `لا توجد بيانات مسجلة.\n`;
+            weekOps.forEach((item, idx) => {
+                report += `${idx + 1}. ID: ${item.id} | الاسم: ${item.name} | العمليات: ${item.ops}\n`;
+            });
+
+            report += `\n--- قائمة القبول ---\n`;
+            if(weekAcc.length === 0) report += `لا توجد بيانات مسجلة.\n`;
+            weekAcc.forEach((item, idx) => {
+                report += `${idx + 1}. ID: ${item.id} | الاسم: ${item.name} | المقبولين: ${item.acceptance}\n`;
+            });
+            report += `\n========================================`;
+
+            let modalOverlay = document.createElement('div');
+            modalOverlay.style.cssText = "position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.8);display:flex;justify-content:center;align-items:center;z-index:2000;";
+            modalOverlay.innerHTML = `
+                <div style="background:var(--bg-sidebar);border:1px solid var(--accent-gold);padding:25px;border-radius:12px;width:90%;max-width:600px;box-shadow:0 10px 30px rgba(0,0,0,0.9);">
+                    <h3 style="color:var(--accent-gold);margin-bottom:15px;"><i class="fa-solid fa-file-lines"></i> تقرير ${week}</h3>
+                    <textarea readonly class="login-input" style="height:250px;font-family:monospace;resize:none;font-size:0.85rem;">${report}</textarea>
+                    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:15px;">
+                        <button class="btn" style="background:#22c55e;color:#fff;" onclick="navigator.clipboard.writeText(` + "`" + report.replace(/`/g, '\\`') + "`" + `); alert('تم نسخ التقرير إلى الحافظة بنجاح!');">نسخ التقرير</button>
+                        <button class="btn btn-danger" onclick="this.closest('div').parentElement.parentElement.remove()">إغلاق</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modalOverlay);
+        }
+
+        function processInventoryData(type) {
+            let text = "";
+            let week = "";
+            if(type === 'logs_ads') {
+                text = document.getElementById('bulkLogsAdsText').value;
+                week = document.getElementById('autoWeekLogsAds').value;
+            } else if(type === 'ops') {
+                text = document.getElementById('bulkOpsText').value;
+                week = document.getElementById('autoWeekOps').value;
+            } else if(type === 'acceptance') {
+                text = document.getElementById('bulkAcceptanceText').value;
+                week = document.getElementById('autoWeekAcceptance').value;
+            }
+
+            let lines = text.split("\n");
+            lines.forEach(line => {
+                let parts = line.split(",").map(p => p.trim());
+                if(parts.length >= 2) {
+                    let id = parts[0];
+                    let member = csvData.find(m => m.id === id);
+                    if(member) {
+                        if(type === 'logs_ads' && parts.length >= 3) {
+                            inventoryLogsAds.push({ week, id, rank: member.rank, name: member.name, logs: Number(parts[1]) || 0, ads: Number(parts[2]) || 0 });
+                        } else if(type === 'ops') {
+                            inventoryOps.push({ week, id, rank: member.rank, name: member.name, ops: Number(parts[1]) || 0 });
+                        } else if(type === 'acceptance') {
+                            inventoryAcceptance.push({ week, id, rank: member.rank, name: member.name, acceptance: Number(parts[1]) || 0 });
+                        }
+                    }
+                }
+            });
+
+            saveToLocalStorage();
+            renderInventoryTables();
+            if(type === 'logs_ads') document.getElementById('bulkLogsAdsText').value = "";
+            if(type === 'ops') document.getElementById('bulkOpsText').value = "";
+            if(type === 'acceptance') document.getElementById('bulkAcceptanceText').value = "";
+        }
+
+        function renderInventoryTables() {
+            let selectedWeekLogs = document.getElementById('autoWeekLogsAds').value;
+            let filteredLogs = inventoryLogsAds.filter(i => i.week === selectedWeekLogs);
+            let tbodyLogs = document.getElementById('tableLogsAds');
+            if(tbodyLogs) {
+                tbodyLogs.innerHTML = filteredLogs.length === 0 ? `<tr><td colspan="7" style="text-align: center;">لا توجد بيانات مرفقة لهذا الأسبوع</td></tr>` : "";
+                filteredLogs.forEach((item) => {
+                    let originalIndex = inventoryLogsAds.indexOf(item);
+                    tbodyLogs.innerHTML += `<tr><td>${item.week}</td><td>${item.id}</td><td>${item.rank}</td><td>${item.name}</td><td>${item.logs}</td><td>${item.ads}</td><td><button class="btn btn-danger" onclick="deleteInventoryItem('logs_ads', ${originalIndex})">حذف</button></td></tr>`;
+                });
+            }
+
+            let selectedWeekOps = document.getElementById('autoWeekOps').value;
+            let filteredOps = inventoryOps.filter(i => i.week === selectedWeekOps);
+            let tbodyOps = document.getElementById('tableOps');
+            if(tbodyOps) {
+                tbodyOps.innerHTML = filteredOps.length === 0 ? `<tr><td colspan="6" style="text-align: center;">لا توجد بيانات مرفقة لهذا الأسبوع</td></tr>` : "";
+                filteredOps.forEach((item) => {
+                    let originalIndex = inventoryOps.indexOf(item);
+                    tbodyOps.innerHTML += `<tr><td>${item.week}</td><td>${item.id}</td><td>${item.rank}</td><td>${item.name}</td><td>${item.ops}</td><td><button class="btn btn-danger" onclick="deleteInventoryItem('ops', ${originalIndex})">حذف</button></td></tr>`;
+                });
+            }
+
+            let selectedWeekAcc = document.getElementById('autoWeekAcceptance').value;
+            let filteredAcc = inventoryAcceptance.filter(i => i.week === selectedWeekAcc);
+            let tbodyAcc = document.getElementById('tableAcceptance');
+            if(tbodyAcc) {
+                tbodyAcc.innerHTML = filteredAcc.length === 0 ? `<tr><td colspan="6" style="text-align: center;">لا توجد بيانات مرفقة لهذا الأسبوع</td></tr>` : "";
+                filteredAcc.forEach((item) => {
+                    let originalIndex = inventoryAcceptance.indexOf(item);
+                    tbodyAcc.innerHTML += `<tr><td>${item.week}</td><td>${item.id}</td><td>${item.rank}</td><td>${item.name}</td><td>${item.acceptance}</td><td><button class="btn btn-danger" onclick="deleteInventoryItem('acceptance', ${originalIndex})">حذف</button></td></tr>`;
+                });
+            }
+
+            renderSoldierOfWeek();
+        }
+
+        function deleteInventoryItem(type, index) {
+            if(type === 'logs_ads') inventoryLogsAds.splice(index, 1);
+            if(type === 'ops') inventoryOps.splice(index, 1);
+            if(type === 'acceptance') inventoryAcceptance.splice(index, 1);
+            saveToLocalStorage();
+            renderInventoryTables();
+        }
+
+        function renderSoldierOfWeek() {
+            let weekElement = document.getElementById('selectWeekSoldier');
+            if(!weekElement) return;
+            let week = weekElement.value;
+            let topContainer = document.getElementById('topSoldiersList');
+            let approvedContainer = document.getElementById('currentApprovedSoldier');
+
+            if(!week) return;
+
+            let weekLogs = inventoryLogsAds.filter(i => i.week === week);
+            let weekOps = inventoryOps.filter(i => i.week === week);
+            let weekAcc = inventoryAcceptance.filter(i => i.week === week);
+
+            let soldiersMap = {};
+
+            weekLogs.forEach(item => {
+                if(!soldiersMap[item.id]) {
+                    soldiersMap[item.id] = { id: item.id, name: item.name, rank: item.rank, logs: 0, ads: 0, ops: 0, acceptance: 0 };
+                }
+                soldiersMap[item.id].logs += Number(item.logs) || 0;
+                soldiersMap[item.id].ads += Number(item.ads) || 0;
+            });
+
+            weekOps.forEach(item => {
+                if(!soldiersMap[item.id]) {
+                    let member = csvData.find(m => m.id === item.id) || {};
+                    soldiersMap[item.id] = { id: item.id, name: item.name, rank: member.rank || '---', logs: 0, ads: 0, ops: 0, acceptance: 0 };
+                }
+                soldiersMap[item.id].ops += Number(item.ops) || 0;
+            });
+
+            weekAcc.forEach(item => {
+                if(!soldiersMap[item.id]) {
+                    let member = csvData.find(m => m.id === item.id) || {};
+                    soldiersMap[item.id] = { id: item.id, name: item.name, rank: member.rank || '---', logs: 0, ads: 0, ops: 0, acceptance: 0 };
+                }
+                soldiersMap[item.id].acceptance += Number(item.acceptance) || 0;
+            });
+
+            let combinedList = Object.values(soldiersMap);
+
+            if(combinedList.length > 0) {
+                combinedList.forEach(s => {
+                    s.totalScore = s.logs + s.ads + s.ops + s.acceptance;
+                });
+
+                combinedList.sort((a, b) => b.totalScore - a.totalScore);
+                
+                let html = `<div class="table-responsive"><table><thead><tr><th>المركز</th><th>ID</th><th>الاسم</th><th>الرتبة</th><th>السجلات</th><th>الإعلانات</th><th>العمليات</th><th>القبول</th><th>مجموع النقاط</th><th>اختيار</th></tr></thead><tbody>`;
+                
+                combinedList.forEach((item, idx) => {
+                    html += `<tr>
+                        <td>#${idx + 1}</td>
+                        <td>${item.id}</td>
+                        <td>${item.name}</td>
+                        <td>${item.rank}</td>
+                        <td>${item.logs}</td>
+                        <td>${item.ads}</td>
+                        <td>${item.ops}</td>
+                        <td>${item.acceptance}</td>
+                        <td><strong style="color: var(--accent-gold); font-size: 1.05rem;">${item.totalScore}</strong></td>
+                        <td><button class="btn" style="padding: 4px 10px; font-size: 0.75rem;" onclick="previewCandidateCard('${item.id}', '${week}')">اختيار</button></td>
+                    </tr>`;
+                });
+                html += `</tbody></table></div>`;
+                topContainer.innerHTML = html;
+            } else {
+                topContainer.innerHTML = `<p style="color: var(--text-muted); font-size: 0.85rem;">لا توجد بيانات جرد مرفقة لهذا الأسبوع حتى الآن.</p>`;
+                let candidatePreview = document.getElementById('candidateCardPreview');
+                if(candidatePreview) candidatePreview.innerHTML = "";
+            }
+
+            let approvedData = soldierOfWeekData[week];
+            if(approvedData) {
+                let id = approvedData.id;
+                let memberObj = csvData.find(m => m.id === id) || {};
+                let logEntry = inventoryLogsAds.find(i => i.week === week && i.id === id) || { logs: 0, ads: 0 };
+                let opEntry = inventoryOps.find(i => i.week === week && i.id === id) || { ops: 0 };
+                let accEntry = inventoryAcceptance.find(i => i.week === week && i.id === id) || { acceptance: 0 };
+                let totalScore = Number(logEntry.logs) + Number(logEntry.ads) + Number(opEntry.ops) + Number(accEntry.acceptance);
+
+                approvedContainer.innerHTML = `
+                    <div style="margin-top: 10px; color: var(--accent-gold); font-weight: bold; font-size: 0.95rem;"><i class="fa-solid fa-circle-check"></i> العسكري المعتمد نهائياً للأسبوع:</div>
+                    <div class="paint-soldier-card">
+                        <div class="paint-card-top-right">
+                            <div>اسم العسكري : ${approvedData.name}</div>
+                            <div>رقم الهوية : ${approvedData.id}</div>
+                            <div>الكود العسكري : ${memberObj.code || '---'}</div>
+                        </div>
+
+                        <div class="paint-card-avatar-section">
+                            <div class="paint-card-circle-avatar">
+                                <i class="fa-solid fa-user-shield"></i>
+                            </div>
+                            <div class="paint-card-curved-line"></div>
+                        </div>
+
+                        <div class="paint-card-bottom-grid">
+                            <div class="paint-metric-item">
+                                <div class="paint-metric-title">السجلات :</div>
+                                <div class="paint-metric-val">${logEntry.logs}</div>
+                            </div>
+                            <div class="paint-metric-item center-total">
+                                <div class="paint-metric-title">مجموع النقاط</div>
+                                <div class="paint-metric-val" style="font-size: 1.2rem;">${totalScore}</div>
+                            </div>
+                            <div class="paint-metric-item">
+                                <div class="paint-metric-title">الإعلانات :</div>
+                                <div class="paint-metric-val">${logEntry.ads}</div>
+                            </div>
+                            <div class="paint-metric-item">
+                                <div class="paint-metric-title">مسؤول القبول :</div>
+                                <div class="paint-metric-val">${accEntry.acceptance}</div>
+                            </div>
+                            <div></div>
+                            <div class="paint-metric-item">
+                                <div class="paint-metric-title">مسؤول العمليات :</div>
+                                <div class="paint-metric-val">${opEntry.ops}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                approvedContainer.innerHTML = `<p style="color: var(--text-muted); font-size: 0.85rem; text-align: center; padding: 20px;">لم يتم اعتماد عسكري لهذا الأسبوع بعد.</p>`;
+            }
+        }
+
+        function previewCandidateCard(id, week) {
+            document.getElementById('selectedSoldierInput').value = id;
+            let previewContainer = document.getElementById('candidateCardPreview');
+            let memberObj = csvData.find(m => m.id === id) || {};
+            let logEntry = inventoryLogsAds.find(i => i.week === week && i.id === id) || { logs: 0, ads: 0, name: memberObj.name || "عسكري" };
+            let opEntry = inventoryOps.find(i => i.week === week && i.id === id) || { ops: 0 };
+            let accEntry = inventoryAcceptance.find(i => i.week === week && i.id === id) || { acceptance: 0 };
+            let totalScore = Number(logEntry.logs) + Number(logEntry.ads) + Number(opEntry.ops) + Number(accEntry.acceptance);
+
+            previewContainer.innerHTML = `
+                <div style="margin-top: 15px; color: var(--accent-gold); font-weight: bold; font-size: 0.95rem;"><i class="fa-solid fa-eye"></i> معاينة الكارت للمرشح المختار:</div>
+                <div class="paint-soldier-card">
+                    <div class="paint-card-top-right">
+                        <div>اسم العسكري : ${logEntry.name}</div>
+                        <div>رقم الهوية : ${id}</div>
+                        <div>الكود العسكري : ${memberObj.code || '---'}</div>
+                    </div>
+
+                    <div class="paint-card-avatar-section">
+                        <div class="paint-card-circle-avatar">
+                            <i class="fa-solid fa-user-shield"></i>
+                        </div>
+                        <div class="paint-card-curved-line"></div>
+                    </div>
+
+                    <div class="paint-card-bottom-grid">
+                        <div class="paint-metric-item">
+                            <div class="paint-metric-title">السجلات :</div>
+                            <div class="paint-metric-val">${logEntry.logs}</div>
+                        </div>
+                        <div class="paint-metric-item center-total">
+                            <div class="paint-metric-title">مجموع النقاط</div>
+                            <div class="paint-metric-val" style="font-size: 1.2rem;">${totalScore}</div>
+                        </div>
+                        <div class="paint-metric-item">
+                            <div class="paint-metric-title">الإعلانات :</div>
+                            <div class="paint-metric-val">${logEntry.ads}</div>
+                        </div>
+                        <div class="paint-metric-item">
+                            <div class="paint-metric-title">مسؤول القبول :</div>
+                            <div class="paint-metric-val">${accEntry.acceptance}</div>
+                        </div>
+                        <div></div>
+                        <div class="paint-metric-item">
+                            <div class="paint-metric-title">مسؤول العمليات :</div>
+                            <div class="paint-metric-val">${opEntry.ops}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            previewContainer.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function saveSoldierOfWeek() {
+            let week = document.getElementById('selectWeekSoldier').value;
+            let id = document.getElementById('selectedSoldierInput').value.trim();
+            let member = csvData.find(m => m.id === id);
+
+            if(member) {
+                soldierOfWeekData[week] = member;
+                saveToLocalStorage();
+                renderSoldierOfWeek();
+                alert("تم اعتماد عسكري الأسبوع بنجاح!");
+            } else {
+                alert("لم يتم العثور على العسكري بهذا الآيدي في قائمة منسوبي القطاع!");
+            }
+        }
+
+        function removeSoldierOfWeek() {
+            let week = document.getElementById('selectWeekSoldier').value;
+            if(soldierOfWeekData[week]) {
+                if(confirm(`هل أنت متأكد من حذف عسكري الأسبوع المعتمد لـ (${week})؟`)) {
+                    delete soldierOfWeekData[week];
+                    saveToLocalStorage();
+                    renderSoldierOfWeek();
+                    document.getElementById('candidateCardPreview').innerHTML = "";
+                    alert("تم إزالة اعتماد عسكري الأسبوع.");
+                }
+            } else {
+                alert("لا يوجد عسكري معتمد أساساً في هذا الأسبوع.");
+            }
+        }
+
+        window.onload = function() {
+            updateWeekDropdowns();
+            fetchSheetData();
+            renderFieldMissionsTable();
+            renderNotesArchiveTable();
+            applyPageVisibility();
+        };
+    </script>
 </body>
 </html>
