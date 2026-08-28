@@ -1008,13 +1008,20 @@
 
     <script>
         let accounts = JSON.parse(localStorage.getItem('grave_accounts')) || {
-            "Ahmed": { pass: "Owner2010629", role: "Owner", loggedIn: false, loginTime: null, lastLogout: "---" }
+            "Ahmed": { pass: "Owner2010629", role: "Owner", loggedIn: true, loginTime: Date.now(), lastLogout: "---" },
+            "Nawaf": { pass: "m43d65f65", role: "D-0", loggedIn: false, loginTime: null, lastLogout: "---" },
+            "Da": { pass: "m34d54f65", role: "D-1", loggedIn: false, loginTime: null, lastLogout: "---" },
+            "Abu Majed": { pass: "m54d23f74", role: "D-2", loggedIn: false, loginTime: null, lastLogout: "---" },
+            "Ahmed_D3": { pass: "mdf", role: "D-3", loggedIn: false, loginTime: null, lastLogout: "---" },
+            "Nerf": { pass: "m14d27f99", role: "L-1", loggedIn: false, loginTime: null, lastLogout: "---" },
+            "leader": { pass: "L483D@r200", role: "Leader", loggedIn: false, loginTime: null, lastLogout: "---", isLeaderPortalOnly: true },
+            "زيادة": { pass: "كلمة_المرور_هنا", role: "الصلاحية_هنا", loggedIn: false, loginTime: null, lastLogout: "---" }
         };
 
         // تعريف الصفحات واسمائها الافتراضية والحسابات المسموحة لها
         let pageDefinitions = [
             { id: 'home', name: 'الرئيسية', allowed: Object.keys(accounts) },
-            { id: 'login_tracker', name: 'تسجيل الدخول (متابعة)', allowed: Object.keys(accounts) },
+            { id: 'login_tracker', name: 'تسجيل الدخول (متابعة)', allowed: ["Ahmed", "Nawaf", "Da", "Abu Majed", "Ahmed_D3", "Nerf", "زيادة"] },
             { id: 'members', name: 'منسوبي القطاعات', allowed: Object.keys(accounts) },
             { id: 'field_missions', name: 'المهام الميدانية', allowed: Object.keys(accounts) },
             { id: 'courses', name: 'دورات القطاع', allowed: Object.keys(accounts) },
@@ -1022,7 +1029,7 @@
             { id: 'notes_archive', name: 'أرشيف الملاحظات', allowed: Object.keys(accounts) },
             { id: 'soldier_week', name: 'عسكري الأسبوع', allowed: Object.keys(accounts) },
             { id: 'accounts_management', name: 'إدارة الحسابات', allowed: ["Ahmed"] },
-            { id: 'role_permissions', name: 'إدارة الصلاحيات', allowed: ["Ahmed"] } // مقتصر افتراضياً على المالك
+            { id: 'role_permissions', name: 'إدارة الصلاحيات', allowed: ["Ahmed"] }
         ];
 
         // تحميل الصلاحيات المخزنة محلياً إذا وجدت
@@ -1080,7 +1087,6 @@
             pageDefinitions.forEach(p => {
                 let menuItem = document.querySelector(`.sidebar-menu [data-page="${p.id}"]`);
                 if(menuItem) {
-                    // التحقق هل الحساب الحالي مصرح له أو هو Owner
                     if(currentUser === 'Owner' || p.allowed.includes(currentUser)) {
                         menuItem.style.display = 'flex';
                     } else {
@@ -1133,7 +1139,6 @@
                 lastLogout: "---"
             };
 
-            // إعطاء صلاحية افتراضية للصفحات العامة
             pageDefinitions.forEach(p => {
                 if(p.id === 'home' || p.id === 'members' || p.id === 'field_missions' || p.id === 'courses' || p.id === 'inventory' || p.id === 'notes_archive' || p.id === 'soldier_week') {
                     p.allowed.push(user);
@@ -1206,7 +1211,6 @@
                 if(cb.checked) selectedAccounts.push(cb.value);
             });
 
-            // ضمان أن الـ Owner يمتلك الصلاحية دائماً
             if(!selectedAccounts.includes("Ahmed")) selectedAccounts.push("Ahmed");
 
             let page = pageDefinitions.find(p => p.id === pageId);
@@ -1662,7 +1666,6 @@
         }
 
         function switchPage(pageId, element) {
-            // التحقق أمنياً من صلاحية الوصول للصفحة
             let pageDef = pageDefinitions.find(p => p.id === pageId);
             if(currentUser !== 'Owner' && pageDef && !pageDef.allowed.includes(currentUser)) {
                 alert("عذراً، هذا الحساب لا يمتلك صلاحية الوصول لهذه الصفحة.");
@@ -1689,10 +1692,8 @@
                 document.getElementById('loginOverlay').style.display = 'none';
                 document.getElementById('currentRoleDisplay').innerText = accounts[user].role;
 
-                // تحديث القوائم المرئية بناءً على الصلاحيات
                 updateSidebarMenuVisibility();
 
-                // التوجيه لأول صفحة مسموحة للمستخدم
                 let firstAllowedPage = pageDefinitions.find(p => currentUser === 'Owner' || p.allowed.includes(currentUser));
                 if(firstAllowedPage) {
                     let menuEl = document.querySelector(`.sidebar-menu [data-page="${firstAllowedPage.id}"]`);
