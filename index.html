@@ -1008,19 +1008,13 @@
 
     <script>
         let accounts = JSON.parse(localStorage.getItem('grave_accounts')) || {
-            "Ahmed": { pass: "Owner2010629", role: "Owner", loggedIn: true, loginTime: Date.now(), lastLogout: "---" },
-            "Nawaf": { pass: "m43d65f65", role: "D-0", loggedIn: false, loginTime: null, lastLogout: "---" },
-            "Da": { pass: "m34d54f65", role: "D-1", loggedIn: false, loginTime: null, lastLogout: "---" },
-            "Abu Majed": { pass: "m54d23f74", role: "D-2", loggedIn: false, loginTime: null, lastLogout: "---" },
-            "Ahmed_D3": { pass: "mdf", role: "D-3", loggedIn: false, loginTime: null, lastLogout: "---" },
-            "Nerf": { pass: "m14d27f99", role: "L-1", loggedIn: false, loginTime: null, lastLogout: "---" },
-            "leader": { pass: "L483D@r200", role: "Leader", loggedIn: false, loginTime: null, lastLogout: "---", isLeaderPortalOnly: true }
+            "Ahmed": { pass: "Owner2010629", role: "Owner", loggedIn: false, loginTime: null, lastLogout: "---" }
         };
 
         // تعريف الصفحات واسمائها الافتراضية والحسابات المسموحة لها
         let pageDefinitions = [
             { id: 'home', name: 'الرئيسية', allowed: Object.keys(accounts) },
-            { id: 'login_tracker', name: 'تسجيل الدخول (متابعة)', allowed: ["Ahmed", "Nawaf", "Da", "Abu Majed", "Ahmed_D3", "Nerf"] },
+            { id: 'login_tracker', name: 'تسجيل الدخول (متابعة)', allowed: Object.keys(accounts) },
             { id: 'members', name: 'منسوبي القطاعات', allowed: Object.keys(accounts) },
             { id: 'field_missions', name: 'المهام الميدانية', allowed: Object.keys(accounts) },
             { id: 'courses', name: 'دورات القطاع', allowed: Object.keys(accounts) },
