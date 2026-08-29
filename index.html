@@ -1728,9 +1728,6 @@
             let thActions = document.getElementById('thMissionActions');
             if(!tbody) return;
 
-            let userObj = accounts[currentUser] || {};
-            let canManageMissions = userObj.role === 'Owner' || userObj.permissions?.includes('accounts_management') || !userObj.permissions?.includes('home');
-
             if(thActions) {
                 thActions.style.display = "";
             }
