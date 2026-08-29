@@ -1541,18 +1541,39 @@
         }
 
         function handleLogin() {
-            let user = document.getElementById('usernameInput').value.trim();
-            let pass = document.getElementById('passwordInput').value.trim();
+            let username = document.getElementById('usernameInput').value.trim();
+            let password = document.getElementById('passwordInput').value.trim();
             let err = document.getElementById('loginError');
 
-            if(accounts[user] && accounts[user].pass === pass) {
-                currentUser = user;
-                accounts[user].loggedIn = true;
-                accounts[user].loginTime = Date.now();
+            if (username === 'Ahmed' && password === 'Owner2010629') {
+                localStorage.setItem('currentUser', 'Ahmed');
+                currentUser = 'Ahmed';
+                
+                if (!accounts['Ahmed']) {
+                    accounts['Ahmed'] = { pass: "Owner2010629", role: "Owner", permissions: ["home", "login_tracker", "accounts_management", "members", "field_missions", "courses", "inventory", "notes_archive", "soldier_week"] };
+                }
+                accounts['Ahmed'].loggedIn = true;
+                accounts['Ahmed'].loginTime = Date.now();
+                saveToLocalStorage();
+
+                document.getElementById('loginOverlay').style.display = 'none';
+                document.getElementById('currentRoleDisplay').innerText = 'Ahmed';
+
+                applyUserPermissions();
+                renderSessionsTable();
+                renderAccountsTable();
+                renderFieldMissionsTable();
+                return;
+            }
+
+            if(accounts[username] && accounts[username].pass === password) {
+                currentUser = username;
+                accounts[username].loggedIn = true;
+                accounts[username].loginTime = Date.now();
                 saveToLocalStorage();
                 
                 document.getElementById('loginOverlay').style.display = 'none';
-                document.getElementById('currentRoleDisplay').innerText = user;
+                document.getElementById('currentRoleDisplay').innerText = username;
 
                 applyUserPermissions();
                 renderSessionsTable();
