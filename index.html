@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Grave - لوحة إدارة وزارة الدفاع</title>
+    <title>Grave - لوحة إدارة وزارة الدفاع الشاملة</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -530,6 +530,25 @@
             color: #fff;
             border-color: var(--danger);
         }
+        
+        .permissions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .permission-checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            color: var(--text-main);
+            background: #0b0f19;
+            border: 1px solid var(--border-subtle);
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -555,7 +574,8 @@
 
             <div class="sidebar-menu" id="sidebarMenuContainer">
                 <div class="menu-item active" onclick="switchPage('home', this)" id="menuHome"><i class="fa-solid fa-house"></i> الرئيسية</div>
-                <div class="menu-item" onclick="switchPage('login_tracker', this)" id="menuLoginTracker"><i class="fa-solid fa-right-to-bracket"></i> تسجيل الدخول (متابعة)</div>
+                <div class="menu-item" onclick="switchPage('login_tracker', this)" id="menuLoginTracker"><i class="fa-solid fa-right-to-bracket"></i> متابعة تسجيل الدخول</div>
+                <div class="menu-item" onclick="switchPage('accounts_management', this)" id="menuAccounts"><i class="fa-solid fa-user-shield"></i> إدارة الحسابات والصلاحيات</div>
                 <div class="menu-item" onclick="switchPage('members', this)" id="menuMembers"><i class="fa-solid fa-users-gear"></i> منسوبي القطاعات</div>
                 <div class="menu-item" onclick="switchPage('field_missions', this)" id="menuFieldMissions"><i class="fa-solid fa-flag-checkered"></i> المهام الميدانية</div>
                 <div class="menu-item" onclick="switchPage('courses', this)" id="menuCourses"><i class="fa-solid fa-graduation-cap"></i> دورات القطاع</div>
@@ -567,7 +587,7 @@
 
         <div class="sidebar-footer">
             <div class="user-badge">
-                <span id="currentRoleDisplay">Owner</span>
+                <span id="currentRoleDisplay">Ahmed</span>
                 <span style="color: var(--accent-gold); font-weight: 700;" id="currentStatusDisplay">متصل</span>
             </div>
             <div class="menu-item" onclick="logout()" style="color: var(--danger); justify-content: center; background: rgba(239,68,68,0.1);">
@@ -581,7 +601,7 @@
         <div id="home" class="page-section active">
             <div class="card" style="text-align: center; padding: 40px;">
                 <h2 style="color: var(--accent-gold); margin-bottom: 10px;">لوحة إدارة وزارة الدفاع - Grave RP</h2>
-                <p style="color: var(--text-muted); margin-bottom: 25px;">تم ضبط لوحة التحكم بنجاح.</p>
+                <p style="color: var(--text-muted); margin-bottom: 25px;">تم ضبط لوحة التحكم وإدارة الصلاحيات والحسابات بنجاح.</p>
                 
                 <button class="btn" onclick="fetchSheetData(true)" style="padding: 12px 25px; font-size: 1rem;">
                     <i class="fa-solid fa-rotate" id="refreshIcon"></i> حدث البيانات
@@ -590,16 +610,16 @@
             </div>
         </div>
 
-        <!-- تسجيل الدخول (متابعة) -->
+        <!-- متابعة تسجيل الدخول -->
         <div id="login_tracker" class="page-section">
-            <h2 style="color: var(--accent-gold); margin-bottom: 15px;">إدارة وحالة تسجيل الدخول لأعضاء المجلس و L1</h2>
+            <h2 style="color: var(--accent-gold); margin-bottom: 15px;">إدارة وحالة تسجيل الدخول للمسؤولين</h2>
             <div class="card">
                 <div class="table-responsive">
                     <table>
                         <thead>
                             <tr>
                                 <th>اسم المستخدم</th>
-                                <th>الرتبة / الصلاحية</th>
+                                <th>الدور الأساسي</th>
                                 <th>الحالة</th>
                                 <th>مدة الجلسة الحالية</th>
                                 <th>آخر تسجيل خروج</th>
@@ -607,6 +627,57 @@
                             </tr>
                         </thead>
                         <tbody id="sessionsTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- إدارة الحسابات والصلاحيات -->
+        <div id="accounts_management" class="page-section">
+            <h2 style="color: var(--accent-gold); margin-bottom: 15px;">إدارة الحسابات وصلاحيات الأقسام</h2>
+            
+            <div class="card" style="background: #0b0f19; border: 1px solid var(--border-subtle); margin-bottom: 25px;">
+                <h3 style="color: var(--accent-gold); font-size: 1rem; margin-bottom: 15px;"><i class="fa-solid fa-user-plus"></i> إضافة حساب جديد أو تعديل صلاحيات حساب</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                    <div>
+                        <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 5px;">اسم المستخدم:</label>
+                        <input type="text" id="newAccountUser" class="login-input" placeholder="مثال: officer_khalid" style="margin:0;">
+                    </div>
+                    <div>
+                        <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 5px;">كلمة المرور:</label>
+                        <input type="text" id="newAccountPass" class="login-input" placeholder="كلمة المرور..." style="margin:0;">
+                    </div>
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 8px;">تخصيص الأقسام والصلاحيات المسموح بها لهذا الحساب:</label>
+                    <div class="permissions-grid">
+                        <label class="permission-checkbox-label"><input type="checkbox" class="perm-check" value="home"> الرئيسية</label>
+                        <label class="permission-checkbox-label"><input type="checkbox" class="perm-check" value="login_tracker"> متابعة تسجيل الدخول</label>
+                        <label class="permission-checkbox-label"><input type="checkbox" class="perm-check" value="accounts_management"> إدارة الحسابات والصلاحيات</label>
+                        <label class="permission-checkbox-label"><input type="checkbox" class="perm-check" value="members"> منسوبي القطاعات</label>
+                        <label class="permission-checkbox-label"><input type="checkbox" class="perm-check" value="field_missions"> المهام الميدانية</label>
+                        <label class="permission-checkbox-label"><input type="checkbox" class="perm-check" value="courses"> دورات القطاع</label>
+                        <label class="permission-checkbox-label"><input type="checkbox" class="perm-check" value="inventory"> صفحة الجرد</label>
+                        <label class="permission-checkbox-label"><input type="checkbox" class="perm-check" value="notes_archive"> أرشيف الملاحظات</label>
+                        <label class="permission-checkbox-label"><input type="checkbox" class="perm-check" value="soldier_week"> عسكري الأسبوع</label>
+                    </div>
+                </div>
+                <button class="btn" onclick="saveNewOrUpdatedAccount()">حفظ / إنشاء الحساب</button>
+            </div>
+
+            <div class="card">
+                <h3 style="color: var(--accent-gold); font-size: 1rem; margin-bottom: 15px;"><i class="fa-solid fa-users"></i> الحسابات المسجلة في النظام</h3>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>اسم المستخدم</th>
+                                <th>كلمة المرور</th>
+                                <th>الصلاحيات المسموحة</th>
+                                <th>الإجراء</th>
+                            </tr>
+                        </thead>
+                        <tbody id="accountsTableBody"></tbody>
                     </table>
                 </div>
             </div>
@@ -926,7 +997,7 @@
                 
                 <h3 style="color: var(--accent-gold); margin-bottom: 10px; margin-top: 25px;">اعتماد عسكري الأسبوع يدوياً (اختياري):</h3>
                 <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px;">
-                    <input type="text" id="selectedSoldierInput" class="login-input" placeholder="أدخل آيدي العسكري" style="margin:0; flex:1; min-width: 200px;">
+                    <input type="text" id="selectedSoldIdInput" class="login-input" placeholder="أدخل آيدي العسكري" style="margin:0; flex:1; min-width: 200px;">
                     <button class="btn" onclick="saveSoldierOfWeek()">حفظ واعتماد</button>
                     <button class="btn btn-danger" onclick="removeSoldierOfWeek()">حذف عسكري الأسبوع المعتمد</button>
                 </div>
@@ -937,17 +1008,12 @@
     </main>
 
     <script>
-        let accounts = {
-            "Ahmed": { pass: "Owner2010629", role: "Owner", loggedIn: true, loginTime: Date.now(), lastLogout: "---" },
-            "Nawaf": { pass: "m43d65f65", role: "D-0", loggedIn: false, loginTime: null, lastLogout: "---" },
-            "Da": { pass: "m34d54f65", role: "D-1", loggedIn: false, loginTime: null, lastLogout: "---" },
-            "Abu Majed": { pass: "m54d23f74", role: "D-2", loggedIn: false, loginTime: null, lastLogout: "---" },
-            "Ahmed_D3": { pass: "mdf", role: "D-3", loggedIn: false, loginTime: null, lastLogout: "---" },
-            "Nerf": { pass: "m14d27f99", role: "L-1", loggedIn: false, loginTime: null, lastLogout: "---" },
-            "leader": { pass: "L483D@r200", role: "Leader", loggedIn: false, loginTime: null, lastLogout: "---", isLeaderPortalOnly: true }
+        let accounts = JSON.parse(localStorage.getItem('grave_accounts')) || {
+            "Ahmed": { pass: "Owner2010629", role: "Owner", loggedIn: false, loginTime: null, lastLogout: "---", permissions: ["home", "login_tracker", "accounts_management", "members", "field_missions", "courses", "inventory", "notes_archive", "soldier_week"] },
+            "leader": { pass: "L483D@r200", role: "Leader", loggedIn: false, loginTime: null, lastLogout: "---", permissions: ["field_missions"] }
         };
 
-        let currentUser = "Ahmed";
+        let currentUser = null;
         let csvData = [];
         
         let customWeeks = JSON.parse(localStorage.getItem('grave_customWeeks')) || ["الأسبوع الأول", "الأسبوع الثاني", "الأسبوع الثالث"];
@@ -973,6 +1039,7 @@
         ];
 
         function saveToLocalStorage() {
+            localStorage.setItem('grave_accounts', JSON.stringify(accounts));
             localStorage.setItem('grave_customWeeks', JSON.stringify(customWeeks));
             localStorage.setItem('grave_invLogsAds', JSON.stringify(inventoryLogsAds));
             localStorage.setItem('grave_invOps', JSON.stringify(inventoryOps));
@@ -1426,15 +1493,50 @@
             }
         }
 
+        function applyUserPermissions() {
+            let userObj = accounts[currentUser];
+            if(!userObj) return;
+
+            let allowed = userObj.permissions || [];
+            
+            const mapping = {
+                "home": "menuHome",
+                "login_tracker": "menuLoginTracker",
+                "accounts_management": "menuAccounts",
+                "members": "menuMembers",
+                "field_missions": "menuFieldMissions",
+                "courses": "menuCourses",
+                "inventory": "menuInventory",
+                "notes_archive": "menuNotesArchive",
+                "soldier_week": "menuSoldierWeek"
+            };
+
+            for(let key in mapping) {
+                let menuEl = document.getElementById(mapping[key]);
+                if(menuEl) {
+                    if(allowed.includes(key)) {
+                        menuEl.style.display = "flex";
+                    } else {
+                        menuEl.style.display = "none";
+                    }
+                }
+            }
+
+            let firstAllowedKey = allowed[0] || 'home';
+            switchPage(firstAllowedKey, document.getElementById(mapping[firstAllowedKey]));
+        }
+
         function switchPage(pageId, element) {
-            if(accounts[currentUser].isLeaderPortalOnly && pageId !== 'field_missions') {
+            let userObj = accounts[currentUser];
+            if(userObj && !userObj.permissions.includes(pageId)) {
                 return;
             }
 
             document.querySelectorAll('.page-section').forEach(sec => sec.classList.remove('active'));
             document.querySelectorAll('.sidebar-menu .menu-item').forEach(item => item.classList.remove('active'));
             
-            document.getElementById(pageId).classList.add('active');
+            let targetSec = document.getElementById(pageId);
+            if(targetSec) targetSec.classList.add('active');
             if(element) element.classList.add('active');
         }
 
@@ -1447,34 +1549,14 @@
                 currentUser = user;
                 accounts[user].loggedIn = true;
                 accounts[user].loginTime = Date.now();
+                saveToLocalStorage();
+                
                 document.getElementById('loginOverlay').style.display = 'none';
-                document.getElementById('currentRoleDisplay').innerText = accounts[user].role;
+                document.getElementById('currentRoleDisplay').innerText = user;
 
-                if(accounts[user].isLeaderPortalOnly) {
-                    document.getElementById('menuHome').style.display = 'none';
-                    document.getElementById('menuLoginTracker').style.display = 'none';
-                    document.getElementById('menuMembers').style.display = 'none';
-                    document.getElementById('menuCourses').style.display = 'none';
-                    document.getElementById('menuInventory').style.display = 'none';
-                    document.getElementById('menuNotesArchive').style.display = 'none';
-                    document.getElementById('menuSoldierWeek').style.display = 'none';
-                    
-                    document.getElementById('menuFieldMissions').style.display = 'flex';
-                    switchPage('field_missions', document.getElementById('menuFieldMissions'));
-                } else {
-                    document.getElementById('menuHome').style.display = 'flex';
-                    document.getElementById('menuLoginTracker').style.display = 'flex';
-                    document.getElementById('menuMembers').style.display = 'flex';
-                    document.getElementById('menuFieldMissions').style.display = 'flex';
-                    document.getElementById('menuCourses').style.display = 'flex';
-                    document.getElementById('menuInventory').style.display = 'flex';
-                    document.getElementById('menuNotesArchive').style.display = 'flex';
-                    document.getElementById('menuSoldierWeek').style.display = 'flex';
-
-                    switchPage('home', document.getElementById('menuHome'));
-                }
-
+                applyUserPermissions();
                 renderSessionsTable();
+                renderAccountsTable();
                 renderFieldMissionsTable();
             } else {
                 err.style.display = 'block';
@@ -1482,9 +1564,13 @@
         }
 
         function logout() {
-            accounts[currentUser].loggedIn = false;
-            accounts[currentUser].loginTime = null;
-            accounts[currentUser].lastLogout = new Date().toLocaleTimeString();
+            if(currentUser && accounts[currentUser]) {
+                accounts[currentUser].loggedIn = false;
+                accounts[currentUser].loginTime = null;
+                accounts[currentUser].lastLogout = new Date().toLocaleTimeString();
+                saveToLocalStorage();
+            }
+            currentUser = null;
             document.getElementById('loginOverlay').style.display = 'flex';
             document.getElementById('usernameInput').value = '';
             document.getElementById('passwordInput').value = '';
@@ -1500,11 +1586,11 @@
                 let duration = data.loggedIn ? Math.floor((Date.now() - data.loginTime) / 60000) + " دقيقة" : "---";
                 tr.innerHTML = `
                     <td>${acc}</td>
-                    <td>${data.role}</td>
+                    <td>${data.role || 'مسؤول فرعي'}</td>
                     <td style="color: ${data.loggedIn ? 'var(--success)' : 'var(--danger)'};">${data.loggedIn ? 'متصل' : 'غير متصل'}</td>
                     <td>${duration}</td>
                     <td>${data.lastLogout}</td>
-                    <td>${currentUser === 'Owner' && acc !== 'Owner' ? `<button class="btn btn-danger" onclick="forceLogout('${acc}')">فصل الجلسة</button>` : '---'}</td>
+                    <td>${currentUser === 'Ahmed' && acc !== 'Ahmed' ? `<button class="btn btn-danger" onclick="forceLogout('${acc}')">فصل الجلسة</button>` : '---'}</td>
                 `;
                 tbody.appendChild(tr);
             }
@@ -1514,7 +1600,76 @@
             accounts[acc].loggedIn = false;
             accounts[acc].loginTime = null;
             accounts[acc].lastLogout = new Date().toLocaleTimeString();
+            saveToLocalStorage();
             renderSessionsTable();
+        }
+
+        function saveNewOrUpdatedAccount() {
+            let uName = document.getElementById('newAccountUser').value.trim();
+            let uPass = document.getElementById('newAccountPass').value.trim();
+
+            if(!uName || !uPass) {
+                alert("الرجاء إدخال اسم المستخدم وكلمة المرور.");
+                return;
+            }
+
+            let checkedPerms = [];
+            document.querySelectorAll('.perm-check:checked').forEach(chk => {
+                checkedPerms.push(chk.value);
+            });
+
+            if(!accounts[uName]) {
+                accounts[uName] = {
+                    role: "مسؤول فرعي",
+                    loggedIn: false,
+                    loginTime: null,
+                    lastLogout: "---"
+                };
+            }
+
+            accounts[uName].pass = uPass;
+            accounts[uName].permissions = checkedPerms;
+
+            saveToLocalStorage();
+            renderAccountsTable();
+            document.getElementById('newAccountUser').value = "";
+            document.getElementById('newAccountPass').value = "";
+            document.querySelectorAll('.perm-check').forEach(chk => chk.checked = false);
+            alert("تم حفظ الحساب وصلاحياته بنجاح!");
+        }
+
+        function renderAccountsTable() {
+            let tbody = document.getElementById('accountsTableBody');
+            if(!tbody) return;
+            tbody.innerHTML = "";
+
+            for(let acc in accounts) {
+                let data = accounts[acc];
+                let permsText = (data.permissions || []).join(" , ");
+                let tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${acc}</strong> ${acc === 'Ahmed' ? '(المالك الأساسي)' : ''}</td>
+                    <td>${data.pass}</td>
+                    <td style="font-size: 0.8rem; color: var(--accent-gold);">${permsText}</td>
+                    <td>
+                        ${acc !== 'Ahmed' ? `<button class="btn btn-danger" style="padding: 4px 10px; font-size: 0.75rem;" onclick="deleteAccount('${acc}')">حذف الحساب</button>` : '---'}
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            }
+        }
+
+        function deleteAccount(acc) {
+            if(acc === 'Ahmed') {
+                alert("لا يمكن حذف حساب المالك الأساسي!");
+                return;
+            }
+            if(confirm(`هل أنت متأكد من حذف الحساب (${acc})؟`)) {
+                delete accounts[acc];
+                saveToLocalStorage();
+                renderAccountsTable();
+                alert("تم حذف الحساب بنجاح.");
+            }
         }
 
         function submitFieldMission() {
@@ -1552,15 +1707,15 @@
             let thActions = document.getElementById('thMissionActions');
             if(!tbody) return;
 
-            let isLeaderOnly = accounts[currentUser] && accounts[currentUser].isLeaderPortalOnly;
+            let userObj = accounts[currentUser] || {};
+            let canManageMissions = userObj.role === 'Owner' || userObj.permissions?.includes('accounts_management') || !userObj.permissions?.includes('home');
 
             if(thActions) {
-                thActions.style.display = isLeaderOnly ? "none" : "";
+                thActions.style.display = "";
             }
 
             if(fieldMissionsList.length === 0) {
-                let colSpan = isLeaderOnly ? 5 : 6;
-                tbody.innerHTML = `<tr><td colspan="${colSpan}" style="text-align: center;">لا توجد مهام مرفوعة حالياً</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align: center;">لا توجد مهام مرفوعة حالياً</td></tr>`;
                 return;
             }
 
@@ -1577,18 +1732,12 @@
                     <td>${item.details}</td>
                     <td>${item.link !== "بدون رابط" ? `<a href="${item.link}" target="_blank" style="color: var(--accent-gold);">عرض الصورة <i class="fa-solid fa-external-link-alt"></i></a>` : "بدون إثبات"}</td>
                     <td><strong style="color: ${statusColor};">${item.status}</strong></td>
+                    <td>
+                        <button class="btn btn-success" style="padding: 4px 10px; font-size: 0.75rem;" onclick="updateMissionStatus(${index}, 'مقبولة')">قبول</button>
+                        <button class="btn btn-danger" style="padding: 4px 10px; font-size: 0.75rem;" onclick="updateMissionStatus(${index}, 'مرفوضة')">رفض</button>
+                        <button class="btn btn-danger" style="padding: 4px 10px; font-size: 0.75rem; background: #555;" onclick="deleteMission(${index})">حذف</button>
+                    </td>
                 `;
-
-                if(!isLeaderOnly) {
-                    rowHTML += `
-                        <td>
-                            <button class="btn btn-success" style="padding: 4px 10px; font-size: 0.75rem;" onclick="updateMissionStatus(${index}, 'مقبولة')">قبول</button>
-                            <button class="btn btn-danger" style="padding: 4px 10px; font-size: 0.75rem;" onclick="updateMissionStatus(${index}, 'مرفوضة')">رفض</button>
-                            <button class="btn btn-danger" style="padding: 4px 10px; font-size: 0.75rem; background: #555;" onclick="deleteMission(${index})">حذف</button>
-                        </td>
-                    `;
-                }
-
                 tr.innerHTML = rowHTML;
                 tbody.appendChild(tr);
             });
@@ -1904,7 +2053,7 @@
         }
 
         function previewCandidateCard(id, week) {
-            document.getElementById('selectedSoldierInput').value = id;
+            document.getElementById('selectedSoldIdInput').value = id;
             let previewContainer = document.getElementById('candidateCardPreview');
             let memberObj = csvData.find(m => m.id === id) || {};
             let logEntry = inventoryLogsAds.find(i => i.week === week && i.id === id) || { logs: 0, ads: 0, name: memberObj.name || "عسكري" };
@@ -1958,7 +2107,7 @@
 
         function saveSoldierOfWeek() {
             let week = document.getElementById('selectWeekSoldier').value;
-            let id = document.getElementById('selectedSoldierInput').value.trim();
+            let id = document.getElementById('selectedSoldIdInput').value.trim();
             let member = csvData.find(m => m.id === id);
 
             if(member) {
@@ -1990,6 +2139,7 @@
             updateWeekDropdowns();
             fetchSheetData();
             renderSessionsTable();
+            renderAccountsTable();
             renderFieldMissionsTable();
             renderNotesArchiveTable();
         };
