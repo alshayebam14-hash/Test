@@ -1034,7 +1034,7 @@
         let notesArchiveList = JSON.parse(localStorage.getItem('grave_notesArchiveList')) || [];
 
         let currentMemberFilter = 'ALL';
-        let uploadedImageBase64 = "";
+        let uploadedImageBase64 = ""; // لتخزين الصورة المؤقتة للمهمة
 
         let allAvailableCourses = [
             "فرد أساس",
@@ -1058,6 +1058,7 @@
             localStorage.setItem('grave_notesArchiveList', JSON.stringify(notesArchiveList));
         }
 
+        // دالة معاينة الصورة عند اختيارها من جهاز المستخدم
         function previewSelectedImage(event) {
             let file = event.target.files[0];
             let previewContainer = document.getElementById('imagePreviewContainer');
@@ -1147,19 +1148,18 @@
         }
 
         async function fetchSheetData(isManualClick = false) {
-            // تم تحديث الرابط هنا برابط السكريبت الجديد الخاص بك
-            const url = "https://script.google.com/macros/s/AKfycbyuPG60NsbHUXpa_SLcojal_-rf4ntdLd-nI57r2Br7YBlXL6IlBDjOGi-WOI-O8ONxEw/exec";
+            const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT5IjG47ogq2fHCI_clfxmoYcs9G-6uoTRfojuRRaj9dc82XFo-ydNNFNYawGBdXIv4kT4BfXkoQvNj/pub?gid=2094506019&single=true&output=csv";
             
             let statusText = document.getElementById('refreshStatus');
             let icon = document.getElementById('refreshIcon');
 
             if (isManualClick && statusText) {
-                statusText.innerText = "جاري تحديث البيانات من السكريبت...";
+                statusText.innerText = "جاري تحديث البيانات من الشيت...";
                 if(icon) icon.classList.add('fa-spin');
             }
 
             try {
-                const response = await fetch(url + "?t=" + new Date().getTime());
+                const response = await fetch(url + "&t=" + new Date().getTime());
                 const data = await response.text();
                 parseCSV(data);
 
@@ -1168,9 +1168,9 @@
                     setTimeout(() => { statusText.innerText = ""; }, 4000);
                 }
             } catch (e) {
-                console.log("خطأ في جلب البيانات من السكريبت", e);
+                console.log("خطأ في جلب الجدول");
                 if (isManualClick && statusText) {
-                    statusText.innerText = "فشل التحديث، تأكد من صحة الرابط واتصالك بالإنترنت.";
+                    statusText.innerText = "فشل التحديث، تأكد من اتصالك بالإنترنت.";
                 }
             } finally {
                 if (isManualClick && icon) {
@@ -1740,13 +1740,14 @@
                 id: id,
                 name: name,
                 details: details,
-                image: uploadedImageBase64 || "",
+                image: uploadedImageBase64 || "", // تخزين الصورة المرفوعة
                 status: "قيد المراجعة"
             });
 
             saveToLocalStorage();
             renderFieldMissionsTable();
 
+            // تصفير الحقول بعد الإرسال
             document.getElementById('missionSoldierId').value = "";
             document.getElementById('missionImageFile').value = "";
             document.getElementById('missionDetailsText').value = "";
@@ -1799,6 +1800,7 @@
             });
         }
 
+        // نافذة منبثقة لعرض الصورة بحجم كبير عند النقر عليها
         function openImageModal(imgSrc) {
             let modal = document.createElement('div');
             modal.style.cssText = "position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.85);display:flex;justify-content:center;align-items:center;z-index:3000;";
@@ -2130,25 +2132,27 @@
             let totalScore = Number(logEntry.logs) + Number(logEntry.ads) + Number(opEntry.ops) + Number(accEntry.acceptance);
 
             previewContainer.innerHTML = `
-                <div style="margin-top: 15px; color: var(--accent-gold); font-weight: bold; font-size: 0.95rem;"><i class="fa-solid fa-eye"></i> معاينة بطاقة المرشح:</div>
-                <div class="paint-soldier-card" style="border-color: #0ea5e9;">
+                <div style="margin-top: 15px; color: var(--accent-gold); font-weight: bold; font-size: 0.95rem;"><i class="fa-solid fa-eye"></i> معاينة الكارت للمرشح المختار:</div>
+                <div class="paint-soldier-card">
                     <div class="paint-card-top-right">
                         <div>اسم العسكري : ${logEntry.name}</div>
                         <div>رقم الهوية : ${id}</div>
                         <div>الكود العسكري : ${memberObj.code || '---'}</div>
                     </div>
+
                     <div class="paint-card-avatar-section">
-                        <div class="paint-card-circle-avatar" style="border-color: #0ea5e9; color: #0ea5e9;">
-                            <i class="fa-solid fa-user-check"></i>
+                        <div class="paint-card-circle-avatar">
+                            <i class="fa-solid fa-user-shield"></i>
                         </div>
-                        <div class="paint-card-curved-line" style="background: #0ea5e9;"></div>
+                        <div class="paint-card-curved-line"></div>
                     </div>
+
                     <div class="paint-card-bottom-grid">
                         <div class="paint-metric-item">
                             <div class="paint-metric-title">السجلات :</div>
                             <div class="paint-metric-val">${logEntry.logs}</div>
                         </div>
-                        <div class="paint-metric-item center-total" style="border-color: #0ea5e9;">
+                        <div class="paint-metric-item center-total">
                             <div class="paint-metric-title">مجموع النقاط</div>
                             <div class="paint-metric-val" style="font-size: 1.2rem;">${totalScore}</div>
                         </div>
@@ -2168,56 +2172,46 @@
                     </div>
                 </div>
             `;
+            previewContainer.scrollIntoView({ behavior: 'smooth' });
         }
 
         function saveSoldierOfWeek() {
             let week = document.getElementById('selectWeekSoldier').value;
             let id = document.getElementById('selectedSoldIdInput').value.trim();
-
-            if(!week || !id) {
-                alert("الرجاء اختيار الأسبوع وإدخال آيدي العسكري.");
-                return;
-            }
-
             let member = csvData.find(m => m.id === id);
-            if(!member) {
-                alert("لم يتم العثور على عسكري بهذا الآيدي في قائمة المنسوبين!");
-                return;
-            }
 
-            soldierOfWeekData[week] = { id: id, name: member.name };
-            saveToLocalStorage();
-            renderSoldierOfWeek();
-            alert(`تم اعتماد العسكري (${member.name}) بنجاح كعسكري الأسبوع لـ (${week})!`);
+            if(member) {
+                soldierOfWeekData[week] = member;
+                saveToLocalStorage();
+                renderSoldierOfWeek();
+                alert("تم اعتماد عسكري الأسبوع بنجاح!");
+            } else {
+                alert("لم يتم العثور على العسكري بهذا الآيدي في قائمة منسوبي القطاع!");
+            }
         }
 
         function removeSoldierOfWeek() {
             let week = document.getElementById('selectWeekSoldier').value;
-            if(!week) return;
-
-            if(confirm(`هل أنت متأكد من حذف عسكري الأسبوع المعتمد لـ (${week})؟`)) {
-                delete soldierOfWeekData[week];
-                saveToLocalStorage();
-                renderSoldierOfWeek();
-                document.getElementById('candidateCardPreview').innerHTML = "";
-                document.getElementById('selectedSoldIdInput').value = "";
-                alert("تم الحذف بنجاح.");
+            if(soldierOfWeekData[week]) {
+                if(confirm(`هل أنت متأكد من حذف عسكري الأسبوع المعتمد لـ (${week})؟`)) {
+                    delete soldierOfWeekData[week];
+                    saveToLocalStorage();
+                    renderSoldierOfWeek();
+                    document.getElementById('candidateCardPreview').innerHTML = "";
+                    alert("تم إزالة اعتماد عسكري الأسبوع.");
+                }
+            } else {
+                alert("لا يوجد عسكري معتمد أساساً في هذا الأسبوع.");
             }
         }
 
         window.onload = function() {
             updateWeekDropdowns();
             fetchSheetData();
-
-            let savedUser = localStorage.getItem('currentUser');
-            if(savedUser && accounts[savedUser]) {
-                currentUser = savedUser;
-                document.getElementById('loginOverlay').style.display = 'none';
-                document.getElementById('currentRoleDisplay').innerText = savedUser;
-                applyUserPermissions();
-                renderSessionsTable();
-                renderAccountsTable();
-            }
+            renderSessionsTable();
+            renderAccountsTable();
+            renderFieldMissionsTable();
+            renderNotesArchiveTable();
         };
     </script>
 </body>
