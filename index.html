@@ -554,16 +554,14 @@
             </div>
 
             <div class="sidebar-menu" id="sidebarMenuContainer">
-                <div class="menu-item active" onclick="switchPage('home', this)" id="menuHome" data-page="home"><i class="fa-solid fa-house"></i> الرئيسية</div>
-                <div class="menu-item" onclick="switchPage('login_tracker', this)" id="menuLoginTracker" data-page="login_tracker"><i class="fa-solid fa-right-to-bracket"></i> تسجيل الدخول (متابعة)</div>
-                <div class="menu-item" onclick="switchPage('members', this)" id="menuMembers" data-page="members"><i class="fa-solid fa-users-gear"></i> منسوبي القطاعات</div>
-                <div class="menu-item" onclick="switchPage('field_missions', this)" id="menuFieldMissions" data-page="field_missions"><i class="fa-solid fa-flag-checkered"></i> المهام الميدانية</div>
-                <div class="menu-item" onclick="switchPage('courses', this)" id="menuCourses" data-page="courses"><i class="fa-solid fa-graduation-cap"></i> دورات القطاع</div>
-                <div class="menu-item" onclick="switchPage('inventory', this)" id="menuInventory" data-page="inventory"><i class="fa-solid fa-boxes-stacked"></i> صفحة الجرد</div>
-                <div class="menu-item" onclick="switchPage('notes_archive', this)" id="menuNotesArchive" data-page="notes_archive"><i class="fa-solid fa-box-archive"></i> أرشيف الملاحظات</div>
-                <div class="menu-item" onclick="switchPage('soldier_week', this)" id="menuSoldierWeek" data-page="soldier_week"><i class="fa-solid fa-award"></i> عسكري الأسبوع</div>
-                <div class="menu-item" onclick="switchPage('accounts_management', this)" id="menuAccountsManagement" data-page="accounts_management"><i class="fa-solid fa-user-shield"></i> إدارة الحسابات</div>
-                <div class="menu-item" onclick="switchPage('role_permissions', this)" id="menuRolePermissions" data-page="role_permissions" style="color: var(--accent-gold);"><i class="fa-solid fa-key"></i> إدارة الصلاحيات</div>
+                <div class="menu-item active" onclick="switchPage('home', this)" id="menuHome"><i class="fa-solid fa-house"></i> الرئيسية</div>
+                <div class="menu-item" onclick="switchPage('login_tracker', this)" id="menuLoginTracker"><i class="fa-solid fa-right-to-bracket"></i> تسجيل الدخول (متابعة)</div>
+                <div class="menu-item" onclick="switchPage('members', this)" id="menuMembers"><i class="fa-solid fa-users-gear"></i> منسوبي القطاعات</div>
+                <div class="menu-item" onclick="switchPage('field_missions', this)" id="menuFieldMissions"><i class="fa-solid fa-flag-checkered"></i> المهام الميدانية</div>
+                <div class="menu-item" onclick="switchPage('courses', this)" id="menuCourses"><i class="fa-solid fa-graduation-cap"></i> دورات القطاع</div>
+                <div class="menu-item" onclick="switchPage('inventory', this)" id="menuInventory"><i class="fa-solid fa-boxes-stacked"></i> صفحة الجرد</div>
+                <div class="menu-item" onclick="switchPage('notes_archive', this)" id="menuNotesArchive"><i class="fa-solid fa-box-archive"></i> أرشيف الملاحظات</div>
+                <div class="menu-item" onclick="switchPage('soldier_week', this)" id="menuSoldierWeek"><i class="fa-solid fa-award"></i> عسكري الأسبوع</div>
             </div>
         </div>
 
@@ -583,7 +581,7 @@
         <div id="home" class="page-section active">
             <div class="card" style="text-align: center; padding: 40px;">
                 <h2 style="color: var(--accent-gold); margin-bottom: 10px;">لوحة إدارة وزارة الدفاع - Grave RP</h2>
-                <p style="color: var(--text-muted); margin-bottom: 25px;">تم ضبط لوحة التحكم بنجاح مع نظام صلاحيات الصفحات الديناميكي.</p>
+                <p style="color: var(--text-muted); margin-bottom: 25px;">تم ضبط لوحة التحكم بنجاح.</p>
                 
                 <button class="btn" onclick="fetchSheetData(true)" style="padding: 12px 25px; font-size: 1rem;">
                     <i class="fa-solid fa-rotate" id="refreshIcon"></i> حدث البيانات
@@ -936,78 +934,10 @@
                 <div id="currentApprovedSoldier" style="margin-top: 15px;"></div>
             </div>
         </div>
-
-        <!-- إدارة الحسابات -->
-        <div id="accounts_management" class="page-section">
-            <h2 style="color: var(--accent-gold); margin-bottom: 15px;"><i class="fa-solid fa-user-shield"></i> إدارة الحسابات والصلاحيات</h2>
-            <div class="card" style="background: #0b0f19; border: 1px solid var(--border-subtle); margin-bottom: 20px;">
-                <h3 style="color: var(--accent-gold); font-size: 1rem; margin-bottom: 10px;">إضافة حساب جديد</h3>
-                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 15px; align-items: end;">
-                    <div>
-                        <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 5px;">اسم المستخدم:</label>
-                        <input type="text" id="newAccUser" class="login-input" placeholder="مثال: SoldierX" style="margin:0;">
-                    </div>
-                    <div>
-                        <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 5px;">كلمة المرور:</label>
-                        <input type="password" id="newAccPass" class="login-input" placeholder="كلمة المرور" style="margin:0;">
-                    </div>
-                    <div>
-                        <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 5px;">الرتبة / الصلاحية:</label>
-                        <input type="text" id="newAccRole" class="login-input" placeholder="مثال: L-2" style="margin:0;">
-                    </div>
-                    <div>
-                        <button class="btn" style="height: 45px;" onclick="addNewAccount()">إضافة الحساب</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card">
-                <h3 style="color: var(--accent-gold); font-size: 1rem; margin-bottom: 15px;">قائمة الحسابات المسجلة</h3>
-                <div class="table-responsive">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>اسم المستخدم</th>
-                                <th>كلمة المرور</th>
-                                <th>الرتبة / الصلاحية</th>
-                                <th>الإجراء</th>
-                            </tr>
-                        </thead>
-                        <tbody id="accountsTableBody">
-                            <!-- سيتم تعبئتها ديناميكياً -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- إدارة الصلاحيات المخصصة -->
-        <div id="role_permissions" class="page-section">
-            <h2 style="color: var(--accent-gold); margin-bottom: 15px;"><i class="fa-solid fa-key"></i> إدارة صلاحيات الحسابات للوحات والصفحات</h2>
-            <div class="card">
-                <p style="color: var(--text-muted); margin-bottom: 20px; font-size: 0.9rem;">
-                    حدد الحسابات التي يمكنها الوصول إلى كل صفحة من صفحات النظام. حساب <strong>Owner</strong> يمتلك كافة الصلاحيات بشكل تلقائي.
-                </p>
-                <div class="table-responsive">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>اسم الصفحة</th>
-                                <th>الحسابات المصرح لها بالوصول</th>
-                                <th>حفظ التعديلات</th>
-                            </tr>
-                        </thead>
-                        <tbody id="permissionsTableBody">
-                            <!-- سيتم تعبئتها ديناميكياً -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
     </main>
 
     <script>
-        let accounts = JSON.parse(localStorage.getItem('grave_accounts')) || {
+        let accounts = {
             "Ahmed": { pass: "Owner2010629", role: "Owner", loggedIn: true, loginTime: Date.now(), lastLogout: "---" },
             "Nawaf": { pass: "m43d65f65", role: "D-0", loggedIn: false, loginTime: null, lastLogout: "---" },
             "Da": { pass: "m34d54f65", role: "D-1", loggedIn: false, loginTime: null, lastLogout: "---" },
@@ -1016,30 +946,6 @@
             "Nerf": { pass: "m14d27f99", role: "L-1", loggedIn: false, loginTime: null, lastLogout: "---" },
             "leader": { pass: "L483D@r200", role: "Leader", loggedIn: false, loginTime: null, lastLogout: "---", isLeaderPortalOnly: true }
         };
-
-        // تعريف الصفحات واسمائها الافتراضية والحسابات المسموحة لها
-        let pageDefinitions = [
-            { id: 'home', name: 'الرئيسية', allowed: Object.keys(accounts) },
-            { id: 'login_tracker', name: 'تسجيل الدخول (متابعة)', allowed: ["Ahmed", "Nawaf", "Da", "Abu Majed", "Ahmed_D3", "Nerf"] },
-            { id: 'members', name: 'منسوبي القطاعات', allowed: Object.keys(accounts) },
-            { id: 'field_missions', name: 'المهام الميدانية', allowed: Object.keys(accounts) },
-            { id: 'courses', name: 'دورات القطاع', allowed: Object.keys(accounts) },
-            { id: 'inventory', name: 'صفحة الجرد', allowed: Object.keys(accounts) },
-            { id: 'notes_archive', name: 'أرشيف الملاحظات', allowed: Object.keys(accounts) },
-            { id: 'soldier_week', name: 'عسكري الأسبوع', allowed: Object.keys(accounts) },
-            { id: 'accounts_management', name: 'إدارة الحسابات', allowed: ["Ahmed"] },
-            { id: 'role_permissions', name: 'إدارة الصلاحيات', allowed: ["Ahmed"] } // مقتصر افتراضياً على المالك
-        ];
-
-        // تحميل الصلاحيات المخزنة محلياً إذا وجدت
-        let savedPermissions = JSON.parse(localStorage.getItem('grave_pagePermissions'));
-        if(savedPermissions) {
-            pageDefinitions.forEach(p => {
-                if(savedPermissions[p.id]) {
-                    p.allowed = savedPermissions[p.id];
-                }
-            });
-        }
 
         let currentUser = "Ahmed";
         let csvData = [];
@@ -1067,7 +973,6 @@
         ];
 
         function saveToLocalStorage() {
-            localStorage.setItem('grave_accounts', JSON.stringify(accounts));
             localStorage.setItem('grave_customWeeks', JSON.stringify(customWeeks));
             localStorage.setItem('grave_invLogsAds', JSON.stringify(inventoryLogsAds));
             localStorage.setItem('grave_invOps', JSON.stringify(inventoryOps));
@@ -1076,152 +981,6 @@
             localStorage.setItem('grave_fieldMissions', JSON.stringify(fieldMissionsList));
             localStorage.setItem('grave_soldierCoursesData', JSON.stringify(soldierCoursesData));
             localStorage.setItem('grave_notesArchiveList', JSON.stringify(notesArchiveList));
-            
-            let permObj = {};
-            pageDefinitions.forEach(p => { permObj[p.id] = p.allowed; });
-            localStorage.setItem('grave_pagePermissions', JSON.stringify(permObj));
-        }
-
-        function updateSidebarMenuVisibility() {
-            pageDefinitions.forEach(p => {
-                let menuItem = document.querySelector(`.sidebar-menu [data-page="${p.id}"]`);
-                if(menuItem) {
-                    // التحقق هل الحساب الحالي مصرح له أو هو Owner
-                    if(currentUser === 'Owner' || p.allowed.includes(currentUser)) {
-                        menuItem.style.display = 'flex';
-                    } else {
-                        menuItem.style.display = 'none';
-                    }
-                }
-            });
-        }
-
-        function renderAccountsManagementTable() {
-            let tbody = document.getElementById('accountsTableBody');
-            if(!tbody) return;
-            tbody.innerHTML = "";
-
-            for(let acc in accounts) {
-                let data = accounts[acc];
-                let tr = document.createElement('tr');
-                let deleteBtnHtml = (acc !== 'Owner') ? `<button class="btn btn-danger" style="padding: 4px 10px; font-size: 0.75rem;" onclick="deleteAccount('${acc}')">حذف</button>` : '---';
-                
-                tr.innerHTML = `
-                    <td><strong>${acc}</strong></td>
-                    <td><input type="text" class="login-input" style="margin:0; padding:6px 10px;" value="${data.pass}" onchange="updateAccountPass('${acc}', this.value)"></td>
-                    <td>${data.role}</td>
-                    <td>${deleteBtnHtml}</td>
-                `;
-                tbody.appendChild(tr);
-            }
-        }
-
-        function addNewAccount() {
-            let user = document.getElementById('newAccUser').value.trim();
-            let pass = document.getElementById('newAccPass').value.trim();
-            let role = document.getElementById('newAccRole').value.trim();
-
-            if(!user || !pass || !role) {
-                alert("الرجاء تعبئة جميع حقول الحساب الجديد.");
-                return;
-            }
-
-            if(accounts[user]) {
-                alert("اسم المستخدم موجود مسبقاً!");
-                return;
-            }
-
-            accounts[user] = {
-                pass: pass,
-                role: role,
-                loggedIn: false,
-                loginTime: null,
-                lastLogout: "---"
-            };
-
-            // إعطاء صلاحية افتراضية للصفحات العامة
-            pageDefinitions.forEach(p => {
-                if(p.id === 'home' || p.id === 'members' || p.id === 'field_missions' || p.id === 'courses' || p.id === 'inventory' || p.id === 'notes_archive' || p.id === 'soldier_week') {
-                    p.allowed.push(user);
-                }
-            });
-
-            saveToLocalStorage();
-            renderAccountsManagementTable();
-            renderPermissionsTable();
-
-            document.getElementById('newAccUser').value = "";
-            document.getElementById('newAccPass').value = "";
-            document.getElementById('newAccRole').value = "";
-            alert("تم إضافة الحساب بنجاح!");
-        }
-
-        function updateAccountPass(acc, newPass) {
-            if(accounts[acc]) {
-                accounts[acc].pass = newPass;
-                saveToLocalStorage();
-            }
-        }
-
-        function deleteAccount(acc) {
-            if(acc === 'Owner') {
-                alert("لا يمكن حذف حساب المالك الأساسي (Owner).");
-                return;
-            }
-            if(confirm(`هل أنت متأكد من حذف الحساب (${acc})؟`)) {
-                delete accounts[acc];
-                pageDefinitions.forEach(p => {
-                    p.allowed = p.allowed.filter(u => u !== acc);
-                });
-                saveToLocalStorage();
-                renderAccountsManagementTable();
-                renderPermissionsTable();
-                updateSidebarMenuVisibility();
-                alert("تم حذف الحساب بنجاح!");
-            }
-        }
-
-        function renderPermissionsTable() {
-            let tbody = document.getElementById('permissionsTableBody');
-            if(!tbody) return;
-            tbody.innerHTML = "";
-
-            pageDefinitions.forEach(p => {
-                let checkboxesHtml = "";
-                for(let acc in accounts) {
-                    let isChecked = p.allowed.includes(acc) ? "checked" : "";
-                    checkboxesHtml += `<label style="margin-left: 15px; display: inline-flex; align-items: center; gap: 5px; cursor: pointer;">
-                        <input type="checkbox" value="${acc}" ${isChecked} class="perm-checkbox-${p.id}"> ${acc} (${accounts[acc].role})
-                    </label>`;
-                }
-
-                let tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td><strong>${p.name}</strong></td>
-                    <td>${checkboxesHtml}</td>
-                    <td><button class="btn" style="padding: 5px 12px; font-size: 0.8rem;" onclick="savePagePermissions('${p.id}')">حفظ</button></td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        function savePagePermissions(pageId) {
-            let checkboxes = document.querySelectorAll(`.perm-checkbox-${pageId}`);
-            let selectedAccounts = [];
-            checkboxes.forEach(cb => {
-                if(cb.checked) selectedAccounts.push(cb.value);
-            });
-
-            // ضمان أن الـ Owner يمتلك الصلاحية دائماً
-            if(!selectedAccounts.includes("Ahmed")) selectedAccounts.push("Ahmed");
-
-            let page = pageDefinitions.find(p => p.id === pageId);
-            if(page) {
-                page.allowed = selectedAccounts;
-                saveToLocalStorage();
-                updateSidebarMenuVisibility();
-                alert(`تم تحديث صلاحيات صفحة (${page.name}) بنجاح!`);
-            }
         }
 
         function updateWeekDropdowns() {
@@ -1668,18 +1427,14 @@
         }
 
         function switchPage(pageId, element) {
-            // التحقق أمنياً من صلاحية الوصول للصفحة
-            let pageDef = pageDefinitions.find(p => p.id === pageId);
-            if(currentUser !== 'Owner' && pageDef && !pageDef.allowed.includes(currentUser)) {
-                alert("عذراً، هذا الحساب لا يمتلك صلاحية الوصول لهذه الصفحة.");
+            if(accounts[currentUser].isLeaderPortalOnly && pageId !== 'field_missions') {
                 return;
             }
 
             document.querySelectorAll('.page-section').forEach(sec => sec.classList.remove('active'));
             document.querySelectorAll('.sidebar-menu .menu-item').forEach(item => item.classList.remove('active'));
             
-            let targetSec = document.getElementById(pageId);
-            if(targetSec) targetSec.classList.add('active');
+            document.getElementById(pageId).classList.add('active');
             if(element) element.classList.add('active');
         }
 
@@ -1695,20 +1450,32 @@
                 document.getElementById('loginOverlay').style.display = 'none';
                 document.getElementById('currentRoleDisplay').innerText = accounts[user].role;
 
-                // تحديث القوائم المرئية بناءً على الصلاحيات
-                updateSidebarMenuVisibility();
+                if(accounts[user].isLeaderPortalOnly) {
+                    document.getElementById('menuHome').style.display = 'none';
+                    document.getElementById('menuLoginTracker').style.display = 'none';
+                    document.getElementById('menuMembers').style.display = 'none';
+                    document.getElementById('menuCourses').style.display = 'none';
+                    document.getElementById('menuInventory').style.display = 'none';
+                    document.getElementById('menuNotesArchive').style.display = 'none';
+                    document.getElementById('menuSoldierWeek').style.display = 'none';
+                    
+                    document.getElementById('menuFieldMissions').style.display = 'flex';
+                    switchPage('field_missions', document.getElementById('menuFieldMissions'));
+                } else {
+                    document.getElementById('menuHome').style.display = 'flex';
+                    document.getElementById('menuLoginTracker').style.display = 'flex';
+                    document.getElementById('menuMembers').style.display = 'flex';
+                    document.getElementById('menuFieldMissions').style.display = 'flex';
+                    document.getElementById('menuCourses').style.display = 'flex';
+                    document.getElementById('menuInventory').style.display = 'flex';
+                    document.getElementById('menuNotesArchive').style.display = 'flex';
+                    document.getElementById('menuSoldierWeek').style.display = 'flex';
 
-                // التوجيه لأول صفحة مسموحة للمستخدم
-                let firstAllowedPage = pageDefinitions.find(p => currentUser === 'Owner' || p.allowed.includes(currentUser));
-                if(firstAllowedPage) {
-                    let menuEl = document.querySelector(`.sidebar-menu [data-page="${firstAllowedPage.id}"]`);
-                    switchPage(firstAllowedPage.id, menuEl);
+                    switchPage('home', document.getElementById('menuHome'));
                 }
 
                 renderSessionsTable();
                 renderFieldMissionsTable();
-                renderPermissionsTable();
-                renderAccountsManagementTable();
             } else {
                 err.style.display = 'block';
             }
@@ -2225,8 +1992,6 @@
             renderSessionsTable();
             renderFieldMissionsTable();
             renderNotesArchiveTable();
-            renderPermissionsTable();
-            renderAccountsManagementTable();
         };
     </script>
 </body>
