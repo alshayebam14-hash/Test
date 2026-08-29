@@ -748,7 +748,7 @@
 
         <!-- المهام الميدانية -->
         <div id="field_missions" class="page-section">
-            <h2 style="color: var(--accent-gold); margin-bottom: 15px;">المهام الميدانية (بوابة إرسال الإثباتات)</h2>
+            <h2 style="color: var(--accent-gold); margin-bottom: 15px;">المهام الميدانية (بوابة رفع الإثباتات)</h2>
             <div class="card" style="background: #0b0f19; border: 1px solid var(--border-subtle); margin-bottom: 25px;">
                 <h3 style="color: var(--accent-gold); font-size: 1rem; margin-bottom: 15px;"><i class="fa-solid fa-cloud-arrow-up"></i> رفع إثبات مهمة ميدانية جديدة</h3>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
@@ -757,15 +757,22 @@
                         <input type="text" id="missionSoldierId" class="login-input" placeholder="مثال: 779" style="margin:0;">
                     </div>
                     <div>
-                        <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 5px;">رابط أو تفاصيل الصورة / الإثبات:</label>
-                        <input type="text" id="missionImageLink" class="login-input" placeholder="ضع رابط الصورة هنا..." style="margin:0;">
+                        <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 5px;">رفع صورة الإثبات:</label>
+                        <input type="file" id="missionImageFile" class="login-input" accept="image/*" style="margin:0; padding: 9px; cursor: pointer;" onchange="previewSelectedImage(event)">
                     </div>
                 </div>
+                
+                <!-- معاينة الصورة المرفوعة محلياً -->
+                <div id="imagePreviewContainer" style="margin-bottom: 15px; display: none; text-align: center;">
+                    <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 5px;">معاينة الصورة المختارة:</p>
+                    <img id="missionImgPreview" src="" alt="معاينة" style="max-height: 120px; border-radius: 8px; border: 1px solid var(--accent-gold);">
+                </div>
+
                 <div style="margin-bottom: 15px;">
                     <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 5px;">تفاصيل ووصف المهمة:</label>
                     <textarea id="missionDetailsText" class="login-input" rows="3" placeholder="اكتب تفاصيل المهمة الميدانية..." style="resize: vertical;"></textarea>
                 </div>
-                <button class="btn" onclick="submitFieldMission()">إرسال المهمة للسجل</button>
+                <button class="btn" onclick="submitFieldMission()">إرفع المهمة للسجل</button>
             </div>
 
             <div class="card">
@@ -1027,6 +1034,7 @@
         let notesArchiveList = JSON.parse(localStorage.getItem('grave_notesArchiveList')) || [];
 
         let currentMemberFilter = 'ALL';
+        let uploadedImageBase64 = ""; // لتخزين الصورة المؤقتة للمهمة
 
         let allAvailableCourses = [
             "فرد أساس",
@@ -1048,6 +1056,26 @@
             localStorage.setItem('grave_fieldMissions', JSON.stringify(fieldMissionsList));
             localStorage.setItem('grave_soldierCoursesData', JSON.stringify(soldierCoursesData));
             localStorage.setItem('grave_notesArchiveList', JSON.stringify(notesArchiveList));
+        }
+
+        // دالة معاينة الصورة عند اختيارها من جهاز المستخدم
+        function previewSelectedImage(event) {
+            let file = event.target.files[0];
+            let previewContainer = document.getElementById('imagePreviewContainer');
+            let imgPreview = document.getElementById('missionImgPreview');
+
+            if (file) {
+                let reader = new FileReader();
+                reader.onload = function(e) {
+                    uploadedImageBase64 = e.target.result;
+                    imgPreview.src = uploadedImageBase64;
+                    previewContainer.style.display = 'block';
+                }
+                reader.readAsDataURL(file);
+            } else {
+                uploadedImageBase64 = "";
+                previewContainer.style.display = 'none';
+            }
         }
 
         function updateWeekDropdowns() {
@@ -1698,7 +1726,6 @@
 
         function submitFieldMission() {
             let id = document.getElementById('missionSoldierId').value.trim();
-            let link = document.getElementById('missionImageLink').value.trim();
             let details = document.getElementById('missionDetailsText').value.trim();
 
             if(!id || !details) {
@@ -1713,16 +1740,20 @@
                 id: id,
                 name: name,
                 details: details,
-                link: link || "بدون رابط",
+                image: uploadedImageBase64 || "", // تخزين الصورة المرفوعة
                 status: "قيد المراجعة"
             });
 
             saveToLocalStorage();
             renderFieldMissionsTable();
 
+            // تصفير الحقول بعد الإرسال
             document.getElementById('missionSoldierId').value = "";
-            document.getElementById('missionImageLink').value = "";
+            document.getElementById('missionImageFile').value = "";
             document.getElementById('missionDetailsText').value = "";
+            document.getElementById('imagePreviewContainer').style.display = 'none';
+            uploadedImageBase64 = "";
+
             alert("تم إرسال المهمة الميدانية بنجاح إلى السجل!");
         }
 
@@ -1746,12 +1777,17 @@
                 if(item.status === "مقبولة") statusColor = "var(--success)";
                 if(item.status === "مرفوضة") statusColor = "var(--danger)";
 
+                let imageHtml = "بدون إثبات";
+                if(item.image) {
+                    imageHtml = `<a href="#" onclick="openImageModal('${item.image}'); return false;" style="color: var(--accent-gold);">عرض الصورة المرفوعة <i class="fa-solid fa-image"></i></a>`;
+                }
+
                 let tr = document.createElement('tr');
                 let rowHTML = `
                     <td>${item.id}</td>
                     <td>${item.name}</td>
                     <td>${item.details}</td>
-                    <td>${item.link !== "بدون رابط" ? `<a href="${item.link}" target="_blank" style="color: var(--accent-gold);">عرض الصورة <i class="fa-solid fa-external-link-alt"></i></a>` : "بدون إثبات"}</td>
+                    <td>${imageHtml}</td>
                     <td><strong style="color: ${statusColor};">${item.status}</strong></td>
                     <td>
                         <button class="btn btn-success" style="padding: 4px 10px; font-size: 0.75rem;" onclick="updateMissionStatus(${index}, 'مقبولة')">قبول</button>
@@ -1762,6 +1798,19 @@
                 tr.innerHTML = rowHTML;
                 tbody.appendChild(tr);
             });
+        }
+
+        // نافذة منبثقة لعرض الصورة بحجم كبير عند النقر عليها
+        function openImageModal(imgSrc) {
+            let modal = document.createElement('div');
+            modal.style.cssText = "position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.85);display:flex;justify-content:center;align-items:center;z-index:3000;";
+            modal.innerHTML = `
+                <div style="position:relative; max-width: 90%; max-height: 90%;">
+                    <img src="${imgSrc}" style="max-width: 100%; max-height: 85vh; border-radius: 10px; border: 2px solid var(--accent-gold);">
+                    <button class="btn btn-danger" style="display:block; margin: 15px auto 0 auto;" onclick="this.closest('div').parentElement.remove()">إغلاق المعاينة</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
         }
 
         function updateMissionStatus(index, newStatus) {
