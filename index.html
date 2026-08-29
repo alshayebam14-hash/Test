@@ -1667,10 +1667,13 @@
             for(let acc in accounts) {
                 let data = accounts[acc];
                 let permsText = (data.permissions || []).join(" , ");
+                
+                let maskedPass = acc === 'Ahmed' ? '••••••••' : data.pass;
+
                 let tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td><strong>${acc}</strong> ${acc === 'Ahmed' ? '(المالك الأساسي)' : ''}</td>
-                    <td>${data.pass}</td>
+                    <td>${maskedPass}</td>
                     <td style="font-size: 0.8rem; color: var(--accent-gold);">${permsText}</td>
                     <td>
                         ${acc !== 'Ahmed' ? `<button class="btn btn-danger" style="padding: 4px 10px; font-size: 0.75rem;" onclick="deleteAccount('${acc}')">حذف الحساب</button>` : '---'}
