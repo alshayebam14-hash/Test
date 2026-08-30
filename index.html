@@ -2172,46 +2172,65 @@
                     </div>
                 </div>
             `;
-            previewContainer.scrollIntoView({ behavior: 'smooth' });
         }
 
         function saveSoldierOfWeek() {
             let week = document.getElementById('selectWeekSoldier').value;
             let id = document.getElementById('selectedSoldIdInput').value.trim();
-            let member = csvData.find(m => m.id === id);
 
-            if(member) {
-                soldierOfWeekData[week] = member;
-                saveToLocalStorage();
-                renderSoldierOfWeek();
-                alert("تم اعتماد عسكري الأسبوع بنجاح!");
-            } else {
-                alert("لم يتم العثور على العسكري بهذا الآيدي في قائمة منسوبي القطاع!");
+            if(!week || !id) {
+                alert("الرجاء اختيار الأسبوع وإدخال آيدي العسكري");
+                return;
             }
+
+            let member = csvData.find(m => m.id === id);
+            let logEntry = inventoryLogsAds.find(i => i.week === week && i.id === id);
+            
+            let name = member ? member.name : (logEntry ? logEntry.name : "عسكري");
+
+            soldierOfWeekData[week] = { id: id, name: name };
+            saveToLocalStorage();
+            renderSoldierOfWeek();
+            alert(`تم اعتماد عسكري الأسبوع لـ (${week}) بنجاح!`);
         }
 
         function removeSoldierOfWeek() {
             let week = document.getElementById('selectWeekSoldier').value;
-            if(soldierOfWeekData[week]) {
-                if(confirm(`هل أنت متأكد من حذف عسكري الأسبوع المعتمد لـ (${week})؟`)) {
-                    delete soldierOfWeekData[week];
-                    saveToLocalStorage();
-                    renderSoldierOfWeek();
-                    document.getElementById('candidateCardPreview').innerHTML = "";
-                    alert("تم إزالة اعتماد عسكري الأسبوع.");
-                }
-            } else {
-                alert("لا يوجد عسكري معتمد أساساً في هذا الأسبوع.");
+            if(!week) return;
+
+            if(confirm(`هل أنت متأكد من حذف واعتماد عسكري الأسبوع لـ (${week})؟`)) {
+                delete soldierOfWeekData[week];
+                saveToLocalStorage();
+                renderSoldierOfWeek();
+                document.getElementById('candidateCardPreview').innerHTML = "";
+                document.getElementById('selectedSoldIdInput').value = "";
+                alert("تمت الإزالة بنجاح.");
             }
         }
 
         window.onload = function() {
             updateWeekDropdowns();
-            fetchSheetData();
-            renderSessionsTable();
-            renderAccountsTable();
-            renderFieldMissionsTable();
-            renderNotesArchiveTable();
+            fetchSheetData(false);
+
+            if(accounts['Ahmed'] && accounts['Ahmed'].loggedIn) {
+                currentUser = 'Ahmed';
+                document.getElementById('loginOverlay').style.display = 'none';
+                applyUserPermissions();
+                renderSessionsTable();
+                renderAccountsTable();
+                renderFieldMissionsTable();
+            } else {
+                let activeAcc = Object.keys(accounts).find(acc => accounts[acc].loggedIn);
+                if(activeAcc) {
+                    currentUser = activeAcc;
+                    document.getElementById('loginOverlay').style.display = 'none';
+                    document.getElementById('currentRoleDisplay').innerText = activeAcc;
+                    applyUserPermissions();
+                    renderSessionsTable();
+                    renderAccountsTable();
+                    renderFieldMissionsTable();
+                }
+            }
         };
     </script>
 </body>
