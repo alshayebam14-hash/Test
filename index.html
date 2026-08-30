@@ -1034,7 +1034,7 @@
         let notesArchiveList = JSON.parse(localStorage.getItem('grave_notesArchiveList')) || [];
 
         let currentMemberFilter = 'ALL';
-        let uploadedImageBase64 = ""; // لتخزين الصورة المؤقتة للمهمة
+        let uploadedImageBase64 = "";
 
         let allAvailableCourses = [
             "فرد أساس",
@@ -1058,7 +1058,6 @@
             localStorage.setItem('grave_notesArchiveList', JSON.stringify(notesArchiveList));
         }
 
-        // دالة معاينة الصورة عند اختيارها من جهاز المستخدم
         function previewSelectedImage(event) {
             let file = event.target.files[0];
             let previewContainer = document.getElementById('imagePreviewContainer');
@@ -1740,14 +1739,13 @@
                 id: id,
                 name: name,
                 details: details,
-                image: uploadedImageBase64 || "", // تخزين الصورة المرفوعة
+                image: uploadedImageBase64 || "",
                 status: "قيد المراجعة"
             });
 
             saveToLocalStorage();
             renderFieldMissionsTable();
 
-            // تصفير الحقول بعد الإرسال
             document.getElementById('missionSoldierId').value = "";
             document.getElementById('missionImageFile').value = "";
             document.getElementById('missionDetailsText').value = "";
@@ -1800,7 +1798,6 @@
             });
         }
 
-        // نافذة منبثقة لعرض الصورة بحجم كبير عند النقر عليها
         function openImageModal(imgSrc) {
             let modal = document.createElement('div');
             modal.style.cssText = "position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.85);display:flex;justify-content:center;align-items:center;z-index:3000;";
@@ -2172,46 +2169,62 @@
                     </div>
                 </div>
             `;
-            previewContainer.scrollIntoView({ behavior: 'smooth' });
         }
 
         function saveSoldierOfWeek() {
             let week = document.getElementById('selectWeekSoldier').value;
             let id = document.getElementById('selectedSoldIdInput').value.trim();
-            let member = csvData.find(m => m.id === id);
 
-            if(member) {
-                soldierOfWeekData[week] = member;
-                saveToLocalStorage();
-                renderSoldierOfWeek();
-                alert("تم اعتماد عسكري الأسبوع بنجاح!");
-            } else {
-                alert("لم يتم العثور على العسكري بهذا الآيدي في قائمة منسوبي القطاع!");
+            if(!week || !id) {
+                alert("الرجاء اختيار الأسبوع وإدخال آيدي العسكري.");
+                return;
             }
+
+            let member = csvData.find(m => m.id === id);
+            if(!member) {
+                alert("لم يتم العثور على عسكري بهذا الآيدي في جدول المنسوبين!");
+                return;
+            }
+
+            soldierOfWeekData[week] = {
+                id: id,
+                name: member.name
+            };
+
+            saveToLocalStorage();
+            renderSoldierOfWeek();
+            alert(`تم اعتماد (${member.name}) عسكرياً للأسبوع (${week}) بنجاح!`);
         }
 
         function removeSoldierOfWeek() {
             let week = document.getElementById('selectWeekSoldier').value;
-            if(soldierOfWeekData[week]) {
-                if(confirm(`هل أنت متأكد من حذف عسكري الأسبوع المعتمد لـ (${week})؟`)) {
-                    delete soldierOfWeekData[week];
-                    saveToLocalStorage();
-                    renderSoldierOfWeek();
-                    document.getElementById('candidateCardPreview').innerHTML = "";
-                    alert("تم إزالة اعتماد عسكري الأسبوع.");
-                }
-            } else {
-                alert("لا يوجد عسكري معتمد أساساً في هذا الأسبوع.");
+            if(!week) return;
+
+            if(confirm(`هل أنت متأكد من حذف العسكري المعتمد للأسبوع (${week})؟`)) {
+                delete soldierOfWeekData[week];
+                saveToLocalStorage();
+                renderSoldierOfWeek();
+                document.getElementById('candidateCardPreview').innerHTML = "";
+                document.getElementById('selectedSoldIdInput').value = "";
+                alert("تم الحذف بنجاح.");
             }
         }
 
         window.onload = function() {
             updateWeekDropdowns();
             fetchSheetData();
+            
+            let savedUser = localStorage.getItem('currentUser');
+            if(savedUser && accounts[savedUser]) {
+                currentUser = savedUser;
+                document.getElementById('loginOverlay').style.display = 'none';
+                document.getElementById('currentRoleDisplay').innerText = currentUser;
+                applyUserPermissions();
+            } else {
+                document.getElementById('loginOverlay').style.display = 'flex';
+            }
             renderSessionsTable();
             renderAccountsTable();
-            renderFieldMissionsTable();
-            renderNotesArchiveTable();
         };
     </script>
 </body>
