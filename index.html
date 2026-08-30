@@ -554,7 +554,7 @@
             </div>
 
             <div class="sidebar-menu" id="sidebarMenuContainer">
-                <div class="menu-item active" onclick="switchPage('home', this)" id="menuHome"><i class="fa-solid fa-house"></i> الرئيسية</div>
+                <div class="menu-item" onclick="switchPage('home', this)" id="menuHome"><i class="fa-solid fa-house"></i> الرئيسية</div>
                 <div class="menu-item" onclick="switchPage('login_tracker', this)" id="menuLoginTracker"><i class="fa-solid fa-right-to-bracket"></i> متابعة تسجيل الدخول</div>
                 <div class="menu-item" onclick="switchPage('members', this)" id="menuMembers"><i class="fa-solid fa-users-gear"></i> منسوبي القطاعات</div>
                 <div class="menu-item" onclick="switchPage('field_missions', this)" id="menuFieldMissions"><i class="fa-solid fa-flag-checkered"></i> المهام الميدانية</div>
@@ -578,10 +578,10 @@
 
     <main>
         <!-- الرئيسية -->
-        <div id="home" class="page-section active">
+        <div id="home" class="page-section">
             <div class="card" style="text-align: center; padding: 40px;">
                 <h2 style="color: var(--accent-gold); margin-bottom: 10px;">لوحة إدارة وزارة الدفاع - Grave RP</h2>
-                <p style="color: var(--text-muted); margin-bottom: 25px;">تم ضبط لوحة التحكم وإدارة الصلاحيات والحسابات داخل الكود بنجاح.</p>
+                <p style="color: var(--text-muted); margin-bottom: 25px;">تم ضبط لوحة التحكم والحسابات والصلاحيات الثابتة داخل الكود بنجاح.</p>
                 
                 <button class="btn" onclick="fetchSheetData(true)" style="padding: 12px 25px; font-size: 1rem;">
                     <i class="fa-solid fa-rotate" id="refreshIcon"></i> حدث البيانات
@@ -943,25 +943,61 @@
     </main>
 
     <script>
-        // الحسابات والصلاحيات مثبتة مباشرة داخل الكود الثابت (Hardcoded)
-        let accounts = {
-            "Ahmed": { 
-                pass: "Owner2010629", 
-                role: "Owner", 
+        // قائمة الحسابات والصلاحيات الثابتة المحدثة داخل الكود
+        const accounts = {
+            "Ahmed": {
+                password: "Owner2010629",
+                role: "Owner",
                 loggedIn: false, 
                 loginTime: null, 
-                lastLogout: "---", 
-                permissions: ["home", "login_tracker", "members", "field_missions", "courses", "inventory", "notes_archive", "soldier_week"] 
+                lastLogout: "---",
+                permissions: ["home", "login_tracker", "members", "field_missions", "courses", "inventory", "notes_archive", "soldier_week"]
             },
-            "leader": { 
-                pass: "L483D@r200", 
-                role: "Leader", 
+            "Ahmed Owner": {
+                password: "Owner@432",
+                role: "Owner",
                 loggedIn: false, 
                 loginTime: null, 
-                lastLogout: "---", 
-                permissions: ["field_missions"] 
+                lastLogout: "---",
+                permissions: ["home", "login_tracker", "members", "field_missions", "courses", "inventory", "notes_archive", "soldier_week"]
+            },
+            "The Minister": {
+                password: "t33m7@200",
+                role: "Minister",
+                loggedIn: false, 
+                loginTime: null, 
+                lastLogout: "---",
+                permissions: ["home", "members", "field_missions", "courses", "inventory", "notes_archive", "soldier_week"]
+            },
+            "Leader": {
+                password: "L483D@r200",
+                role: "Leader",
+                loggedIn: false, 
+                loginTime: null, 
+                lastLogout: "---",
+                permissions: ["members", "field_missions"]
+            },
+            "Affairs": {
+                password: "a64@ff76",
+                role: "Affairs",
+                loggedIn: false, 
+                loginTime: null, 
+                lastLogout: "---",
+                permissions: ["members", "notes_archive"]
             }
         };
+
+        // دالة التحقق من تسجيل الدخول والصلاحيات
+        function checkPermissions(username, password, pageName) {
+            const account = accounts[username];
+            if (account && account.password === password) {
+                if (account.permissions.includes(pageName)) {
+                    return true;
+                }
+                return false;
+            }
+            return false;
+        }
 
         let currentUser = null;
         let csvData = [];
@@ -1513,7 +1549,7 @@
             let password = document.getElementById('passwordInput').value.trim();
             let err = document.getElementById('loginError');
 
-            if(accounts[username] && accounts[username].pass === password) {
+            if(checkPermissions(username, password, 'home') || checkPermissions(username, password, 'members')) {
                 currentUser = username;
                 accounts[username].loggedIn = true;
                 accounts[username].loginTime = Date.now();
@@ -1545,17 +1581,25 @@
             let tbody = document.getElementById('sessionsTableBody');
             if(!tbody) return;
             tbody.innerHTML = "";
+            let isUserOwner = (accounts[currentUser] && accounts[currentUser].role === "Owner");
+
             for(let acc in accounts) {
                 let data = accounts[acc];
                 let tr = document.createElement('tr');
                 let duration = data.loggedIn ? Math.floor((Date.now() - data.loginTime) / 60000) + " دقيقة" : "---";
+                
+                let actionBtn = '---';
+                if(isUserOwner && acc !== currentUser) {
+                    actionBtn = `<button class="btn btn-danger" onclick="forceLogout('${acc}')">فصل الجلسة</button>`;
+                }
+
                 tr.innerHTML = `
                     <td>${acc}</td>
                     <td>${data.role || 'مسؤول فرعي'}</td>
                     <td style="color: ${data.loggedIn ? 'var(--success)' : 'var(--danger)'};">${data.loggedIn ? 'متصل' : 'غير متصل'}</td>
                     <td>${duration}</td>
                     <td>${data.lastLogout}</td>
-                    <td>${currentUser === 'Ahmed' && acc !== 'Ahmed' ? `<button class="btn btn-danger" onclick="forceLogout('${acc}')">فصل الجلسة</button>` : '---'}</td>
+                    <td>${actionBtn}</td>
                 `;
                 tbody.appendChild(tr);
             }
