@@ -600,8 +600,8 @@
         <!-- الرئيسية -->
         <div id="home" class="page-section active">
             <div class="card" style="text-align: center; padding: 40px;">
-                <h2 style="color: var(--accent-gold); margin-bottom: 10px;">لوحة إدارة وزارة الدفاع - Grave RP</h2>
-                <p style="color: var(--text-muted); margin-bottom: 25px;">تم ضبط لوحة التحكم وإدارة الصلاحيات والحسابات بنجاح.</p>
+                <h2 style="color: var(--accent-gold); margin-bottom: 10px;">لوحة إدارة وزارة الدفاع - Grave RP[cite: 5]</h2>
+                <p style="color: var(--text-muted); margin-bottom: 25px;">تم ضبط لوحة التحكم وإدارة الصلاحيات والحسابات بنجاح.[cite: 5]</p>
                 
                 <button class="btn" onclick="fetchSheetData(true)" style="padding: 12px 25px; font-size: 1rem;">
                     <i class="fa-solid fa-rotate" id="refreshIcon"></i> حدث البيانات
@@ -762,7 +762,6 @@
                     </div>
                 </div>
                 
-                <!-- معاينة الصورة المرفوعة محلياً -->
                 <div id="imagePreviewContainer" style="margin-bottom: 15px; display: none; text-align: center;">
                     <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 5px;">معاينة الصورة المختارة:</p>
                     <img id="missionImgPreview" src="" alt="معاينة" style="max-height: 120px; border-radius: 8px; border: 1px solid var(--accent-gold);">
@@ -1015,9 +1014,53 @@
     </main>
 
     <script>
+        // إعداد الحسابات والصلاحيات المدمجة
         let accounts = JSON.parse(localStorage.getItem('grave_accounts')) || {
-            "Ahmed": { pass: "Owner2010629", role: "Owner", loggedIn: false, loginTime: null, lastLogout: "---", permissions: ["home", "login_tracker", "accounts_management", "members", "field_missions", "courses", "inventory", "notes_archive", "soldier_week"] },
-            "leader": { pass: "L483D@r200", role: "Leader", loggedIn: false, loginTime: null, lastLogout: "---", permissions: ["field_missions"] }
+            "Ahmed (المالك الأساسي)": { 
+                pass: "Owner2010296", 
+                role: "المالك الأساسي", 
+                loggedIn: false, 
+                loginTime: null, 
+                lastLogout: "---", 
+                displayPassword: "•••••••",
+                permissions: ["home", "login_tracker", "accounts_management", "members", "field_missions", "courses", "inventory", "notes_archive", "soldier_week"] 
+            },
+            "Ahmed Owner": { 
+                pass: "Owner@432", 
+                role: "الأونر الثاني", 
+                loggedIn: false, 
+                loginTime: null, 
+                lastLogout: "---", 
+                displayPassword: "Owner@432",
+                permissions: ["home", "login_tracker", "accounts_management", "members", "field_missions", "courses", "inventory", "notes_archive", "soldier_week"] 
+            },
+            "The Minister": { 
+                pass: "t33m7@200", 
+                role: "أعضاء المجلس", 
+                loggedIn: false, 
+                loginTime: null, 
+                lastLogout: "---", 
+                displayPassword: "t33m7@200",
+                permissions: ["home", "members", "field_missions", "courses", "inventory", "notes_archive", "soldier_week"] 
+            },
+            "Leader": { 
+                pass: "L483D@r200", 
+                role: "الليدرات", 
+                loggedIn: false, 
+                loginTime: null, 
+                lastLogout: "---", 
+                displayPassword: "L483D@r200",
+                permissions: ["members", "field_missions"] 
+            },
+            "Affairs": { 
+                pass: "a64@ff76", 
+                role: "الشؤون", 
+                loggedIn: false, 
+                loginTime: null, 
+                lastLogout: "---", 
+                displayPassword: "a64@ff76",
+                permissions: ["members", "notes_archive"] 
+            }
         };
 
         let currentUser = null;
@@ -1034,7 +1077,7 @@
         let notesArchiveList = JSON.parse(localStorage.getItem('grave_notesArchiveList')) || [];
 
         let currentMemberFilter = 'ALL';
-        let uploadedImageBase64 = ""; // لتخزين الصورة المؤقتة للمهمة
+        let uploadedImageBase64 = "";
 
         let allAvailableCourses = [
             "فرد أساس",
@@ -1058,7 +1101,6 @@
             localStorage.setItem('grave_notesArchiveList', JSON.stringify(notesArchiveList));
         }
 
-        // دالة معاينة الصورة عند اختيارها من جهاز المستخدم
         function previewSelectedImage(event) {
             let file = event.target.files[0];
             let previewContainer = document.getElementById('imagePreviewContainer');
@@ -1569,39 +1611,26 @@
         }
 
         function handleLogin() {
-            let username = document.getElementById('usernameInput').value.trim();
+            let usernameInput = document.getElementById('usernameInput').value.trim();
             let password = document.getElementById('passwordInput').value.trim();
             let err = document.getElementById('loginError');
 
-            if (username === 'Ahmed' && password === 'Owner2010629') {
-                localStorage.setItem('currentUser', 'Ahmed');
-                currentUser = 'Ahmed';
-                
-                if (!accounts['Ahmed']) {
-                    accounts['Ahmed'] = { pass: "Owner2010629", role: "Owner", permissions: ["home", "login_tracker", "accounts_management", "members", "field_missions", "courses", "inventory", "notes_archive", "soldier_week"] };
+            let matchedKey = null;
+            for(let accKey in accounts) {
+                if(accKey.toLowerCase() === usernameInput.toLowerCase() || accKey.split(" ")[0].toLowerCase() === usernameInput.toLowerCase()) {
+                    matchedKey = accKey;
+                    break;
                 }
-                accounts['Ahmed'].loggedIn = true;
-                accounts['Ahmed'].loginTime = Date.now();
-                saveToLocalStorage();
-
-                document.getElementById('loginOverlay').style.display = 'none';
-                document.getElementById('currentRoleDisplay').innerText = 'Ahmed';
-
-                applyUserPermissions();
-                renderSessionsTable();
-                renderAccountsTable();
-                renderFieldMissionsTable();
-                return;
             }
 
-            if(accounts[username] && accounts[username].pass === password) {
-                currentUser = username;
-                accounts[username].loggedIn = true;
-                accounts[username].loginTime = Date.now();
+            if (matchedKey && accounts[matchedKey].pass === password) {
+                currentUser = matchedKey;
+                accounts[matchedKey].loggedIn = true;
+                accounts[matchedKey].loginTime = Date.now();
                 saveToLocalStorage();
                 
                 document.getElementById('loginOverlay').style.display = 'none';
-                document.getElementById('currentRoleDisplay').innerText = username;
+                document.getElementById('currentRoleDisplay').innerText = matchedKey;
 
                 applyUserPermissions();
                 renderSessionsTable();
@@ -1639,7 +1668,7 @@
                     <td style="color: ${data.loggedIn ? 'var(--success)' : 'var(--danger)'};">${data.loggedIn ? 'متصل' : 'غير متصل'}</td>
                     <td>${duration}</td>
                     <td>${data.lastLogout}</td>
-                    <td>${currentUser === 'Ahmed' && acc !== 'Ahmed' ? `<button class="btn btn-danger" onclick="forceLogout('${acc}')">فصل الجلسة</button>` : '---'}</td>
+                    <td>${currentUser && currentUser.includes("Ahmed") && acc !== currentUser ? `<button class="btn btn-danger" onclick="forceLogout('${acc}')">فصل الجلسة</button>` : '---'}</td>
                 `;
                 tbody.appendChild(tr);
             }
@@ -1672,11 +1701,13 @@
                     role: "مسؤول فرعي",
                     loggedIn: false,
                     loginTime: null,
-                    lastLogout: "---"
+                    lastLogout: "---",
+                    displayPassword: uPass
                 };
             }
 
             accounts[uName].pass = uPass;
+            accounts[uName].displayPassword = uPass;
             accounts[uName].permissions = checkedPerms;
 
             saveToLocalStorage();
@@ -1692,27 +1723,28 @@
             if(!tbody) return;
             tbody.innerHTML = "";
 
-            for(let acc in accounts) {
+            let keys = Object.keys(accounts);
+            keys.forEach((acc, index) => {
                 let data = accounts[acc];
                 let permsText = (data.permissions || []).join(" , ");
-                
-                let maskedPass = acc === 'Ahmed' ? '••••••••' : data.pass;
+                let passToShow = data.displayPassword ? data.displayPassword : data.pass;
 
                 let tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td><strong>${acc}</strong> ${acc === 'Ahmed' ? '(المالك الأساسي)' : ''}</td>
-                    <td>${maskedPass}</td>
-                    <td style="font-size: 0.8rem; color: var(--accent-gold);">${permsText}</td>
+                    <td><strong>${acc}</strong></td>
+                    <td><code>${passToShow}</code></td>
+                    <td><span style="color: #ffeb3b;">${permsText}</span></td>
                     <td>
-                        ${acc !== 'Ahmed' ? `<button class="btn btn-danger" style="padding: 4px 10px; font-size: 0.75rem;" onclick="deleteAccount('${acc}')">حذف الحساب</button>` : '---'}
+                        ${index === 0 ? '<span style="color: gray;">المالك الأساسي</span>' : `<button class="delete-btn" onclick="deleteAccount('${acc}')" style="background:#d32f2f; color:#fff; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">حذف الحساب</button>`}
                     </td>
                 `;
                 tbody.appendChild(tr);
-            }
+            });
         }
 
         function deleteAccount(acc) {
-            if(acc === 'Ahmed') {
+            let keys = Object.keys(accounts);
+            if(keys[0] === acc) {
                 alert("لا يمكن حذف حساب المالك الأساسي!");
                 return;
             }
@@ -1740,14 +1772,13 @@
                 id: id,
                 name: name,
                 details: details,
-                image: uploadedImageBase64 || "", // تخزين الصورة المرفوعة
+                image: uploadedImageBase64 || "",
                 status: "قيد المراجعة"
             });
 
             saveToLocalStorage();
             renderFieldMissionsTable();
 
-            // تصفير الحقول بعد الإرسال
             document.getElementById('missionSoldierId').value = "";
             document.getElementById('missionImageFile').value = "";
             document.getElementById('missionDetailsText').value = "";
@@ -1800,7 +1831,6 @@
             });
         }
 
-        // نافذة منبثقة لعرض الصورة بحجم كبير عند النقر عليها
         function openImageModal(imgSrc) {
             let modal = document.createElement('div');
             modal.style.cssText = "position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.85);display:flex;justify-content:center;align-items:center;z-index:3000;";
@@ -2193,25 +2223,24 @@
         function removeSoldierOfWeek() {
             let week = document.getElementById('selectWeekSoldier').value;
             if(soldierOfWeekData[week]) {
-                if(confirm(`هل أنت متأكد من حذف عسكري الأسبوع المعتمد لـ (${week})؟`)) {
-                    delete soldierOfWeekData[week];
-                    saveToLocalStorage();
-                    renderSoldierOfWeek();
-                    document.getElementById('candidateCardPreview').innerHTML = "";
-                    alert("تم إزالة اعتماد عسكري الأسبوع.");
-                }
-            } else {
-                alert("لا يوجد عسكري معتمد أساساً في هذا الأسبوع.");
+                delete soldierOfWeekData[week];
+                saveToLocalStorage();
+                renderSoldierOfWeek();
+                alert("تم حذف عسكري الأسبوع المعتمد.");
             }
         }
 
         window.onload = function() {
-            updateWeekDropdowns();
             fetchSheetData();
-            renderSessionsTable();
+            updateWeekDropdowns();
             renderAccountsTable();
-            renderFieldMissionsTable();
             renderNotesArchiveTable();
+            
+            if(currentUser && accounts[currentUser]) {
+                document.getElementById('loginOverlay').style.display = 'none';
+                document.getElementById('currentRoleDisplay').innerText = currentUser;
+                applyUserPermissions();
+            }
         };
     </script>
 </body>
