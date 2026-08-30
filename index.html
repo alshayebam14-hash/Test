@@ -1015,9 +1015,6 @@
     </main>
 
     <script>
-        // رابط سكريبت جوجل المحدث للربط والمزامنة
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwoh0ykspr3eCrMHPwo0A85Sw86VKjDl2UpNrhxy5_wqC9IqQpPPtXD3gy7ioiV3XXRIQ/exec";
-
         let accounts = JSON.parse(localStorage.getItem('grave_accounts')) || {
             "Ahmed": { pass: "Owner2010629", role: "Owner", loggedIn: false, loginTime: null, lastLogout: "---", permissions: ["home", "login_tracker", "accounts_management", "members", "field_missions", "courses", "inventory", "notes_archive", "soldier_week"] },
             "leader": { pass: "L483D@r200", role: "Leader", loggedIn: false, loginTime: null, lastLogout: "---", permissions: ["field_missions"] }
@@ -1151,7 +1148,7 @@
         }
 
         async function fetchSheetData(isManualClick = false) {
-            const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT5IjG47ogq2fHCI_clfxmoYcs9G-6uoTRfojuRRaj9dc82XFo-ydNNFNYawGBdXIv4kT4BfXkoQvNj/pub?gid=2094506019&single=true&output=csv";
+            const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT5IjG47ogq2fHCI_clfxmoYcs9G-6uoTRfojuRRaj9dc82XFo-ydNNFNYawGBdXIv4kT4BfXkoQvNj/pub?gid=2094506019&single=true&output=csv";
             
             let statusText = document.getElementById('refreshStatus');
             let icon = document.getElementById('refreshIcon');
@@ -1162,8 +1159,7 @@
             }
 
             try {
-                // جلب بيانات الشيت الأساسية
-                const response = await fetch(csvUrl + "&t=" + new Date().getTime());
+                const response = await fetch(url + "&t=" + new Date().getTime());
                 const data = await response.text();
                 parseCSV(data);
 
@@ -2176,56 +2172,46 @@
                     </div>
                 </div>
             `;
+            previewContainer.scrollIntoView({ behavior: 'smooth' });
         }
 
         function saveSoldierOfWeek() {
             let week = document.getElementById('selectWeekSoldier').value;
             let id = document.getElementById('selectedSoldIdInput').value.trim();
-
-            if(!week || !id) {
-                alert("الرجاء اختيار الأسبوع وإدخال آيدي العسكري");
-                return;
-            }
-
             let member = csvData.find(m => m.id === id);
-            if(!member) {
-                alert("لم يتم العثور على عسكري بهذا الآيدي في جدول المنسوبين!");
-                return;
-            }
 
-            soldierOfWeekData[week] = { id: id, name: member.name };
-            saveToLocalStorage();
-            renderSoldierOfWeek();
-            alert(`تم اعتماد (${member.name}) كعسكري الأسبوع لـ (${week}) بنجاح!`);
+            if(member) {
+                soldierOfWeekData[week] = member;
+                saveToLocalStorage();
+                renderSoldierOfWeek();
+                alert("تم اعتماد عسكري الأسبوع بنجاح!");
+            } else {
+                alert("لم يتم العثور على العسكري بهذا الآيدي في قائمة منسوبي القطاع!");
+            }
         }
 
         function removeSoldierOfWeek() {
             let week = document.getElementById('selectWeekSoldier').value;
-            if(!week) return;
-
             if(soldierOfWeekData[week]) {
-                delete soldierOfWeekData[week];
-                saveToLocalStorage();
-                renderSoldierOfWeek();
-                alert(`تم حذف عسكري الأسبوع المعتمد لـ (${week})`);
+                if(confirm(`هل أنت متأكد من حذف عسكري الأسبوع المعتمد لـ (${week})؟`)) {
+                    delete soldierOfWeekData[week];
+                    saveToLocalStorage();
+                    renderSoldierOfWeek();
+                    document.getElementById('candidateCardPreview').innerHTML = "";
+                    alert("تم إزالة اعتماد عسكري الأسبوع.");
+                }
             } else {
-                alert("لا يوجد عسكري معتمد لهذا الأسبوع أصلاً.");
+                alert("لا يوجد عسكري معتمد أساساً في هذا الأسبوع.");
             }
         }
 
         window.onload = function() {
-            let savedUser = localStorage.getItem('currentUser');
-            if (savedUser && accounts[savedUser] && accounts[savedUser].loggedIn) {
-                currentUser = savedUser;
-                document.getElementById('loginOverlay').style.display = 'none';
-                document.getElementById('currentRoleDisplay').innerText = currentUser;
-                applyUserPermissions();
-            }
-
             updateWeekDropdowns();
             fetchSheetData();
             renderSessionsTable();
             renderAccountsTable();
+            renderFieldMissionsTable();
+            renderNotesArchiveTable();
         };
     </script>
 </body>
