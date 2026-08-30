@@ -530,25 +530,6 @@
             color: #fff;
             border-color: var(--danger);
         }
-        
-        .permissions-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 10px;
-            margin-top: 10px;
-        }
-        .permission-checkbox-label {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.85rem;
-            color: var(--text-main);
-            background: #0b0f19;
-            border: 1px solid var(--border-subtle);
-            padding: 8px 12px;
-            border-radius: 6px;
-            cursor: pointer;
-        }
     </style>
 </head>
 <body>
@@ -575,7 +556,6 @@
             <div class="sidebar-menu" id="sidebarMenuContainer">
                 <div class="menu-item active" onclick="switchPage('home', this)" id="menuHome"><i class="fa-solid fa-house"></i> الرئيسية</div>
                 <div class="menu-item" onclick="switchPage('login_tracker', this)" id="menuLoginTracker"><i class="fa-solid fa-right-to-bracket"></i> متابعة تسجيل الدخول</div>
-                <div class="menu-item" onclick="switchPage('accounts_management', this)" id="menuAccounts"><i class="fa-solid fa-user-shield"></i> إدارة الحسابات والصلاحيات</div>
                 <div class="menu-item" onclick="switchPage('members', this)" id="menuMembers"><i class="fa-solid fa-users-gear"></i> منسوبي القطاعات</div>
                 <div class="menu-item" onclick="switchPage('field_missions', this)" id="menuFieldMissions"><i class="fa-solid fa-flag-checkered"></i> المهام الميدانية</div>
                 <div class="menu-item" onclick="switchPage('courses', this)" id="menuCourses"><i class="fa-solid fa-graduation-cap"></i> دورات القطاع</div>
@@ -601,7 +581,7 @@
         <div id="home" class="page-section active">
             <div class="card" style="text-align: center; padding: 40px;">
                 <h2 style="color: var(--accent-gold); margin-bottom: 10px;">لوحة إدارة وزارة الدفاع - Grave RP</h2>
-                <p style="color: var(--text-muted); margin-bottom: 25px;">تم ضبط لوحة التحكم وإدارة الصلاحيات والحسابات بنجاح.</p>
+                <p style="color: var(--text-muted); margin-bottom: 25px;">تم ضبط لوحة التحكم وإدارة الصلاحيات والحسابات داخل الكود بنجاح.</p>
                 
                 <button class="btn" onclick="fetchSheetData(true)" style="padding: 12px 25px; font-size: 1rem;">
                     <i class="fa-solid fa-rotate" id="refreshIcon"></i> حدث البيانات
@@ -627,52 +607,6 @@
                             </tr>
                         </thead>
                         <tbody id="sessionsTableBody"></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- إدارة الحسابات والصلاحيات -->
-        <div id="accounts_management" class="page-section">
-            <h2 style="color: var(--accent-gold); margin-bottom: 15px;">إدارة الحسابات وصلاحيات الأقسام</h2>
-            
-            <div class="card" style="background: #0b0f19; border: 1px solid var(--border-subtle); margin-bottom: 25px;">
-                <h3 style="color: var(--accent-gold); font-size: 1rem; margin-bottom: 15px;"><i class="fa-solid fa-user-shield"></i> تعديل صلاحيات حساب</h3>
-                <div style="margin-bottom: 15px;">
-                    <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 5px;">اختر اسم المستخدم:</label>
-                    <select id="newAccountUser" class="login-input" style="margin:0;" onchange="onAccountSelectChange()">
-                        <!-- يتم تعبئتها تلقائياً بالحسابات الموجودة -->
-                    </select>
-                </div>
-                <div style="margin-bottom: 15px;">
-                    <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 8px;">تخصيص الأقسام والصلاحيات المسموح بها لهذا الحساب:</label>
-                    <div class="permissions-grid">
-                        <label class="permission-checkbox-label"><input type="checkbox" class="perm-check" value="home"> الرئيسية</label>
-                        <label class="permission-checkbox-label"><input type="checkbox" class="perm-check" value="login_tracker"> متابعة تسجيل الدخول</label>
-                        <label class="permission-checkbox-label"><input type="checkbox" class="perm-check" value="accounts_management"> إدارة الحسابات والصلاحيات</label>
-                        <label class="permission-checkbox-label"><input type="checkbox" class="perm-check" value="members"> منسوبي القطاعات</label>
-                        <label class="permission-checkbox-label"><input type="checkbox" class="perm-check" value="field_missions"> المهام الميدانية</label>
-                        <label class="permission-checkbox-label"><input type="checkbox" class="perm-check" value="courses"> دورات القطاع</label>
-                        <label class="permission-checkbox-label"><input type="checkbox" class="perm-check" value="inventory"> صفحة الجرد</label>
-                        <label class="permission-checkbox-label"><input type="checkbox" class="perm-check" value="notes_archive"> أرشيف الملاحظات</label>
-                        <label class="permission-checkbox-label"><input type="checkbox" class="perm-check" value="soldier_week"> عسكري الأسبوع</label>
-                    </div>
-                </div>
-                <button class="btn" onclick="saveNewOrUpdatedAccount()">حفظ التعديلات</button>
-            </div>
-
-            <div class="card">
-                <h3 style="color: var(--accent-gold); font-size: 1rem; margin-bottom: 15px;"><i class="fa-solid fa-users"></i> الحسابات المسجلة في النظام</h3>
-                <div class="table-responsive">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>اسم المستخدم</th>
-                                <th>كلمة المرور</th>
-                                <th>الصلاحيات المسموحة</th>
-                            </tr>
-                        </thead>
-                        <tbody id="accountsTableBody"></tbody>
                     </table>
                 </div>
             </div>
@@ -757,7 +691,6 @@
                     </div>
                 </div>
                 
-                <!-- معاينة الصورة المرفوعة محلياً -->
                 <div id="imagePreviewContainer" style="margin-bottom: 15px; display: none; text-align: center;">
                     <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 5px;">معاينة الصورة المختارة:</p>
                     <img id="missionImgPreview" src="" alt="معاينة" style="max-height: 120px; border-radius: 8px; border: 1px solid var(--accent-gold);">
@@ -1010,9 +943,24 @@
     </main>
 
     <script>
-        let accounts = JSON.parse(localStorage.getItem('grave_accounts')) || {
-            "Ahmed": { pass: "Owner2010629", role: "Owner", loggedIn: false, loginTime: null, lastLogout: "---", permissions: ["home", "login_tracker", "accounts_management", "members", "field_missions", "courses", "inventory", "notes_archive", "soldier_week"] },
-            "leader": { pass: "L483D@r200", role: "Leader", loggedIn: false, loginTime: null, lastLogout: "---", permissions: ["field_missions"] }
+        // الحسابات والصلاحيات مثبتة مباشرة داخل الكود الثابت (Hardcoded)
+        let accounts = {
+            "Ahmed": { 
+                pass: "Owner2010629", 
+                role: "Owner", 
+                loggedIn: false, 
+                loginTime: null, 
+                lastLogout: "---", 
+                permissions: ["home", "login_tracker", "members", "field_missions", "courses", "inventory", "notes_archive", "soldier_week"] 
+            },
+            "leader": { 
+                pass: "L483D@r200", 
+                role: "Leader", 
+                loggedIn: false, 
+                loginTime: null, 
+                lastLogout: "---", 
+                permissions: ["field_missions"] 
+            }
         };
 
         let currentUser = null;
@@ -1029,7 +977,7 @@
         let notesArchiveList = JSON.parse(localStorage.getItem('grave_notesArchiveList')) || [];
 
         let currentMemberFilter = 'ALL';
-        let uploadedImageBase64 = ""; // لتخزين الصورة المؤقتة للمهمة
+        let uploadedImageBase64 = "";
 
         let allAvailableCourses = [
             "فرد أساس",
@@ -1042,7 +990,6 @@
         ];
 
         function saveToLocalStorage() {
-            localStorage.setItem('grave_accounts', JSON.stringify(accounts));
             localStorage.setItem('grave_customWeeks', JSON.stringify(customWeeks));
             localStorage.setItem('grave_invLogsAds', JSON.stringify(inventoryLogsAds));
             localStorage.setItem('grave_invOps', JSON.stringify(inventoryOps));
@@ -1053,7 +1000,6 @@
             localStorage.setItem('grave_notesArchiveList', JSON.stringify(notesArchiveList));
         }
 
-        // دالة معاينة الصورة عند اختيارها من جهاز المستخدم
         function previewSelectedImage(event) {
             let file = event.target.files[0];
             let previewContainer = document.getElementById('imagePreviewContainer');
@@ -1525,7 +1471,6 @@
             const mapping = {
                 "home": "menuHome",
                 "login_tracker": "menuLoginTracker",
-                "accounts_management": "menuAccounts",
                 "members": "menuMembers",
                 "field_missions": "menuFieldMissions",
                 "courses": "menuCourses",
@@ -1568,41 +1513,16 @@
             let password = document.getElementById('passwordInput').value.trim();
             let err = document.getElementById('loginError');
 
-            if (username === 'Ahmed' && password === 'Owner2010629') {
-                localStorage.setItem('currentUser', 'Ahmed');
-                currentUser = 'Ahmed';
-                
-                if (!accounts['Ahmed']) {
-                    accounts['Ahmed'] = { pass: "Owner2010629", role: "Owner", permissions: ["home", "login_tracker", "accounts_management", "members", "field_missions", "courses", "inventory", "notes_archive", "soldier_week"] };
-                }
-                accounts['Ahmed'].loggedIn = true;
-                accounts['Ahmed'].loginTime = Date.now();
-                saveToLocalStorage();
-
-                document.getElementById('loginOverlay').style.display = 'none';
-                document.getElementById('currentRoleDisplay').innerText = 'Ahmed';
-
-                applyUserPermissions();
-                renderSessionsTable();
-                renderAccountsDropdown();
-                renderAccountsTable();
-                renderFieldMissionsTable();
-                return;
-            }
-
             if(accounts[username] && accounts[username].pass === password) {
                 currentUser = username;
                 accounts[username].loggedIn = true;
                 accounts[username].loginTime = Date.now();
-                saveToLocalStorage();
                 
                 document.getElementById('loginOverlay').style.display = 'none';
                 document.getElementById('currentRoleDisplay').innerText = username;
 
                 applyUserPermissions();
                 renderSessionsTable();
-                renderAccountsDropdown();
-                renderAccountsTable();
                 renderFieldMissionsTable();
             } else {
                 err.style.display = 'block';
@@ -1614,7 +1534,6 @@
                 accounts[currentUser].loggedIn = false;
                 accounts[currentUser].loginTime = null;
                 accounts[currentUser].lastLogout = new Date().toLocaleTimeString();
-                saveToLocalStorage();
             }
             currentUser = null;
             document.getElementById('loginOverlay').style.display = 'flex';
@@ -1646,85 +1565,7 @@
             accounts[acc].loggedIn = false;
             accounts[acc].loginTime = null;
             accounts[acc].lastLogout = new Date().toLocaleTimeString();
-            saveToLocalStorage();
             renderSessionsTable();
-        }
-
-        function renderAccountsDropdown() {
-            let select = document.getElementById('newAccountUser');
-            if(!select) return;
-            let currentVal = select.value;
-            select.innerHTML = "";
-            
-            for(let acc in accounts) {
-                let opt = document.createElement('option');
-                opt.value = acc;
-                opt.textContent = acc + (acc === 'Ahmed' ? ' (المالك الأساسي)' : '');
-                select.appendChild(opt);
-            }
-            if(accounts[currentVal]) {
-                select.value = currentVal;
-            }
-            onAccountSelectChange();
-        }
-
-        function onAccountSelectChange() {
-            let select = document.getElementById('newAccountUser');
-            if(!select) return;
-            let accName = select.value;
-            let accObj = accounts[accName];
-            
-            // إعادة ضبط جميع مربعات الاختيار أولاً
-            document.querySelectorAll('.perm-check').forEach(chk => chk.checked = false);
-
-            if(accObj && accObj.permissions) {
-                accObj.permissions.forEach(perm => {
-                    let chk = document.querySelector(`.perm-check[value="${perm}"]`);
-                    if(chk) chk.checked = true;
-                });
-            }
-        }
-
-        function saveNewOrUpdatedAccount() {
-            let select = document.getElementById('newAccountUser');
-            if(!select) return;
-            let uName = select.value;
-
-            if(!uName || !accounts[uName]) {
-                alert("الرجاء اختيار حساب صحيح.");
-                return;
-            }
-
-            let checkedPerms = [];
-            document.querySelectorAll('.perm-check:checked').forEach(chk => {
-                checkedPerms.push(chk.value);
-            });
-
-            accounts[uName].permissions = checkedPerms;
-
-            saveToLocalStorage();
-            renderAccountsTable();
-            alert("تم حفظ وتحديث صلاحيات الحساب بنجاح!");
-        }
-
-        function renderAccountsTable() {
-            let tbody = document.getElementById('accountsTableBody');
-            if(!tbody) return;
-            tbody.innerHTML = "";
-
-            for(let acc in accounts) {
-                let data = accounts[acc];
-                let permsText = (data.permissions || []).join(" , ");
-                let maskedPass = acc === 'Ahmed' ? '••••••••' : data.pass;
-
-                let tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td><strong>${acc}</strong> ${acc === 'Ahmed' ? '(المالك الأساسي)' : ''}</td>
-                    <td>${maskedPass}</td>
-                    <td style="font-size: 0.8rem; color: var(--accent-gold);">${permsText}</td>
-                `;
-                tbody.appendChild(tr);
-            }
         }
 
         function submitFieldMission() {
@@ -1743,14 +1584,13 @@
                 id: id,
                 name: name,
                 details: details,
-                image: uploadedImageBase64 || "", // تخزين الصورة المرفوعة
+                image: uploadedImageBase64 || "",
                 status: "قيد المراجعة"
             });
 
             saveToLocalStorage();
             renderFieldMissionsTable();
 
-            // تصفير الحقول بعد الإرسال
             document.getElementById('missionSoldierId').value = "";
             document.getElementById('missionImageFile').value = "";
             document.getElementById('missionDetailsText').value = "";
@@ -1803,7 +1643,6 @@
             });
         }
 
-        // نافذة منبثقة لعرض الصورة بحجم كبير عند النقر عليها
         function openImageModal(imgSrc) {
             let modal = document.createElement('div');
             modal.style.cssText = "position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.85);display:flex;justify-content:center;align-items:center;z-index:3000;";
@@ -2212,8 +2051,6 @@
             updateWeekDropdowns();
             fetchSheetData();
             renderSessionsTable();
-            renderAccountsDropdown();
-            renderAccountsTable();
             renderFieldMissionsTable();
             renderNotesArchiveTable();
         };
