@@ -581,7 +581,7 @@
         <div id="home" class="page-section">
             <div class="card" style="text-align: center; padding: 40px;">
                 <h2 style="color: var(--accent-gold); margin-bottom: 10px;">لوحة إدارة وزارة الدفاع - Grave RP</h2>
-                <p style="color: var(--text-muted); margin-bottom: 25px;">تم ضبط لوحة التحكم والحسابات والصلاحيات الثابتة داخل الكود بنجاح.</p>
+                <p style="color: var(--text-muted); margin-bottom: 25px;">تم ضبط لوحة التحكم والحسابات والصلاحيات الثابتة وتفعيل المزامنة المحلية والسحابية بنجاح.</p>
                 
                 <button class="btn" onclick="fetchSheetData(true)" style="padding: 12px 25px; font-size: 1rem;">
                     <i class="fa-solid fa-rotate" id="refreshIcon"></i> حدث البيانات
@@ -943,7 +943,8 @@
     </main>
 
     <script>
-        // قائمة الحسابات والصلاحيات الثابتة المحدثة داخل الكود
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzH1QJRV5gJGNWZWvpdEnh7A8nF0-SqDOBM7r9zzQlB_1cDSxNyii5j1Q3Cr8xaEj998Q/exec";
+
         const accounts = {
             "Ahmed": {
                 password: "Owner2010629",
@@ -987,7 +988,6 @@
             }
         };
 
-        // دالة التحقق من تسجيل الدخول والصلاحيات
         function checkPermissions(username, password, pageName) {
             const account = accounts[username];
             if (account && account.password === password) {
@@ -1003,7 +1003,6 @@
         let csvData = [];
         
         let customWeeks = JSON.parse(localStorage.getItem('grave_customWeeks')) || ["الأسبوع الأول", "الأسبوع الثاني", "الأسبوع الثالث"];
-
         let inventoryLogsAds = JSON.parse(localStorage.getItem('grave_invLogsAds')) || [];
         let inventoryOps = JSON.parse(localStorage.getItem('grave_invOps')) || [];
         let inventoryAcceptance = JSON.parse(localStorage.getItem('grave_invAcceptance')) || [];
@@ -1034,6 +1033,53 @@
             localStorage.setItem('grave_fieldMissions', JSON.stringify(fieldMissionsList));
             localStorage.setItem('grave_soldierCoursesData', JSON.stringify(soldierCoursesData));
             localStorage.setItem('grave_notesArchiveList', JSON.stringify(notesArchiveList));
+        }
+
+        async function loadCloudData() {
+            try {
+                let resNotes = await fetch(WEB_APP_URL + "?sheet=notesArchive");
+                let notesData = await resNotes.json();
+                if(Array.isArray(notesData) && notesData.length > 1) {
+                    let cloudNotes = notesData.slice(1).map(r => ({ date: r[0], id: r[1], name: r[2], note: r[3], author: r[4] }));
+                    // دمج البيانات السحابية مع المحلية بدون تكرار
+                    cloudNotes.forEach(cn => {
+                        if(!notesArchiveList.some(ln => ln.date === cn.date && ln.id === cn.id && ln.note === cn.note)) {
+                            notesArchiveList.unshift(cn);
+                        }
+                    });
+                    saveToLocalStorage();
+                }
+
+                let resMissions = await fetch(WEB_APP_URL + "?sheet=fieldMissions");
+                let missionsData = await resMissions.json();
+                if(Array.isArray(missionsData) && missionsData.length > 1) {
+                    let cloudMissions = missionsData.slice(1).map(r => ({ id: r[0], name: r[1], details: r[2], image: r[3], status: r[4] }));
+                    cloudMissions.forEach(cm => {
+                        if(!fieldMissionsList.some(lm => lm.id === cm.id && lm.details === cm.details)) {
+                            fieldMissionsList.push(cm);
+                        }
+                    });
+                    saveToLocalStorage();
+                }
+
+                renderNotesArchiveTable();
+                renderFieldMissionsTable();
+            } catch(e) {
+                console.log("خطأ في جلب البيانات السحابية", e);
+            }
+        }
+
+        async function saveCloudRow(sheetName, rowData) {
+            try {
+                await fetch(WEB_APP_URL, {
+                    method: "POST",
+                    mode: "no-cors",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ sheet: sheetName, row: rowData })
+                });
+            } catch(e) {
+                console.log("خطأ في الحفظ السحابي", e);
+            }
         }
 
         function previewSelectedImage(event) {
@@ -1139,6 +1185,7 @@
                 const response = await fetch(url + "&t=" + new Date().getTime());
                 const data = await response.text();
                 parseCSV(data);
+                await loadCloudData();
 
                 if (isManualClick && statusText) {
                     statusText.innerText = "تم تحديث البيانات بنجاح! (" + new Date().toLocaleTimeString() + ")";
@@ -1414,7 +1461,7 @@
             renderCoursesListsForSelectedSoldier(soldierId);
         }
 
-        function saveArchiveNote() {
+        async function saveArchiveNote() {
             let id = document.getElementById('archiveSoldierId').value.trim();
             let noteText = document.getElementById('archiveNoteText').value.trim();
 
@@ -1427,20 +1474,23 @@
             let name = member ? member.name : "عسكري غير معروف";
             let now = new Date().toLocaleString('ar-SA');
 
-            notesArchiveList.unshift({
+            let newNote = {
                 date: now,
                 id: id,
                 name: name,
                 note: noteText,
                 author: currentUser
-            });
+            };
 
+            notesArchiveList.unshift(newNote);
             saveToLocalStorage();
             renderNotesArchiveTable();
 
+            await saveCloudRow("notesArchive", [now, id, name, noteText, currentUser]);
+
             document.getElementById('archiveSoldierId').value = "";
             document.getElementById('archiveNoteText').value = "";
-            alert("تم حفظ الملاحظة في الأرشيف بنجاح!");
+            alert("تم حفظ الملاحظة محلياً وسحابياً في الأرشيف بنجاح!");
         }
 
         function renderNotesArchiveTable() {
@@ -1612,7 +1662,7 @@
             renderSessionsTable();
         }
 
-        function submitFieldMission() {
+        async function submitFieldMission() {
             let id = document.getElementById('missionSoldierId').value.trim();
             let details = document.getElementById('missionDetailsText').value.trim();
 
@@ -1624,16 +1674,19 @@
             let member = csvData.find(m => m.id === id);
             let name = member ? member.name : "عسكري غير معروف";
 
-            fieldMissionsList.push({
+            let newMission = {
                 id: id,
                 name: name,
                 details: details,
                 image: uploadedImageBase64 || "",
                 status: "قيد المراجعة"
-            });
+            };
 
+            fieldMissionsList.push(newMission);
             saveToLocalStorage();
             renderFieldMissionsTable();
+
+            await saveCloudRow("fieldMissions", [id, name, details, uploadedImageBase64 || "", "قيد المراجعة"]);
 
             document.getElementById('missionSoldierId').value = "";
             document.getElementById('missionImageFile').value = "";
@@ -1641,7 +1694,7 @@
             document.getElementById('imagePreviewContainer').style.display = 'none';
             uploadedImageBase64 = "";
 
-            alert("تم إرسال المهمة الميدانية بنجاح إلى السجل!");
+            alert("تم إرسال المهمة الميدانية محلياً وسحابياً بنجاح إلى السجل!");
         }
 
         function renderFieldMissionsTable() {
