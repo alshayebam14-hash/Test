@@ -1302,7 +1302,6 @@
             renderMembersTable();
         }
 
-        // --- وظائف نظام كشف الخمول وتصفية العناصر ---
         function renderInactivityTable() {
             let tbody = document.getElementById('inactivityTableBody');
             if(!tbody) return;
@@ -1310,7 +1309,6 @@
 
             let threshold = parseInt(document.getElementById('inactivityThreshold').value) || 1;
 
-            // فلترة العساكر الذين سجلاتهم أقل من الحد المطلوب وليسوا في إجازة رسمية
             let inactiveList = csvData.filter(m => {
                 let logsNum = Number(m.logs) || 0;
                 let isLeave = m.vacationStatus === true || m.vacationStatus === "TRUE" || m.vacationStatus === "true" || m.vacationStatus === "في إجازة";
@@ -1360,7 +1358,6 @@
             if(actionType === 'transfer_reserve') {
                 if(confirm(`هل أنت متأكد من نقل العسكري (${member.name} - ${member.id}) إلى قائمة الاحتياط بسبب الخمول؟`)) {
                     alert(`تم توجيه أمر نقل العسكري ${member.name} إلى الاحتياط بنجاح.`);
-                    // يمكنك ربطها بتحديث البيانات أو حفظ الحالة محلياً
                 }
             } else if(actionType === 'dismiss') {
                 if(confirm(`تحذير: هل أنت متأكد من فصل العسكري (${member.name} - ${member.id}) نهائياً لتنظيف الكادر؟`)) {
