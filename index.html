@@ -605,11 +605,8 @@
                 <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
                     <div>
                         <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 5px;">فلترة حسب الحد الأدنى للسجلات المطلوبة:</label>
-                        <select id="inactivityThreshold" class="login-input" style="margin:0; width: 220px;" onchange="renderInactivityTable()">
-                            <option value="5">أقل من 5 سجلات</option>
-                            <option value="3">أقل من 3 سجلات</option>
-                            <option value="1" selected>أقل من سجل واحد (صفر تفاعل)</option>
-                        </select>
+                        <!-- تم التعديل هنا لتحويل القائمة إلى حقل رقمي -->
+                        <input type="number" id="inactivityThreshold" class="login-input" style="margin:0; width: 220px;" value="1" min="0" placeholder="أدخل العدد" oninput="renderInactivityTable()">
                     </div>
                     <div style="margin-top: auto;">
                         <button class="btn" onclick="renderInactivityTable()"><i class="fa-solid fa-magnifying-glass"></i> فحص وفلترة الخمول</button>
@@ -1302,12 +1299,15 @@
             renderMembersTable();
         }
 
+        // --- وظائف نظام كشف الخمول وتصفية العناصر ---
         function renderInactivityTable() {
             let tbody = document.getElementById('inactivityTableBody');
             if(!tbody) return;
             tbody.innerHTML = "";
 
-            let threshold = parseInt(document.getElementById('inactivityThreshold').value) || 1;
+            // جلب القيمة المدخلة رقمياً من الحقل الجديد بدلاً من الـ select
+            let thresholdInput = document.getElementById('inactivityThreshold');
+            let threshold = thresholdInput ? (parseInt(thresholdInput.value) || 0) : 1;
 
             let inactiveList = csvData.filter(m => {
                 let logsNum = Number(m.logs) || 0;
