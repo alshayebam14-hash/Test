@@ -363,87 +363,6 @@
             color: var(--danger);
         }
 
-        .paint-soldier-card {
-            background: var(--bg-card);
-            border: 3px solid var(--accent-gold);
-            border-radius: 16px;
-            padding: 30px;
-            max-width: 650px;
-            margin: 25px auto;
-            position: relative;
-            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.15);
-        }
-
-        .paint-card-top-right {
-            text-align: right;
-            line-height: 1.8;
-            font-size: 0.95rem;
-            font-weight: bold;
-            color: var(--text-main);
-        }
-
-        .paint-card-avatar-section {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            margin: 15px 0 25px 0;
-        }
-
-        .paint-card-circle-avatar {
-            width: 85px;
-            height: 85px;
-            border: 3px solid var(--accent-gold);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #0b0f19;
-            color: var(--accent-gold);
-            font-size: 2rem;
-            margin-bottom: 12px;
-        }
-
-        .paint-card-curved-line {
-            width: 70%;
-            height: 3px;
-            background: var(--accent-gold);
-            border-radius: 50%;
-        }
-
-        .paint-card-bottom-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 15px;
-            text-align: center;
-            margin-top: 15px;
-            align-items: center;
-        }
-
-        .paint-metric-item {
-            background: #0b0f19;
-            border: 1px solid var(--border-subtle);
-            padding: 12px;
-            border-radius: 8px;
-        }
-
-        .paint-metric-item.center-total {
-            background: rgba(212, 175, 55, 0.08);
-            border-color: var(--accent-gold);
-        }
-
-        .paint-metric-title {
-            color: var(--text-muted);
-            font-size: 0.8rem;
-            margin-bottom: 4px;
-        }
-
-        .paint-metric-val {
-            color: var(--accent-gold);
-            font-weight: bold;
-            font-size: 1.05rem;
-        }
-
         .military-note-card {
             background: #131722;
             border: 1px solid var(--border-subtle);
@@ -557,6 +476,7 @@
                 <div class="menu-item" onclick="switchPage('home', this)" id="menuHome"><i class="fa-solid fa-house"></i> الرئيسية</div>
                 <div class="menu-item" onclick="switchPage('login_tracker', this)" id="menuLoginTracker"><i class="fa-solid fa-right-to-bracket"></i> متابعة تسجيل الدخول</div>
                 <div class="menu-item" onclick="switchPage('members', this)" id="menuMembers"><i class="fa-solid fa-users-gear"></i> منسوبي القطاعات</div>
+                <div class="menu-item" onclick="switchPage('inactivity_system', this)" id="menuInactivity"><i class="fa-solid fa-user-clock"></i> نظام الخمول والتصفية</div>
                 <div class="menu-item" onclick="switchPage('field_missions', this)" id="menuFieldMissions"><i class="fa-solid fa-flag-checkered"></i> المهام الميدانية</div>
                 <div class="menu-item" onclick="switchPage('courses', this)" id="menuCourses"><i class="fa-solid fa-graduation-cap"></i> دورات القطاع</div>
                 <div class="menu-item" onclick="switchPage('inventory', this)" id="menuInventory"><i class="fa-solid fa-boxes-stacked"></i> صفحة الجرد</div>
@@ -581,7 +501,7 @@
         <div id="home" class="page-section">
             <div class="card" style="text-align: center; padding: 40px;">
                 <h2 style="color: var(--accent-gold); margin-bottom: 10px;">لوحة إدارة وزارة الدفاع - Grave RP</h2>
-                <p style="color: var(--text-muted); margin-bottom: 25px;">تم ضبط لوحة التحكم والحسابات والصلاحيات الثابتة وتفعيل المزامنة المحلية والسحابية بنجاح.</p>
+                <p style="color: var(--text-muted); margin-bottom: 25px;">تم ضبط لوحة التحكم والحسابات والصلاحيات الثابتة وتفعيل المزامنة المحلية والسحابية ونظام كشف الخمول بنجاح.</p>
                 
                 <button class="btn" onclick="fetchSheetData(true)" style="padding: 12px 25px; font-size: 1rem;">
                     <i class="fa-solid fa-rotate" id="refreshIcon"></i> حدث البيانات
@@ -669,6 +589,48 @@
                         </thead>
                         <tbody id="membersTableBody">
                             <tr><td colspan="13" style="text-align: center;">جاري تحميل البيانات...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- نظام كشف الخمول وتصفية العناصر -->
+        <div id="inactivity_system" class="page-section">
+            <h2 style="color: var(--accent-gold); margin-bottom: 15px;"><i class="fa-solid fa-user-clock"></i> نظام كشف الخمول وتصفية الكادر</h2>
+            <div class="card" style="background: #0b0f19; border: 1px solid var(--border-subtle); margin-bottom: 20px;">
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 15px;">
+                    هذه الأداة تفحص السجلات والأنشطة والمهام المنجزة للمنسوبين لتحديد العناصر غير المتفاعلة لفترة طويلة، ومساعدتك في اتخاذ قرار نقلهم للاحتياط أو فصلهم لتنظيف الكادر.
+                </p>
+                <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
+                    <div>
+                        <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 5px;">فلترة حسب الحد الأدنى للسجلات المطلوبة:</label>
+                        <!-- تم التعديل هنا لتحويل القائمة إلى حقل رقمي -->
+                        <input type="number" id="inactivityThreshold" class="login-input" style="margin:0; width: 220px;" value="1" min="0" placeholder="أدخل العدد" oninput="renderInactivityTable()">
+                    </div>
+                    <div style="margin-top: auto;">
+                        <button class="btn" onclick="renderInactivityTable()"><i class="fa-solid fa-magnifying-glass"></i> فحص وفلترة الخمول</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>الرتبة</th>
+                                <th>الاسم</th>
+                                <th>رقم الهوية ID</th>
+                                <th>إجمالي السجلات</th>
+                                <th>الإعلانات</th>
+                                <th>حالة الإجازة</th>
+                                <th>حالة الخمول المقترحة</th>
+                                <th>الإجراءات الإدارية</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inactivityTableBody">
+                            <tr><td colspan="8" style="text-align: center;">جاري تحليل السجلات والنشاط...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -945,14 +907,14 @@
     <script>
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzH1QJRV5gJGNWZWvpdEnh7A8nF0-SqDOBM7r9zzQlB_1cDSxNyii5j1Q3Cr8xaEj998Q/exec";
 
-        const accounts = {
+         const accounts = {
             "Ahmed": {
                 password: "Owner2010629",
                 role: "Owner",
                 loggedIn: false, 
                 loginTime: null, 
                 lastLogout: "---",
-                permissions: ["home", "login_tracker", "members", "field_missions", "courses", "inventory", "notes_archive", "soldier_week"]
+                permissions: ["home", "login_tracker", "members", "field_missions", "courses", "inventory", "notes_archive", "soldier_week", "inactivity_system"]
             },
             "Ahmed Owner": {
                 password: "Owner@432",
@@ -960,7 +922,7 @@
                 loggedIn: false, 
                 loginTime: null, 
                 lastLogout: "---",
-                permissions: ["home", "login_tracker", "members", "field_missions", "courses", "inventory", "notes_archive", "soldier_week"]
+                permissions: ["home", "login_tracker", "members", "field_missions", "courses", "inventory", "notes_archive", "soldier_week", "inactivity_system"]
             },
             "The Minister": {
                 password: "t33m7@200",
@@ -968,7 +930,7 @@
                 loggedIn: false, 
                 loginTime: null, 
                 lastLogout: "---",
-                permissions: ["home", "members", "field_missions", "courses", "inventory", "notes_archive", "soldier_week"]
+                permissions: ["home", "members", "field_missions", "courses", "inventory", "notes_archive", "soldier_week", "inactivity_system"]
             },
             "Leader": {
                 password: "L483D@r200",
@@ -1041,7 +1003,6 @@
                 let notesData = await resNotes.json();
                 if(Array.isArray(notesData) && notesData.length > 1) {
                     let cloudNotes = notesData.slice(1).map(r => ({ date: r[0], id: r[1], name: r[2], note: r[3], author: r[4] }));
-                    // دمج البيانات السحابية مع المحلية بدون تكرار
                     cloudNotes.forEach(cn => {
                         if(!notesArchiveList.some(ln => ln.date === cn.date && ln.id === cn.id && ln.note === cn.note)) {
                             notesArchiveList.unshift(cn);
@@ -1266,6 +1227,7 @@
             }
             updateMemberStats();
             renderMembersTable();
+            renderInactivityTable();
             renderFieldMissionsTable();
             renderInventoryTables();
             updateCoursesDropdown();
@@ -1335,6 +1297,77 @@
 
         function filterMembersTableBySearch() {
             renderMembersTable();
+        }
+
+        // --- وظائف نظام كشف الخمول وتصفية العناصر ---
+        function renderInactivityTable() {
+            let tbody = document.getElementById('inactivityTableBody');
+            if(!tbody) return;
+            tbody.innerHTML = "";
+
+            // جلب القيمة المدخلة رقمياً من الحقل الجديد بدلاً من الـ select
+            let thresholdInput = document.getElementById('inactivityThreshold');
+            let threshold = thresholdInput ? (parseInt(thresholdInput.value) || 0) : 1;
+
+            let inactiveList = csvData.filter(m => {
+                let logsNum = Number(m.logs) || 0;
+                let isLeave = m.vacationStatus === true || m.vacationStatus === "TRUE" || m.vacationStatus === "true" || m.vacationStatus === "في إجازة";
+                return logsNum < threshold && !isLeave;
+            });
+
+            if(inactiveList.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: var(--success);">ممتاز! لا توجد حالات خمول مسجلة وفقاً للمعايير الحالية.</td></tr>`;
+                return;
+            }
+
+            inactiveList.forEach(m => {
+                let logsNum = Number(m.logs) || 0;
+                let statusLabel = "";
+                let badgeColor = "";
+
+                if(logsNum === 0) {
+                    statusLabel = "خمول تام (مقترح فصله)";
+                    badgeColor = "var(--danger)";
+                } else {
+                    statusLabel = "خمول مؤقت (مقترح نقله للاحتياط)";
+                    badgeColor = "var(--warning)";
+                }
+
+                let tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${m.rank}</td>
+                    <td>${m.name}</td>
+                    <td>${m.id}</td>
+                    <td style="color: var(--danger); font-weight: bold;">${m.logs}</td>
+                    <td>${m.ads}</td>
+                    <td><span style="color: var(--success);">على رأس عمل</span></td>
+                    <td><span style="color: ${badgeColor}; font-weight: bold;">${statusLabel}</span></td>
+                    <td>
+                        <button class="btn btn-danger" style="padding: 4px 10px; font-size: 0.75rem;" onclick="actionInactivity(${m.id}, 'transfer_reserve')">نقل للاحتياط</button>
+                        <button class="btn btn-danger" style="padding: 4px 10px; font-size: 0.75rem; background: #991b1b;" onclick="actionInactivity(${m.id}, 'dismiss')">فصل من الكادر</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function actionInactivity(soldierId, actionType) {
+            let member = csvData.find(m => m.id == soldierId);
+            if(!member) return;
+
+            if(actionType === 'transfer_reserve') {
+                if(confirm(`هل أنت متأكد من نقل العسكري (${member.name} - ${member.id}) إلى قائمة الاحتياط بسبب الخمول؟`)) {
+                    alert(`تم توجيه أمر نقل العسكري ${member.name} إلى الاحتياط بنجاح.`);
+                }
+            } else if(actionType === 'dismiss') {
+                if(confirm(`تحذير: هل أنت متأكد من فصل العسكري (${member.name} - ${member.id}) نهائياً لتنظيف الكادر؟`)) {
+                    csvData = csvData.filter(m => m.id != soldierId);
+                    updateMemberStats();
+                    renderMembersTable();
+                    renderInactivityTable();
+                    alert(`تمت تصفية وفصل العسكري ${member.name} من الكادر بنجاح.`);
+                }
+            }
         }
 
         function updateCoursesDropdown() {
@@ -1558,6 +1591,7 @@
                 "home": "menuHome",
                 "login_tracker": "menuLoginTracker",
                 "members": "menuMembers",
+                "inactivity_system": "menuInactivity",
                 "field_missions": "menuFieldMissions",
                 "courses": "menuCourses",
                 "inventory": "menuInventory",
@@ -2010,146 +2044,89 @@
             if(approvedData) {
                 let id = approvedData.id;
                 let memberObj = csvData.find(m => m.id === id) || {};
-                let logEntry = inventoryLogsAds.find(i => i.week === week && i.id === id) || { logs: 0, ads: 0 };
-                let opEntry = inventoryOps.find(i => i.week === week && i.id === id) || { ops: 0 };
-                let accEntry = inventoryAcceptance.find(i => i.week === week && i.id === id) || { acceptance: 0 };
-                let totalScore = Number(logEntry.logs) + Number(logEntry.ads) + Number(opEntry.ops) + Number(accEntry.acceptance);
+                let logEntry = inventoryLogsAds.find(i => i.week === week && i.id === id) || {};
+                let opsEntry = inventoryOps.find(i => i.week === week && i.id === id) || {};
+                let accEntry = inventoryAcceptance.find(i => i.week === week && i.id === id) || {};
 
                 approvedContainer.innerHTML = `
-                    <div style="margin-top: 10px; color: var(--accent-gold); font-weight: bold; font-size: 0.95rem;"><i class="fa-solid fa-circle-check"></i> العسكري المعتمد نهائياً للأسبوع:</div>
-                    <div class="paint-soldier-card">
-                        <div class="paint-card-top-right">
-                            <div>اسم العسكري : ${approvedData.name}</div>
-                            <div>رقم الهوية : ${approvedData.id}</div>
-                            <div>الكود العسكري : ${memberObj.code || '---'}</div>
-                        </div>
-
-                        <div class="paint-card-avatar-section">
-                            <div class="paint-card-circle-avatar">
-                                <i class="fa-solid fa-user-shield"></i>
-                            </div>
-                            <div class="paint-card-curved-line"></div>
-                        </div>
-
-                        <div class="paint-card-bottom-grid">
-                            <div class="paint-metric-item">
-                                <div class="paint-metric-title">السجلات :</div>
-                                <div class="paint-metric-val">${logEntry.logs}</div>
-                            </div>
-                            <div class="paint-metric-item center-total">
-                                <div class="paint-metric-title">مجموع النقاط</div>
-                                <div class="paint-metric-val" style="font-size: 1.2rem;">${totalScore}</div>
-                            </div>
-                            <div class="paint-metric-item">
-                                <div class="paint-metric-title">الإعلانات :</div>
-                                <div class="paint-metric-val">${logEntry.ads}</div>
-                            </div>
-                            <div class="paint-metric-item">
-                                <div class="paint-metric-title">مسؤول القبول :</div>
-                                <div class="paint-metric-val">${accEntry.acceptance}</div>
-                            </div>
-                            <div></div>
-                            <div class="paint-metric-item">
-                                <div class="paint-metric-title">مسؤول العمليات :</div>
-                                <div class="paint-metric-val">${opEntry.ops}</div>
-                            </div>
-                        </div>
+                    <div style="background: rgba(212, 175, 55, 0.08); border: 1px solid var(--accent-gold); padding: 20px; border-radius: 12px; text-align: center;">
+                        <h4 style="color: var(--accent-gold); margin-bottom: 10px;"><i class="fa-solid fa-trophy"></i> عسكري الأسبوع المعتمد لـ (${week})</h4>
+                        <p style="font-size: 1.05rem; font-weight: bold; margin-bottom: 5px;">${approvedData.name} (${approvedData.id}) - ${memberObj.rank || '---'}</p>
+                        <p style="font-size: 0.85rem; color: var(--text-muted);">السجلات: ${logEntry.logs || 0} | الإعلانات: ${logEntry.ads || 0} | العمليات: ${opsEntry.ops || 0} | المقبولين: ${accEntry.acceptance || 0}</p>
                     </div>
                 `;
             } else {
-                approvedContainer.innerHTML = `<p style="color: var(--text-muted); font-size: 0.85rem; text-align: center; padding: 20px;">لم يتم اعتماد عسكري لهذا الأسبوع بعد.</p>`;
+                approvedContainer.innerHTML = `<p style="color: var(--text-muted); font-size: 0.85rem;">لم يتم اعتماد عسكري الأسبوع لهذا الأسبوع بعد.</p>`;
             }
         }
 
         function previewCandidateCard(id, week) {
+            let member = csvData.find(m => m.id === id);
+            if(!member) return;
             document.getElementById('selectedSoldIdInput').value = id;
-            let previewContainer = document.getElementById('candidateCardPreview');
-            let memberObj = csvData.find(m => m.id === id) || {};
-            let logEntry = inventoryLogsAds.find(i => i.week === week && i.id === id) || { logs: 0, ads: 0, name: memberObj.name || "عسكري" };
-            let opEntry = inventoryOps.find(i => i.week === week && i.id === id) || { ops: 0 };
-            let accEntry = inventoryAcceptance.find(i => i.week === week && i.id === id) || { acceptance: 0 };
-            let totalScore = Number(logEntry.logs) + Number(logEntry.ads) + Number(opEntry.ops) + Number(accEntry.acceptance);
 
-            previewContainer.innerHTML = `
-                <div style="margin-top: 15px; color: var(--accent-gold); font-weight: bold; font-size: 0.95rem;"><i class="fa-solid fa-eye"></i> معاينة الكارت للمرشح المختار:</div>
+            let logEntry = inventoryLogsAds.find(i => i.week === week && i.id === id) || {};
+            let opsEntry = inventoryOps.find(i => i.week === week && i.id === id) || {};
+            let accEntry = inventoryAcceptance.find(i => i.week === week && i.id === id) || {};
+
+            let previewBox = document.getElementById('candidateCardPreview');
+            previewBox.innerHTML = `
                 <div class="paint-soldier-card">
                     <div class="paint-card-top-right">
-                        <div>اسم العسكري : ${logEntry.name}</div>
-                        <div>رقم الهوية : ${id}</div>
-                        <div>الكود العسكري : ${memberObj.code || '---'}</div>
+                        <div>وزارة الدفاع - Grave RP</div>
+                        <div style="color: var(--accent-gold);">${week}</div>
                     </div>
-
                     <div class="paint-card-avatar-section">
-                        <div class="paint-card-circle-avatar">
-                            <i class="fa-solid fa-user-shield"></i>
-                        </div>
-                        <div class="paint-card-curved-line"></div>
+                        <div class="paint-card-circle-avatar"><i class="fa-solid fa-award"></i></div>
+                        <div style="font-size: 1.2rem; font-weight: bold; color: var(--accent-gold);">${member.name}</div>
+                        <div style="font-size: 0.9rem; color: var(--text-muted);">${member.rank} | ID: ${member.id}</div>
+                        <div class="paint-card-curved-line" style="margin-top: 15px;"></div>
                     </div>
-
                     <div class="paint-card-bottom-grid">
-                        <div class="paint-metric-item">
-                            <div class="paint-metric-title">السجلات :</div>
-                            <div class="paint-metric-val">${logEntry.logs}</div>
-                        </div>
-                        <div class="paint-metric-item center-total">
-                            <div class="paint-metric-title">مجموع النقاط</div>
-                            <div class="paint-metric-val" style="font-size: 1.2rem;">${totalScore}</div>
-                        </div>
-                        <div class="paint-metric-item">
-                            <div class="paint-metric-title">الإعلانات :</div>
-                            <div class="paint-metric-val">${logEntry.ads}</div>
-                        </div>
-                        <div class="paint-metric-item">
-                            <div class="paint-metric-title">مسؤول القبول :</div>
-                            <div class="paint-metric-val">${accEntry.acceptance}</div>
-                        </div>
-                        <div></div>
-                        <div class="paint-metric-item">
-                            <div class="paint-metric-title">مسؤول العمليات :</div>
-                            <div class="paint-metric-val">${opEntry.ops}</div>
-                        </div>
+                        <div class="paint-metric-item"><div class="paint-metric-title">السجلات</div><div class="paint-metric-val">${logEntry.logs || 0}</div></div>
+                        <div class="paint-metric-item center-total"><div class="paint-metric-title">المجموع الكلي</div><div class="paint-metric-val">${(Number(logEntry.logs||0) + Number(logEntry.ads||0) + Number(opsEntry.ops||0) + Number(accEntry.acceptance||0))}</div></div>
+                        <div class="paint-metric-item"><div class="paint-metric-title">العمليات</div><div class="paint-metric-val">${opsEntry.ops || 0}</div></div>
                     </div>
                 </div>
             `;
-            previewContainer.scrollIntoView({ behavior: 'smooth' });
         }
 
         function saveSoldierOfWeek() {
             let week = document.getElementById('selectWeekSoldier').value;
             let id = document.getElementById('selectedSoldIdInput').value.trim();
-            let member = csvData.find(m => m.id === id);
-
-            if(member) {
-                soldierOfWeekData[week] = member;
-                saveToLocalStorage();
-                renderSoldierOfWeek();
-                alert("تم اعتماد عسكري الأسبوع بنجاح!");
-            } else {
-                alert("لم يتم العثور على العسكري بهذا الآيدي في قائمة منسوبي القطاع!");
+            if(!week || !id) {
+                alert("الرجاء اختيار الأسبوع وإدخال آيدي العسكري");
+                return;
             }
+
+            let member = csvData.find(m => m.id === id);
+            if(!member) {
+                alert("لم يتم العثور على عسكري بهذا الآيدي في جدول المنسوبين!");
+                return;
+            }
+
+            soldierOfWeekData[week] = { id: member.id, name: member.name };
+            saveToLocalStorage();
+            renderSoldierOfWeek();
+            alert(`تم اعتماد (${member.name}) كعسكري الأسبوع لـ (${week}) بنجاح!`);
         }
 
         function removeSoldierOfWeek() {
             let week = document.getElementById('selectWeekSoldier').value;
-            if(soldierOfWeekData[week]) {
-                if(confirm(`هل أنت متأكد من حذف عسكري الأسبوع المعتمد لـ (${week})؟`)) {
-                    delete soldierOfWeekData[week];
-                    saveToLocalStorage();
-                    renderSoldierOfWeek();
-                    document.getElementById('candidateCardPreview').innerHTML = "";
-                    alert("تم إزالة اعتماد عسكري الأسبوع.");
-                }
-            } else {
-                alert("لا يوجد عسكري معتمد أساساً في هذا الأسبوع.");
+            if(!week) return;
+
+            if(confirm(`هل أنت متأكد من حذف واعتماد عسكري الأسبوع لـ (${week})؟`)) {
+                delete soldierOfWeekData[week];
+                saveToLocalStorage();
+                renderSoldierOfWeek();
+                document.getElementById('candidateCardPreview').innerHTML = "";
+                alert("تم الحذف بنجاح!");
             }
         }
 
         window.onload = function() {
             updateWeekDropdowns();
             fetchSheetData();
-            renderSessionsTable();
-            renderFieldMissionsTable();
-            renderNotesArchiveTable();
         };
     </script>
 </body>
