@@ -636,11 +636,15 @@
             </div>
 
             <div style="display: flex; gap: 15px; margin-bottom: 15px; flex-wrap: wrap; align-items: center; justify-content: space-between;">
-                <div style="display: flex; gap: 10px;">
+                <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
                     <button class="btn" onclick="filterMembers('ALL')">الكل</button>
                     <button class="btn" onclick="filterMembers('L')">القادات (L)</button>
                     <button class="btn" onclick="filterMembers('M')">الضباط (M)</button>
                     <button class="btn" onclick="filterMembers('R')">الأفراد (R)</button>
+                    <!-- فلتر الرتب المخصص -->
+                    <select id="rankFilterSelect" class="login-input" style="margin: 0; width: 180px; padding: 7px;" onchange="filterMembersByRankDropdown(this.value)">
+                        <option value="ALL">جميع الرتب</option>
+                    </select>
                 </div>
                 <div style="min-width: 250px; flex: 1; max-width: 350px;">
                     <input type="text" id="memberSearchInput" class="login-input" placeholder="بحث برقم الهوية ID أو الاسم..." style="margin: 0;" oninput="filterMembersTableBySearch()">
@@ -1012,6 +1016,7 @@
         let notesArchiveList = JSON.parse(localStorage.getItem('grave_notesArchiveList')) || [];
 
         let currentMemberFilter = 'ALL';
+        let currentRankFilter = 'ALL'; // متغير فلتر الرتب المخصص
         let uploadedImageBase64 = "";
 
         let allAvailableCourses = [
@@ -1264,6 +1269,7 @@
                 }
             }
             updateMemberStats();
+            populateRankDropdown(); // تحديث قائمة خيارات الرتب
             renderMembersTable();
             renderFieldMissionsTable();
             renderInventoryTables();
@@ -1283,6 +1289,34 @@
             document.getElementById('count-R').innerText = countR;
         }
 
+        // تعبئة قائمة منسدلة للرتب الفرعية استناداً إلى البيانات المستخرجة
+        function populateRankDropdown() {
+            let rankSelect = document.getElementById('rankFilterSelect');
+            if(!rankSelect) return;
+            
+            let currentVal = rankSelect.value;
+            rankSelect.innerHTML = '<option value="ALL">جميع الرتب</option>';
+            
+            // استخراج الرتب الفريدة بدون تكرار
+            let uniqueRanks = [...new Set(csvData.map(m => m.rank))].filter(r => r && r !== "---");
+            
+            uniqueRanks.forEach(rank => {
+                let opt = document.createElement('option');
+                opt.value = rank;
+                opt.textContent = rank;
+                rankSelect.appendChild(opt);
+            });
+
+            if(uniqueRanks.includes(currentVal) || currentVal === 'ALL') {
+                rankSelect.value = currentVal;
+            }
+        }
+
+        function filterMembersByRankDropdown(rankVal) {
+            currentRankFilter = rankVal;
+            renderMembersTable();
+        }
+
         function renderMembersTable() {
             let tbody = document.getElementById('membersTableBody');
             if(!tbody) return;
@@ -1292,8 +1326,9 @@
 
             let filtered = csvData.filter(m => {
                 let matchesCat = (currentMemberFilter === 'ALL' || m.category === currentMemberFilter);
+                let matchesRank = (currentRankFilter === 'ALL' || m.rank === currentRankFilter);
                 let matchesSearch = m.name.toLowerCase().includes(searchVal) || m.id.toLowerCase().includes(searchVal) || m.code.toLowerCase().includes(searchVal);
-                return matchesCat && matchesSearch;
+                return matchesCat && matchesRank && matchesSearch;
             });
 
             if(filtered.length === 0) {
