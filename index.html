@@ -1305,6 +1305,7 @@
             if(!tbody) return;
             tbody.innerHTML = "";
 
+            // جلب القيمة المدخلة رقمياً من الحقل الجديد بدلاً من الـ select
             let thresholdInput = document.getElementById('inactivityThreshold');
             let threshold = thresholdInput ? (parseInt(thresholdInput.value) || 0) : 1;
 
