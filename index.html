@@ -648,14 +648,14 @@
                         <input type="text" id="missionSoldierId" class="login-input" placeholder="مثال: 779" style="margin:0;">
                     </div>
                     <div>
-                        <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 5px;">رفع صورة الإثبات:</label>
-                        <input type="file" id="missionImageFile" class="login-input" accept="image/*" style="margin:0; padding: 9px; cursor: pointer;" onchange="previewSelectedImage(event)">
+                        <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 5px;">رفع صورة أو فيديو الإثبات:</label>
+                        <input type="file" id="missionImageFile" class="login-input" accept="image/*,video/*" style="margin:0; padding: 9px; cursor: pointer;" onchange="previewSelectedImage(event)">
                     </div>
                 </div>
                 
                 <div id="imagePreviewContainer" style="margin-bottom: 15px; display: none; text-align: center;">
-                    <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 5px;">معاينة الصورة المختارة:</p>
-                    <img id="missionImgPreview" src="" alt="معاينة" style="max-height: 120px; border-radius: 8px; border: 1px solid var(--accent-gold);">
+                    <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 5px;">معاينة الملف المختار:</p>
+                    <div id="missionMediaPreviewBox"></div>
                 </div>
 
                 <div style="margin-bottom: 15px;">
@@ -674,7 +674,7 @@
                                 <th>ID العسكري</th>
                                 <th>الاسم</th>
                                 <th>تفاصيل المهمة</th>
-                                <th>الإثبات (الصورة)</th>
+                                <th>الإثبات (صورة / فيديو)</th>
                                 <th>الحالة</th>
                                 <th id="thMissionActions">الإجراءات الديناميكية</th>
                             </tr>
@@ -1046,19 +1046,24 @@
         function previewSelectedImage(event) {
             let file = event.target.files[0];
             let previewContainer = document.getElementById('imagePreviewContainer');
-            let imgPreview = document.getElementById('missionImgPreview');
+            let previewBox = document.getElementById('missionMediaPreviewBox');
 
             if (file) {
                 let reader = new FileReader();
                 reader.onload = function(e) {
                     uploadedImageBase64 = e.target.result;
-                    imgPreview.src = uploadedImageBase64;
+                    if (file.type.startsWith('video/')) {
+                        previewBox.innerHTML = `<video src="${uploadedImageBase64}" controls style="max-height: 150px; max-width: 100%; border-radius: 8px; border: 1px solid var(--accent-gold);"></video>`;
+                    } else {
+                        previewBox.innerHTML = `<img src="${uploadedImageBase64}" alt="معاينة" style="max-height: 120px; border-radius: 8px; border: 1px solid var(--accent-gold);">`;
+                    }
                     previewContainer.style.display = 'block';
                 }
                 reader.readAsDataURL(file);
             } else {
                 uploadedImageBase64 = "";
                 previewContainer.style.display = 'none';
+                previewBox.innerHTML = "";
             }
         }
 
@@ -1305,7 +1310,6 @@
             if(!tbody) return;
             tbody.innerHTML = "";
 
-            // جلب القيمة المدخلة رقمياً من الحقل الجديد بدلاً من الـ select
             let thresholdInput = document.getElementById('inactivityThreshold');
             let threshold = thresholdInput ? (parseInt(thresholdInput.value) || 0) : 1;
 
@@ -1726,6 +1730,7 @@
             document.getElementById('missionImageFile').value = "";
             document.getElementById('missionDetailsText').value = "";
             document.getElementById('imagePreviewContainer').style.display = 'none';
+            document.getElementById('missionMediaPreviewBox').innerHTML = "";
             uploadedImageBase64 = "";
 
             alert("تم إرسال المهمة الميدانية محلياً وسحابياً بنجاح إلى السجل!");
@@ -1751,9 +1756,13 @@
                 if(item.status === "مقبولة") statusColor = "var(--success)";
                 if(item.status === "مرفوضة") statusColor = "var(--danger)";
 
-                let imageHtml = "بدون إثبات";
+                let mediaHtml = "بدون إثبات";
                 if(item.image) {
-                    imageHtml = `<a href="#" onclick="openImageModal('${item.image}'); return false;" style="color: var(--accent-gold);">عرض الصورة المرفوعة <i class="fa-solid fa-image"></i></a>`;
+                    if(item.image.startsWith('data:video/')) {
+                        mediaHtml = `<a href="#" onclick="openMediaModal('${item.image}', 'video'); return false;" style="color: var(--accent-gold);">عرض الفيديو المرفوع <i class="fa-solid fa-video"></i></a>`;
+                    } else {
+                        mediaHtml = `<a href="#" onclick="openMediaModal('${item.image}', 'image'); return false;" style="color: var(--accent-gold);">عرض الصورة المرفوعة <i class="fa-solid fa-image"></i></a>`;
+                    }
                 }
 
                 let tr = document.createElement('tr');
@@ -1761,7 +1770,7 @@
                     <td>${item.id}</td>
                     <td>${item.name}</td>
                     <td>${item.details}</td>
-                    <td>${imageHtml}</td>
+                    <td>${mediaHtml}</td>
                     <td><strong style="color: ${statusColor};">${item.status}</strong></td>
                     <td>
                         <button class="btn btn-success" style="padding: 4px 10px; font-size: 0.75rem;" onclick="updateMissionStatus(${index}, 'مقبولة')">قبول</button>
@@ -1774,12 +1783,17 @@
             });
         }
 
-        function openImageModal(imgSrc) {
+        function openMediaModal(mediaSrc, type) {
             let modal = document.createElement('div');
             modal.style.cssText = "position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.85);display:flex;justify-content:center;align-items:center;z-index:3000;";
+            
+            let contentHtml = type === 'video' 
+                ? `<video src="${mediaSrc}" controls autoplay style="max-width: 100%; max-height: 85vh; border-radius: 10px; border: 2px solid var(--accent-gold);"></video>`
+                : `<img src="${mediaSrc}" style="max-width: 100%; max-height: 85vh; border-radius: 10px; border: 2px solid var(--accent-gold);">`;
+
             modal.innerHTML = `
-                <div style="position:relative; max-width: 90%; max-height: 90%;">
-                    <img src="${imgSrc}" style="max-width: 100%; max-height: 85vh; border-radius: 10px; border: 2px solid var(--accent-gold);">
+                <div style="position:relative; max-width: 90%; max-height: 90%; text-align: center;">
+                    ${contentHtml}
                     <button class="btn btn-danger" style="display:block; margin: 15px auto 0 auto;" onclick="this.closest('div').parentElement.remove()">إغلاق المعاينة</button>
                 </div>
             `;
@@ -2083,51 +2097,4 @@
                         <div class="paint-card-curved-line" style="margin-top: 15px;"></div>
                     </div>
                     <div class="paint-card-bottom-grid">
-                        <div class="paint-metric-item"><div class="paint-metric-title">السجلات</div><div class="paint-metric-val">${logEntry.logs || 0}</div></div>
-                        <div class="paint-metric-item center-total"><div class="paint-metric-title">المجموع الكلي</div><div class="paint-metric-val">${(Number(logEntry.logs||0) + Number(logEntry.ads||0) + Number(opsEntry.ops||0) + Number(accEntry.acceptance||0))}</div></div>
-                        <div class="paint-metric-item"><div class="paint-metric-title">العمليات</div><div class="paint-metric-val">${opsEntry.ops || 0}</div></div>
-                    </div>
-                </div>
-            `;
-        }
-
-        function saveSoldierOfWeek() {
-            let week = document.getElementById('selectWeekSoldier').value;
-            let id = document.getElementById('selectedSoldIdInput').value.trim();
-            if(!week || !id) {
-                alert("الرجاء اختيار الأسبوع وإدخال آيدي العسكري");
-                return;
-            }
-
-            let member = csvData.find(m => m.id === id);
-            if(!member) {
-                alert("لم يتم العثور على عسكري بهذا الآيدي في جدول المنسوبين!");
-                return;
-            }
-
-            soldierOfWeekData[week] = { id: member.id, name: member.name };
-            saveToLocalStorage();
-            renderSoldierOfWeek();
-            alert(`تم اعتماد (${member.name}) كعسكري الأسبوع لـ (${week}) بنجاح!`);
-        }
-
-        function removeSoldierOfWeek() {
-            let week = document.getElementById('selectWeekSoldier').value;
-            if(!week) return;
-
-            if(confirm(`هل أنت متأكد من حذف واعتماد عسكري الأسبوع لـ (${week})؟`)) {
-                delete soldierOfWeekData[week];
-                saveToLocalStorage();
-                renderSoldierOfWeek();
-                document.getElementById('candidateCardPreview').innerHTML = "";
-                alert("تم الحذف بنجاح!");
-            }
-        }
-
-        window.onload = function() {
-            updateWeekDropdowns();
-            fetchSheetData();
-        };
-    </script>
-</body>
-</html>
+                        <div class="paint-metric-item"><div class="paint-metric-title">السجلات</div><div class="
